@@ -1,6 +1,6 @@
-import { openExternalLink } from '../desktop/openExternalLink'
-import type { WindowManagerApi } from '../desktop/windowManagerContext'
-import { basename } from './paths'
+import { openExternalLink } from '@/utils/openExternalLink'
+import type { WindowManagerApi } from '@/store/session/windowManagerContext'
+import { basename } from '@/utils/paths'
 import type { FsApi } from './fsDb'
 
 export type OpenPathContext = {

@@ -1,7 +1,7 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { buildSeedNodes, SEED_VERSION } from './seedFs'
 import type { FsNode } from './types'
-import { basename, dirname, normalizePath, parentPath } from './paths'
+import { basename, dirname, normalizePath, parentPath } from '@/utils/paths'
 
 const DB_NAME = 'portfolio-os-fs'
 const DB_VERSION = 1

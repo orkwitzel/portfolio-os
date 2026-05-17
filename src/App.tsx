@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Desktop } from './desktop/Desktop'
-import { ShellKeyboard, type DesktopKeyboardContext } from './desktop/ShellKeyboard'
-import { Taskbar } from './desktop/Taskbar'
-import { WindowManagerProvider } from './desktop/WindowManagerProvider'
-import { useWindowManager } from './desktop/windowManagerContext'
-import { appDefinitions, createAppRegistry } from './desktop/registry'
-import { FsProvider } from './fs/FsProvider'
-import type { DesktopSelectionState } from './desktop/desktopSelection'
-import shell from './App.module.css'
+import { Desktop } from '@/components/shell/Desktop'
+import { ShellKeyboard, type DesktopKeyboardContext } from '@/components/shell/ShellKeyboard'
+import { Taskbar } from '@/components/shell/Taskbar'
+import { WindowManagerProvider } from '@/components/shell/WindowManagerProvider'
+import { useWindowManager } from '@/hooks/useWindowManager'
+import { appDefinitions, createAppRegistry } from '@/components/shell/registry'
+import { FsProvider } from '@/fs/FsProvider'
+import type { DesktopSelectionState } from '@/utils/desktopSelection'
+import { Shell } from './App.style'
 
 function ShellInner({
   startMenuOpen,
@@ -21,7 +21,6 @@ function ShellInner({
   const wm = useWindowManager()
   const registry = wm.registry
 
-  // Desktop selection state — lifted so ShellKeyboard can act on it.
   const [desktopSelection, setDesktopSelection] = useState<DesktopSelectionState>({
     selectedIds: new Set(),
     anchorId: null,
@@ -37,7 +36,6 @@ function ShellInner({
     [],
   )
 
-  // Desktop exposes its open/clear handlers via callbacks.
   const handleRegisterOpenPrimary = useCallback((fn: () => void) => {
     openPrimaryRef.current = fn
   }, [])
@@ -54,18 +52,20 @@ function ShellInner({
   return (
     <FsProvider registry={registry}>
       <ShellKeyboard startMenuOpen={startMenuOpen} desktopCtx={desktopCtx} />
-      <div className={shell.shell}>
+      <Shell>
         <Desktop
           workspaceRef={workspaceRef}
           onSelectionChange={handleSelectionChange}
           onOpenPrimary={handleRegisterOpenPrimary}
-          onRegisterClearSelection={(fn) => { clearSelectionRef.current = fn }}
+          onRegisterClearSelection={(fn) => {
+            clearSelectionRef.current = fn
+          }}
         />
         <Taskbar
           startMenuOpen={startMenuOpen}
           onStartMenuOpenChange={onStartMenuOpenChange}
         />
-      </div>
+      </Shell>
     </FsProvider>
   )
 }

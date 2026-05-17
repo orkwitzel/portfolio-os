@@ -1,4 +1,4 @@
-import type { IconSource } from '../desktop/icons/types'
+import type { IconSource } from '@/components/shell/ShellIcon'
 
 export type FsNode = {
   path: string

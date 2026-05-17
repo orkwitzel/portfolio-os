@@ -1,7 +1,7 @@
-import type { AppDefinition } from '../desktop/sessionTypes'
-import { placeholderIcon, type IconSource } from '../desktop/icons/types'
-import type { AppFile, DesktopEntry, DesktopFile, FsNode, WwwFile } from './types'
-import { extension } from './paths'
+import type { AppDefinition } from '@/store/session/sessionTypes'
+import { placeholderIcon, type IconSource } from '@/components/shell/ShellIcon'
+import type { AppFile, DesktopEntry, DesktopFile, FsNode, WwwFile } from '@/fs/types'
+import { extension } from '@/utils/paths'
 import type { FsApi } from './fsDb'
 
 export function parseDesktopFile(content: string): DesktopFile | null {

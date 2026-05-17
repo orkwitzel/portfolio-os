@@ -2,7 +2,7 @@ import readme from '../content/seed/README.md?raw'
 import keyboardShortcuts from '../content/seed/docs/keyboard-shortcuts.md?raw'
 import notes from '../content/seed/docs/notes.txt?raw'
 import type { FsNode } from './types'
-import { basename, join, parentPath } from './paths'
+import { basename, join, parentPath } from '@/utils/paths'
 
 export const SEED_VERSION = 1
 

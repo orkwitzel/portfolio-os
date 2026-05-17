@@ -6,61 +6,234 @@ Rules here apply to **human contributors** and to **coding agents**. Humans own 
 
 ```
 src/
-  App.tsx                    # Shell wiring + workspace ref + providers
-  fs/                        # IndexedDB virtual FS (seed, openPath, desktop entries)
-  content/seed/              # Canonical copies for seeded .md / .txt files
-  desktop/
-    windowManagerContext.tsx # Context type + useWindowManager hook
-    WindowManagerProvider.tsx# Session reducer + imperative API
-    sessionTypes.ts          # Shared domain types + WMAction union
-    sessionReducer.ts        # Pure session transitions
-    registry.tsx             # App definitions + lazy imports + registry helper
-    Desktop.tsx              # Wallpaper/workspace + shortcuts
-    Taskbar.tsx              # Task buttons bound to windows
-    *.module.css
-  wm/
-    WindowLayer.tsx          # Stacks WindowFrame instances
-    WindowFrame.tsx          # Title bar, resize, min/max/close, app Suspense
-    *.module.css
-  apps/
-    <app-name>/              # One folder per program (lazy-loaded roots + CSS)
-  fs/
-    FsProviderImpl.tsx       # IndexedDB virtual FS context
-    seedFs.ts                # SEED_VERSION + default tree (bump to reseed)
-  content/seed/              # Canonical copies of seeded .md / .txt files
+  App.tsx, App.style.ts       # Shell wiring (providers, lifted desktop selection)
+  main.tsx, index.css, fonts.css   # Entry + global CSS only
+
+  components/                  # All non-app UI
+    shell/                     # OS chrome (desktop, taskbar, start menu, icons, …)
+      Desktop/
+      Taskbar/
+      StartMenu/
+      ShellIcon/
+      WindowManagerProvider/
+      registry.tsx             # App definitions + lazy imports
+    wm/                        # Window chrome (frame + layer)
+      WindowFrame/
+      WindowLayer/
+    shared/                    # UI shared across apps (not tied to one program)
+      MarkdownView/
+
+  apps/                        # Windowed programs (lazy-loaded)
+    <app-name>/
+      <Component>/             # One folder per component (see below)
+      minesweeper.logic.ts     # App-local pure logic (when not a component)
+
+  store/                       # Global client state
+    fsStore.ts                 # Zustand (filesystem + shell binding)
+    session/
+      sessionTypes.ts
+      sessionReducer.ts
+      windowManagerContext.tsx
+
+  hooks/                       # Shared React hooks
+    useWindowManager.ts        # Re-export from store/session
+
+  utils/                       # Pure helpers (no React, no UI)
+    paths.ts
+    desktopLayout.ts
+    desktopSelection.ts
+    shellCatalog.ts
+    shellKeyboard.ts
+    openExternalLink.ts
+    nerdIcons.ts
+
+  fs/                          # Virtual FS domain (IndexedDB, seed, routing)
+    fsDb.ts, seedFs.ts, desktop.ts, extensionRouter.ts
+    FsProvider.tsx, FsBootstrap.tsx
+    types.ts
+
+  content/                     # Static assets (markdown, seed files)
+    about.md
+    seed/
 ```
 
-**Naming**
+**What does not live in `components/`**
 
-- Components: `PascalCase.tsx`.
-- Domain/session modules: `camelCase.ts` where logic-heavy (`sessionReducer.ts`).
-- Colocated styles: `*.module.css` next to the component.
+| Path | Role |
+|------|------|
+| `apps/` | Feature windows; same folder-per-component rules as shell |
+| `fs/` | Data layer (DB, seed, open-by-extension) — not presentational |
+| `content/` | Bundled text/markdown for seeding or `?raw` imports |
+| `index.css`, `fonts.css` | Site-wide reset, fonts, CSS variables |
+
+## Folder-per-component
+
+Every React component gets its own directory:
+
+```
+components/shell/Desktop/
+  Desktop.tsx           # Dumb view: JSX only
+  Desktop.logic.ts      # Behavior: hooks, reducers, handlers, effects
+  Desktop.style.ts      # styled-components primitives
+  index.ts              # export { Desktop } from './Desktop'
+
+apps/computer/FsTree/
+  FsTree.tsx
+  FsTree.logic.ts
+  FsTree.style.ts       # Or import shared styles (see computer.style.ts)
+  index.ts
+```
+
+**Child components** nest under their parent folder only when used exclusively by that parent. Otherwise place them as siblings (e.g. `components/shell/ShellIcon/`, not under `Desktop/`).
+
+Thin apps (About, Resume) still use the full trio (`*.tsx`, `*.logic.ts`, `*.style.ts`) for a uniform tree—even when logic is minimal.
+
+Optional `index.ts` barrels: add when import ergonomics matter (`@/components/shell/Desktop`); not required everywhere.
+
+## The three-file split
+
+| File | Responsibility | Must not contain |
+|------|----------------|------------------|
+| `Component.tsx` | Markup, composition, wiring props from logic into styled elements | Reducers, `useEffect` for data, styled definitions, pure algorithms |
+| `Component.logic.ts` | `useComponent(...)` hook, local types, reducers, event handlers, effects | JSX (except rare type-only helpers), styled-components |
+| `Component.style.ts` | `styled.*` exports, component-local visual tokens | Business logic, hooks, FS/session calls |
+
+### `Component.tsx` (dumb view)
+
+- Shell/wm components: **named** export matching the folder (`export function Desktop`).
+- App roots: **`export default function`** (`export default function NotepadRoot`); `index.ts` re-exports with `export { default } from './NotepadRoot'`.
+- Call `useX(props)` from `./Component.logic` once at the top.
+- Destructure hook return values directly—**do not** bundle refs into a single `vm` object if that triggers `react-hooks/refs` (pass `ref` from props or destructure `ref` separately from the hook).
+- Small presentational subcomponents (e.g. `DragGhosts`) may live in the same file if they are view-only.
+
+```tsx
+// Desktop.tsx
+import { useDesktop, type DesktopProps } from './Desktop.logic'
+import { Workspace, Shortcuts } from './Desktop.style'
+
+export function Desktop(props: DesktopProps) {
+  const { state, handleWorkspacePointerDown, ... } = useDesktop(props)
+  const { workspaceRef } = props
+
+  return (
+    <Workspace ref={workspaceRef} onPointerDown={handleWorkspacePointerDown}>
+      …
+    </Workspace>
+  )
+}
+```
+
+### `Component.logic.ts` (behavior)
+
+- Export a **`use<Component>`** hook as the primary API (e.g. `useDesktop`, `useWindowFrame`).
+- Export **`Props`** types used by the view (`DesktopProps`).
+- Export types the view needs for rendering (`DesktopShortcut`, `DragState`) when they are component-specific.
+- Keep **reducers and action unions** here when they are private to the component; keep **pure geometry/selection math** in `utils/`.
+- Side effects: `useFsStore`, `useWindowManager`, `fetch`, listeners, `document.addEventListener`.
+- Return a **plain object** of state + stable callbacks (`useCallback`); do not return JSX.
+
+```ts
+// Desktop.logic.ts
+export type DesktopProps = { workspaceRef: RefObject<HTMLDivElement | null>; … }
+
+export function useDesktop({ workspaceRef, onSelectionChange, … }: DesktopProps) {
+  const [state, dispatch] = useReducer(desktopReducer, …)
+  // effects, handlers…
+  return { state, handleWorkspacePointerDown, marqueeStyle, … }
+}
+```
+
+For components with almost no behavior, logic may be a thin hook or static data:
+
+```ts
+// AboutRoot.logic.ts
+export function useAboutRoot(props: AppProps) {
+  void props.windowId
+  return { source: aboutMd }
+}
+```
+
+### `Component.style.ts` (presentation)
+
+- Use **styled-components**; import `styled` from `'styled-components'`.
+- Export named styled elements (`Workspace`, `TitleBar`, `Cell`).
+- Use **`$`-prefixed transient props** for style variants (`$active`, `$selected`) to avoid leaking to the DOM.
+- No imports from `store/`, `fs/`, or hooks.
+
+```ts
+// WindowFrame.style.ts
+export const TitleBar = styled.div<{ $active: boolean }>`
+  background: ${(p) => (p.$active ? '…' : '…')};
+`
+```
+
+**Global CSS** stays in `index.css` / `fonts.css` only (reset, font faces, CSS variables). Do not add new `*.module.css` files.
+
+## Where to put logic
+
+| Kind of logic | Location | Example |
+|---------------|----------|---------|
+| Component state, effects, handlers | `Component.logic.ts` | Marquee drag, Start menu open/close |
+| Pure functions (no React) | `utils/` | `snapPosition`, `selectFromMarquee`, `basename` |
+| Global Zustand store | `store/` | `fsStore.ts` |
+| Session (windows, focus, z-order) | `store/session/` + context | `sessionReducer`, `useWindowManager` |
+| Shared hook re-exports | `hooks/` | `useWindowManager.ts` |
+| FS DB, seed, routing | `fs/` | `fsDb.ts`, `extensionRouter.ts` |
+| App-only pure algorithms | `apps/<app>/*.logic.ts` | `minesweeper.logic.ts` |
+| Shared non-app UI | `components/shared/` | `MarkdownView` |
+| App registration + lazy load | `components/shell/registry.tsx` | `appDefinitions` |
+
+**Rules of thumb**
+
+1. If it renders and is not an app window → `components/`.
+2. If two or more components need the same pure function → `utils/`.
+3. If it must survive outside one component tree → `store/` or `hooks/`.
+4. If it touches IndexedDB or path routing → `fs/`.
+5. If only one app uses it and it is not UI → `apps/<app>/` (`.logic.ts` at app or component level).
+
+## Imports
+
+- Use the **`@/`** alias for all `src/` imports: `@/store/fsStore`, `@/components/shell/Desktop`, `@/utils/paths`.
+- Do not use deep relative paths (`../../fs/...`) in new code.
+- Colocated imports within a component folder use `./` (`./Desktop.logic`, `./Desktop.style`).
+- Configure in `vite.config.ts` (`resolve.alias`) and `tsconfig.app.json` (`paths`).
+
+## Styling
+
+- **styled-components** for component UI (`*.style.ts`).
+- **Global** rules only in `index.css` / `fonts.css`.
+- Shared design tokens across many components: add `src/theme.ts` when needed; until then duplicate or re-export from one `.style.ts`.
+- Win95-style borders and colors: follow existing shell/wm patterns.
 
 ## Code rules
 
-1. **TypeScript everywhere** in `src/` — explicit props for exported React components; avoid `any`.
-2. **Keep session transitions pure** — Side effects (analytics, `localStorage`) belong outside the reducer unless we consciously redesign persistence (see roadmap).
-3. **Prefer CSS modules** for component styling to avoid global clashes; global resets stay in `index.css`.
-4. **Lazy-load apps** — Use `React.lazy` in `registry.tsx` so demos do not inflate the initial bundle.
-5. **Hooks & ESLint** — Respect `react-hooks` rules (including ref mutation constraints); fix properly rather than disabling rules broadly.
-6. **Imports** — Use package-relative paths from `src` (`./desktop/...`, `../wm/...`); keep cycles absent unless justified.
+1. **TypeScript everywhere** in `src/` — explicit props for exported components; avoid `any`.
+2. **Keep session transitions pure** — `sessionReducer` has no side effects; persistence/analytics stay outside unless redesigned.
+3. **Lazy-load apps** — `React.lazy` in `registry.tsx`; dynamic import paths use `@/apps/<app>/<Component>`.
+4. **Hooks & ESLint** — Respect `react-hooks` rules; fix ref/access issues by destructuring, not blanket disables.
+5. **Dumb views** — When touching a component, keep new behavior in `.logic.ts`, not in `.tsx`.
 
 ### Adding an application
 
-1. Create `src/apps/<slug>/<Slug>Root.tsx` accepting `AppProps` from `sessionTypes.ts`.
-2. Add styles beside it (`*.module.css`).
-3. Append an entry to `appDefinitions` in `registry.tsx` with unique `id`, titles, default bounds, and `lazy(() => import(...))`.
-4. Add a launcher stub at `/apps/<slug>.app` in `seedFs.ts` (JSON: `{ "appId", "title?" }`).
-5. Optionally pin to the wallpaper with `/desktop/<name>.desktop` pointing at that `.app` (or a `.www` / `.txt` target).
+1. Create `src/apps/<slug>/<Slug>Root/` with `SlugRoot.tsx`, `SlugRoot.logic.ts`, `SlugRoot.style.ts`, `index.ts`.
+2. `SlugRoot` must accept `AppProps` from `@/store/session/sessionTypes`.
+3. Append to `appDefinitions` in `components/shell/registry.tsx`:
 
-Use `useWindowManager()` only when the app must talk to the shell (close self, spawn sibling windows). Prefer local React state for app internals.
+   ```ts
+   Root: lazy(() => import('@/apps/my-app/MyRoot')),
+   ```
+
+4. Add launcher stub at `/apps/<slug>.app` in `seedFs.ts`.
+5. Optionally pin to wallpaper via `/desktop/<name>.desktop`.
+
+Use `useWindowManager()` when the app must talk to the shell (open sibling windows). Use `useFsStore()` for file I/O. Prefer local state in `.logic.ts` for app internals.
 
 ### Virtual filesystem (IndexedDB)
 
-- Default tree is built in `src/fs/seedFs.ts` (`SEED_VERSION`, `buildSeedNodes()`). Text bodies live in `src/content/seed/` and are imported with Vite `?raw`.
-- On first visit (or when `SEED_VERSION` increases), the DB is **cleared and reseeded** — local edits in the browser are lost unless we add export later. Bump `SEED_VERSION` whenever the default tree layout or seed files change.
-- External URLs: add `/www/<name>.www` JSON (`{ "name", "url" }`), then a `/desktop/*.desktop` shortcut with `"path": "/www/..."` if you want a wallpaper pin.
-- Wallpaper shows **only** `/desktop/*.desktop` entries — not every registry app or every `.www` file.
+- Default tree: `src/fs/seedFs.ts` (`SEED_VERSION`, `buildSeedNodes()`). Bodies in `src/content/seed/` via Vite `?raw`.
+- Bump `SEED_VERSION` when the default tree changes (clears and reseeds the DB).
+- External URLs: `/www/<name>.www` JSON + optional `/desktop/*.desktop` shortcut.
+- Wallpaper shows only `/desktop/*.desktop` entries.
 
 ## Git & commits
 
@@ -76,9 +249,10 @@ Use `useWindowManager()` only when the app must talk to the shell (close self, s
 
   - Scope prefixes optional but helpful:
 
-    - `desktop:` shell/workspace/taskbar
-    - `wm:` window chrome/layer
+    - `components/shell:` desktop, taskbar, start menu
+    - `components/wm:` window chrome
     - `apps/<name>:` specific program
+    - `store:`, `utils:`, `hooks:` shared modules
     - `docs:` documentation-only
 
 - Prefer **one coherent change per commit** (feature / fix / docs split).
@@ -108,8 +282,11 @@ Small fixes (typos, copy, CSS-only tweaks with no milestone impact) do not requi
 
 - [ ] Build passes (`npm run build`).
 - [ ] Lint passes (`npm run lint`).
+- [ ] New components follow `Component.tsx` + `Component.logic.ts` + `Component.style.ts`.
 - [ ] New apps registered + reachable from desktop or another sanctioned entry point.
 - [ ] Session updates flow through reducer verbs — no parallel sources of truth for geometry/z-order.
+- [ ] Imports use `@/` (no new deep `../../` chains).
+- [ ] No new `*.module.css` (use `*.style.ts` instead).
 - [ ] **[ROADMAP.md](./ROADMAP.md) updated** for every significant change (status, notes, summary table) — same PR/commit as the implementation.
 - [ ] Other docs updated when behavior or architecture materially changes (`../agents.md`, this file, [README.md](../README.md)).
 
@@ -117,7 +294,7 @@ Small fixes (typos, copy, CSS-only tweaks with no milestone impact) do not requi
 
 When assigning agent work, point to:
 
-- Files listed above,
+- Files and folders listed above,
 - Acceptance criteria (“opening three Notepad instances still cascades”, etc.),
 - Whether UX decisions may evolve ([ROADMAP.md](./ROADMAP.md)) vs must match mock/spec exactly.
 

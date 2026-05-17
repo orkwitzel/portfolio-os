@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
-import { useWindowManager } from '../desktop/windowManagerContext'
-import type { AppDefinition } from '../desktop/sessionTypes'
-import { useFsStore } from './fsStore'
+import { useWindowManager } from '@/hooks/useWindowManager'
+import type { AppDefinition } from '@/store/session/sessionTypes'
+import { useFsStore } from '@/store/fsStore'
 
 export type FsBootstrapProps = {
   registry: Map<string, AppDefinition>
