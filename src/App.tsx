@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
+import { MobileUnsupported } from '@/components/MobileUnsupported'
 import { Desktop } from '@/components/shell/Desktop'
+import { useIsMobileViewport } from '@/hooks/useIsMobileViewport'
 import type { DesktopActions } from '@/components/shell/Desktop/Desktop.logic'
 import { ContextMenuRoot } from '@/components/shell/ContextMenu'
 import { ShellModalProvider } from '@/components/shell/ShellModal'
@@ -85,9 +87,14 @@ function ShellInner({
 }
 
 export default function App() {
+  const isMobile = useIsMobileViewport()
   const workspaceRef = useRef<HTMLDivElement>(null)
   const registry = useMemo(() => createAppRegistry(appDefinitions), [])
   const [startMenuOpen, setStartMenuOpen] = useState(false)
+
+  if (isMobile) {
+    return <MobileUnsupported />
+  }
 
   return (
     <ContextMenuRoot>
