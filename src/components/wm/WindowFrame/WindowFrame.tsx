@@ -22,6 +22,7 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
   return (
     <Window
       data-window-frame
+      data-window-id={win.id}
       $animating={vm.animating}
       style={{
         zIndex: win.zIndex,
@@ -38,6 +39,7 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
       onTransitionEnd={vm.onTransitionEnd}
     >
       <TitleBar
+        data-window-titlebar
         $active={vm.focused}
         onPointerDown={vm.onTitlePointerDown}
         onDoubleClick={vm.onTitleDoubleClick}

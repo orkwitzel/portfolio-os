@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { cursors } from '@/styles/cursors'
 
 const numberColor = (n: number) => {
   const colors = ['', '#0000ff', '#008000', '#ff0000', '#000080', '#800000', '#008080', '#000', '#808080']
@@ -50,7 +51,7 @@ export const FaceBtn = styled.button`
   border: 2px outset #c0c0c0;
   background: #c0c0c0;
   font: 14px/1 var(--font-ui);
-  cursor: default;
+  cursor: ${cursors.default};
 
   &:active {
     border-style: inset;
@@ -86,7 +87,7 @@ export const Cell = styled.button<{
   margin: 0;
   font: bold 12px/22px var(--font-ui);
   text-align: center;
-  cursor: default;
+  cursor: ${cursors.default};
 
   ${(p) =>
     p.$revealed

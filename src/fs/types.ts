@@ -7,6 +7,10 @@ export type FsNode = {
   parentPath: string | null
   content?: string
   updatedAt: number
+  /** Grid column for direct files on `/desktop` (not `.desktop` shortcuts). */
+  gridX?: number
+  /** Grid row for direct files on `/desktop` (not `.desktop` shortcuts). */
+  gridY?: number
 }
 
 export type DesktopFile = {
@@ -20,6 +24,7 @@ export type DesktopFile = {
 }
 
 export type DesktopEntry = {
+  /** Stable id for selection/persistence — `.desktop` path or direct file path. */
   desktopPath: string
   name: string
   targetPath: string

@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { cursors } from '@/styles/cursors'
 
 export const AppBody = styled.div`
   box-sizing: border-box;
@@ -23,7 +24,7 @@ export const ToolBtn = styled.button`
   border: 2px outset #dfdfdf;
   background: #c0c0c0;
   font: inherit;
-  cursor: default;
+  cursor: ${cursors.default};
 
   &:active {
     border-style: inset;

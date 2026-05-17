@@ -12,8 +12,9 @@ export type ShellLaunchItem = {
 } | {
   kind: 'desktop'
   id: string
-  /** Path of the `.desktop` file — used as the unique id for selection/persistence. */
+  /** Desktop item path — `.desktop` shortcut or direct file; used as the unique id. */
   desktopPath: string
+  targetPath: string
   label: string
   icon: IconSource
   launch: () => void
@@ -42,6 +43,7 @@ export async function buildDesktopItems(
       kind: 'desktop',
       id: entry.desktopPath,
       desktopPath: entry.desktopPath,
+      targetPath: entry.targetPath,
       label: entry.name,
       icon: await resolveIcon(entry),
       launch: () => void openPath(entry.targetPath),

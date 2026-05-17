@@ -1,0 +1,36 @@
+/* Windows 98–style cursors — use direct url(), not var(), in cursor properties. */
+
+html,
+body,
+#root {
+  cursor: url('../content/cursors/win98/arrow.png') 0 0, default;
+}
+
+/* Interactive controls */
+a,
+button,
+summary,
+label[for],
+select,
+input[type='button'],
+input[type='submit'],
+input[type='reset'],
+input[type='checkbox'],
+input[type='radio'],
+[role='button'],
+[role='link'],
+[role='menuitem'],
+[role='tab'] {
+  cursor: url('../content/cursors/win98/pointer.png') 3 0, pointer;
+}
+
+input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+textarea,
+[contenteditable='true'] {
+  cursor: url('../content/cursors/win98/text.png') 4 9, text;
+}
+
+[disabled],
+[aria-disabled='true'] {
+  cursor: url('../content/cursors/win98/not-allowed.png') 16 16, not-allowed;
+}

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useContextMenuOptional } from '@/components/shell/ContextMenu'
 import { getNextFocusWindowId, isEditableTarget } from '@/utils/shellKeyboard'
 import { useWindowManager } from '@/hooks/useWindowManager'
 import type { WindowManagerApi } from '@/store/session/windowManagerContext'
@@ -7,6 +8,11 @@ export type DesktopKeyboardContext = {
   openPrimary: () => void
   clearSelection: () => void
   hasSelection: boolean
+  copy: () => void
+  cut: () => void
+  paste: () => void
+  deleteSelection: () => void
+  startRename: () => void
 }
 
 export type ShellKeyboardProps = {
@@ -17,6 +23,7 @@ export type ShellKeyboardProps = {
 type ShortcutContext = {
   event: KeyboardEvent
   startMenuOpen: boolean
+  contextMenuOpen: boolean
   wm: WindowManagerApi
   desktopCtx: DesktopKeyboardContext | undefined
 }
@@ -26,10 +33,23 @@ type Shortcut = {
   run: (ctx: ShortcutContext) => void
 }
 
+function shellShortcutsEnabled(ctx: ShortcutContext): boolean {
+  return (
+    !ctx.startMenuOpen &&
+    !ctx.contextMenuOpen &&
+    !isEditableTarget(document.activeElement)
+  )
+}
+
+function desktopFocused(ctx: ShortcutContext): boolean {
+  return !ctx.wm.session.focusedWindowId
+}
+
 const shortcuts: Shortcut[] = [
   {
-    match: ({ event, startMenuOpen }) =>
+    match: ({ event, startMenuOpen, contextMenuOpen }) =>
       !startMenuOpen &&
+      !contextMenuOpen &&
       event.key === 'Escape' &&
       !isEditableTarget(document.activeElement),
     run: ({ event, wm, desktopCtx }) => {
@@ -44,20 +64,77 @@ const shortcuts: Shortcut[] = [
     },
   },
   {
-    match: ({ event, startMenuOpen }) =>
-      !startMenuOpen &&
-      event.key === 'Enter' &&
-      !isEditableTarget(document.activeElement),
-    run: ({ event, wm, desktopCtx }) => {
-      if (wm.session.focusedWindowId) return
-      if (!desktopCtx?.hasSelection) return
-      desktopCtx.openPrimary()
+    match: (ctx) =>
+      shellShortcutsEnabled(ctx) &&
+      desktopFocused(ctx) &&
+      ctx.event.key === 'Enter' &&
+      Boolean(ctx.desktopCtx?.hasSelection),
+    run: ({ event, desktopCtx }) => {
+      desktopCtx?.openPrimary()
       event.preventDefault()
     },
   },
   {
-    match: ({ event, startMenuOpen }) =>
+    match: (ctx) =>
+      shellShortcutsEnabled(ctx) &&
+      desktopFocused(ctx) &&
+      (ctx.event.ctrlKey || ctx.event.metaKey) &&
+      ctx.event.key.toLowerCase() === 'c' &&
+      Boolean(ctx.desktopCtx?.hasSelection),
+    run: ({ event, desktopCtx }) => {
+      desktopCtx?.copy()
+      event.preventDefault()
+    },
+  },
+  {
+    match: (ctx) =>
+      shellShortcutsEnabled(ctx) &&
+      desktopFocused(ctx) &&
+      (ctx.event.ctrlKey || ctx.event.metaKey) &&
+      ctx.event.key.toLowerCase() === 'x' &&
+      Boolean(ctx.desktopCtx?.hasSelection),
+    run: ({ event, desktopCtx }) => {
+      desktopCtx?.cut()
+      event.preventDefault()
+    },
+  },
+  {
+    match: (ctx) =>
+      shellShortcutsEnabled(ctx) &&
+      desktopFocused(ctx) &&
+      (ctx.event.ctrlKey || ctx.event.metaKey) &&
+      ctx.event.key.toLowerCase() === 'v',
+    run: ({ event, desktopCtx }) => {
+      desktopCtx?.paste()
+      event.preventDefault()
+    },
+  },
+  {
+    match: (ctx) =>
+      shellShortcutsEnabled(ctx) &&
+      desktopFocused(ctx) &&
+      ctx.event.key === 'F2' &&
+      Boolean(ctx.desktopCtx?.hasSelection),
+    run: ({ event, desktopCtx }) => {
+      desktopCtx?.startRename()
+      event.preventDefault()
+    },
+  },
+  {
+    match: (ctx) =>
+      shellShortcutsEnabled(ctx) &&
+      desktopFocused(ctx) &&
+      ctx.event.key === 'Delete' &&
+      Boolean(ctx.desktopCtx?.hasSelection),
+    run: ({ event, desktopCtx }) => {
+      desktopCtx?.deleteSelection()
+      event.preventDefault()
+    },
+  },
+  {
+    match: ({ event, startMenuOpen, contextMenuOpen }) =>
       !startMenuOpen &&
+      !contextMenuOpen &&
       event.ctrlKey &&
       !event.shiftKey &&
       (event.key === 'Backquote' || event.key === '`'),
@@ -72,6 +149,7 @@ const shortcuts: Shortcut[] = [
 
 export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardProps) {
   const wm = useWindowManager()
+  const contextMenu = useContextMenuOptional()
   const desktopCtxRef = useRef(desktopCtx)
 
   useLayoutEffect(() => {
@@ -83,6 +161,7 @@ export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardPro
       const ctx: ShortcutContext = {
         event,
         startMenuOpen,
+        contextMenuOpen: contextMenu?.isOpen() ?? false,
         wm,
         desktopCtx: desktopCtxRef.current,
       }
@@ -96,5 +175,5 @@ export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardPro
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [startMenuOpen, wm])
+  }, [startMenuOpen, wm, contextMenu])
 }

@@ -36,6 +36,7 @@ function TreeNode({
       <TreeItem>
         <TreeButton
           type="button"
+          data-fs-path={node.path}
           style={{ paddingLeft: 4 + depth * 12 }}
           aria-expanded={expanded}
           onClick={() => setExpanded((e) => !e)}
@@ -66,6 +67,7 @@ function TreeNode({
     <TreeItem>
       <TreeButton
         type="button"
+        data-fs-path={node.path}
         $selected={selected}
         style={{ paddingLeft: 4 + depth * 12 }}
         aria-current={selected ? 'true' : undefined}

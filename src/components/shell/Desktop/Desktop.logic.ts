@@ -1,7 +1,14 @@
-import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, type RefObject } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type RefObject } from 'react'
+import { useContextMenuApi } from '@/components/shell/ContextMenu'
 import { useFsStore } from '@/store/fsStore'
+import { useShellClipboard } from '@/store/shellClipboard'
 import type { ShellLaunchItem } from '@/utils/shellCatalog'
 import { buildDesktopItems } from '@/utils/shellCatalog'
+import {
+  buildDesktopBackgroundMenu,
+  buildDesktopIconMenu,
+} from '@/utils/contextMenuBuilders'
+import { nextUntitledPath } from '@/fs/fsOperations'
 import {
   snapPosition,
   clampToWorkspace,
@@ -176,10 +183,19 @@ function desktopReducer(state: DesktopState, action: DesktopAction): DesktopStat
 
 export const DRAG_THRESHOLD = 4
 
+export type DesktopActions = {
+  copy: () => void
+  cut: () => void
+  paste: () => void
+  deleteSelection: () => void
+  startRename: () => void
+}
+
 export type DesktopProps = {
   workspaceRef: RefObject<HTMLDivElement | null>
   onOpenPrimary?: (fn: () => void) => void
   onRegisterClearSelection?: (fn: () => void) => void
+  onRegisterDesktopActions?: (actions: DesktopActions) => void
   onSelectionChange?: (state: DesktopSelectionState) => void
 }
 
@@ -187,13 +203,20 @@ export function useDesktop({
   workspaceRef,
   onOpenPrimary,
   onRegisterClearSelection,
+  onRegisterDesktopActions,
   onSelectionChange,
 }: DesktopProps) {
   const ready = useFsStore((s) => s.ready)
+  const desktopRevision = useFsStore((s) => s.desktopRevision)
+  const fs = useFsStore((s) => s.fs)
+  const fsStore = useFsStore()
   const listDesktopEntries = useFsStore((s) => s.listDesktopEntries)
   const openPath = useFsStore((s) => s.openPath)
   const resolveDesktopIcon = useFsStore((s) => s.resolveDesktopIcon)
   const saveDesktopPositions = useFsStore((s) => s.saveDesktopPositions)
+  const { openMenu } = useContextMenuApi()
+  const shellClipboard = useShellClipboard()
+  const [renamingId, setRenamingId] = useState<string | null>(null)
 
   const [state, dispatch] = useReducer(desktopReducer, {
     items: [],
@@ -213,22 +236,146 @@ export function useDesktop({
     onSelectionChange?.(state.selection)
   }, [state.selection, onSelectionChange])
 
-  // Load desktop entries from FS.
-  useEffect(() => {
+  const reloadDesktop = useCallback(async () => {
     if (!ready) return
-    let cancelled = false
-    ;(async () => {
-      const entries = await listDesktopEntries()
-      const built = await buildDesktopItems(entries, openPath, resolveDesktopIcon)
-      if (!cancelled) {
-        dispatch({
-          type: 'SET_ITEMS',
-          items: built.filter((i): i is DesktopShortcut => i.kind === 'desktop'),
-        })
-      }
-    })()
-    return () => { cancelled = true }
+    const entries = await listDesktopEntries()
+    const built = await buildDesktopItems(entries, openPath, resolveDesktopIcon)
+    dispatch({
+      type: 'SET_ITEMS',
+      items: built.filter((i): i is DesktopShortcut => i.kind === 'desktop'),
+    })
   }, [ready, listDesktopEntries, openPath, resolveDesktopIcon])
+
+  useEffect(() => {
+    void reloadDesktop()
+  }, [reloadDesktop, desktopRevision])
+
+  const selectedPaths = useCallback(() => {
+    return Array.from(stateRef.current.selection.selectedIds)
+  }, [])
+
+  const handleOpenPrimary = useCallback(() => {
+    const s = stateRef.current
+    const primaryId = s.selection.primaryId
+    if (!primaryId) return
+    const item = s.items.find((i) => i.id === primaryId)
+    item?.launch()
+  }, [])
+
+  const handleCopy = useCallback(() => {
+    const paths = selectedPaths()
+    if (paths.length > 0) shellClipboard.copy(paths)
+  }, [selectedPaths, shellClipboard])
+
+  const handleCut = useCallback(() => {
+    const paths = selectedPaths()
+    if (paths.length > 0) shellClipboard.cut(paths)
+  }, [selectedPaths, shellClipboard])
+
+  const handlePaste = useCallback(() => {
+    if (!fs) return
+    void shellClipboard.pasteToDesktop(fs, fsStore).then(() => reloadDesktop())
+  }, [fs, fsStore, shellClipboard, reloadDesktop])
+
+  const handleDelete = useCallback(async () => {
+    const paths = selectedPaths()
+    if (paths.length === 0) return
+    if (!window.confirm(`Delete ${paths.length} item(s)?`)) return
+    for (const p of paths) {
+      await fsStore.deletePath(p)
+    }
+    dispatch({ type: 'CLEAR_SELECTION' })
+    await reloadDesktop()
+  }, [selectedPaths, fsStore, reloadDesktop])
+
+  const handleStartRename = useCallback(() => {
+    const s = stateRef.current
+    if (s.selection.selectedIds.size !== 1) return
+    const id = s.selection.primaryId ?? Array.from(s.selection.selectedIds)[0]
+    if (id) setRenamingId(id)
+  }, [])
+
+  const commitRename = useCallback(
+    async (id: string, label: string) => {
+      setRenamingId(null)
+      const trimmed = label.trim()
+      if (!trimmed) return
+      await fsStore.renameDesktopItem(id, trimmed)
+      await reloadDesktop()
+    },
+    [fsStore, reloadDesktop],
+  )
+
+  const cancelRename = useCallback(() => setRenamingId(null), [])
+
+  const buildMenuCtx = useCallback(
+    () => ({
+      selectedPaths: selectedPaths(),
+      hasClipboard: shellClipboard.hasContent(),
+      onOpen: handleOpenPrimary,
+      onCut: handleCut,
+      onCopy: handleCopy,
+      onDelete: () => void handleDelete(),
+      onRename: handleStartRename,
+      onPaste: handlePaste,
+      onRefresh: () => void reloadDesktop(),
+      onNewTextDocument: () => void fsStore.createTextDocumentOnDesktop().then(() => reloadDesktop()),
+      onNewFolder: () => void fsStore.createFolderIn('/docs').then(() => reloadDesktop()),
+      onNewShortcut: async () => {
+        if (!fs) return
+        const target = await nextUntitledPath(fs)
+        await fs.writeFile(target, '')
+        await fsStore.createShortcutOnDesktop(target)
+        await reloadDesktop()
+      },
+      onProperties: () => {
+        const paths = selectedPaths()
+        if (paths.length !== 1) return
+        const item = stateRef.current.items.find((i) => i.id === paths[0])
+        if (!item) return
+        const isShortcut = item.desktopPath !== item.targetPath
+        window.alert(
+          isShortcut
+            ? `Shortcut: ${item.desktopPath}\nTarget: ${item.targetPath}\nPosition: (${item.gridX}, ${item.gridY})`
+            : `File: ${item.desktopPath}\nPosition: (${item.gridX}, ${item.gridY})`,
+        )
+      },
+    }),
+    [
+      selectedPaths,
+      shellClipboard,
+      handleOpenPrimary,
+      handleCut,
+      handleCopy,
+      handleDelete,
+      handleStartRename,
+      handlePaste,
+      reloadDesktop,
+      fsStore,
+      fs,
+    ],
+  )
+
+  const handleWorkspaceContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      openMenu(e.clientX, e.clientY, buildDesktopBackgroundMenu(buildMenuCtx()))
+    },
+    [openMenu, buildMenuCtx],
+  )
+
+  const handleIconContextMenu = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const current = stateRef.current
+      if (!current.selection.selectedIds.has(id)) {
+        dispatch({ type: 'SELECT_ONE', id })
+      }
+      openMenu(e.clientX, e.clientY, buildDesktopIconMenu(buildMenuCtx()))
+    },
+    [openMenu, buildMenuCtx],
+  )
 
   // ─── Marquee pointer listeners (attached to document while marquee active) ──
 
@@ -435,19 +582,26 @@ export function useDesktop({
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // ─── Expose open-primary for ShellKeyboard ────────────────────────────────
-
-  const handleOpenPrimary = useCallback(() => {
-    const s = stateRef.current
-    const primaryId = s.selection.primaryId
-    if (!primaryId) return
-    const item = s.items.find((i) => i.id === primaryId)
-    item?.launch()
-  }, [])
-
   useEffect(() => {
     onOpenPrimary?.(handleOpenPrimary)
   }, [onOpenPrimary, handleOpenPrimary])
+
+  useEffect(() => {
+    onRegisterDesktopActions?.({
+      copy: handleCopy,
+      cut: handleCut,
+      paste: handlePaste,
+      deleteSelection: () => void handleDelete(),
+      startRename: handleStartRename,
+    })
+  }, [
+    onRegisterDesktopActions,
+    handleCopy,
+    handleCut,
+    handlePaste,
+    handleDelete,
+    handleStartRename,
+  ])
 
   const handleClearSelection = useCallback(() => {
     dispatch({ type: 'CLEAR_SELECTION' })
@@ -473,9 +627,14 @@ export function useDesktop({
 
   return {
     state,
+    renamingId,
     handleWorkspacePointerDown,
+    handleWorkspaceContextMenu,
     handleIconPointerDown,
+    handleIconContextMenu,
     handleIconDoubleClick,
+    commitRename,
+    cancelRename,
     marqueeStyle,
   }
 }

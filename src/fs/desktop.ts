@@ -1,8 +1,13 @@
 import type { AppDefinition } from '@/store/session/sessionTypes'
 import { placeholderIcon, type IconSource } from '@/components/shell/ShellIcon'
 import type { AppFile, DesktopEntry, DesktopFile, FsNode, WwwFile } from '@/fs/types'
-import { extension } from '@/utils/paths'
+import { appIcons } from '@/utils/appIcons'
+import { extension, normalizePath } from '@/utils/paths'
 import type { FsApi } from './fsDb'
+
+function isDesktopShortcutFile(node: FsNode): boolean {
+  return node.kind === 'file' && node.name.endsWith('.desktop')
+}
 
 export function parseDesktopFile(content: string): DesktopFile | null {
   try {
@@ -35,23 +40,37 @@ export function applyDefaultDesktopPositions(entries: DesktopEntry[]): DesktopEn
 export async function listDesktopEntries(fs: FsApi): Promise<DesktopEntry[]> {
   const children = await fs.listChildren('/desktop')
   const entries: DesktopEntry[] = []
+  const shortcutTargets = new Set<string>()
 
   for (const node of children) {
-    if (node.kind !== 'file' || !node.name.endsWith('.desktop')) continue
+    if (!isDesktopShortcutFile(node)) continue
     if (!node.content) continue
     const parsed = parseDesktopFile(node.content)
     if (!parsed) {
       console.warn(`Invalid .desktop file: ${node.path}`)
       continue
     }
+    shortcutTargets.add(normalizePath(parsed.path))
     entries.push({
       desktopPath: node.path,
       name: parsed.name,
       targetPath: parsed.path,
       explicitIcon: parsed.icon,
-      // Sentinel -1 means "not saved"; applyDefaultDesktopPositions will assign.
       gridX: typeof parsed.x === 'number' ? parsed.x : -1,
       gridY: typeof parsed.y === 'number' ? parsed.y : -1,
+    })
+  }
+
+  for (const node of children) {
+    if (node.kind !== 'file' || isDesktopShortcutFile(node)) continue
+    if (node.name.startsWith('.')) continue
+    if (shortcutTargets.has(normalizePath(node.path))) continue
+    entries.push({
+      desktopPath: node.path,
+      name: node.name,
+      targetPath: node.path,
+      gridX: typeof node.gridX === 'number' ? node.gridX : -1,
+      gridY: typeof node.gridY === 'number' ? node.gridY : -1,
     })
   }
 
@@ -60,7 +79,7 @@ export async function listDesktopEntries(fs: FsApi): Promise<DesktopEntry[]> {
 }
 
 /**
- * Persist new grid coordinates for a single .desktop file.
+ * Persist new grid coordinates for a desktop item (.desktop shortcut or direct file).
  */
 export async function updateDesktopPosition(
   fs: FsApi,
@@ -68,14 +87,18 @@ export async function updateDesktopPosition(
   gridX: number,
   gridY: number,
 ): Promise<void> {
-  const content = await fs.readFile(desktopPath)
-  const parsed = parseDesktopFile(content)
-  if (!parsed) return
-  await fs.writeFile(desktopPath, JSON.stringify({ ...parsed, x: gridX, y: gridY }))
+  if (extension(desktopPath) === '.desktop') {
+    const content = await fs.readFile(desktopPath)
+    const parsed = parseDesktopFile(content)
+    if (!parsed) return
+    await fs.writeFile(desktopPath, JSON.stringify({ ...parsed, x: gridX, y: gridY }))
+    return
+  }
+  await fs.patchNode(desktopPath, { gridX, gridY })
 }
 
 /**
- * Persist new grid coordinates for multiple .desktop files in parallel.
+ * Persist new grid coordinates for multiple desktop items in parallel.
  */
 export async function updateDesktopPositions(
   fs: FsApi,
@@ -115,7 +138,11 @@ export async function resolveDesktopIcon(
 
   const ext = extension(entry.targetPath)
   const target = await fs.getNode(entry.targetPath)
-  if (!target?.content) return placeholderIcon
+  if (!target) return placeholderIcon
+
+  if (ext === '.txt') return appIcons.notepad
+
+  if (!target.content) return placeholderIcon
 
   if (ext === '.www') {
     const www = parseWww(target.content)

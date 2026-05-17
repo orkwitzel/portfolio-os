@@ -3,9 +3,19 @@ import type { AppDefinition } from '@/store/session/sessionTypes'
 import type { IconSource } from '@/components/shell/ShellIcon'
 import type { WindowManagerApi } from '@/store/session/windowManagerContext'
 import { listDesktopEntries, resolveDesktopIcon, updateDesktopPositions } from '@/fs/desktop'
+import {
+  createDesktopShortcut,
+  createFolder,
+  createTextDocument,
+  isProtectedPath,
+  moveNode,
+  renameDesktopFile,
+  renameDesktopLabel,
+} from '@/fs/fsOperations'
 import { openPath as routeOpenPath } from '@/fs/extensionRouter'
 import { openFs, type FsApi } from '@/fs/fsDb'
 import type { DesktopEntry, FsNode } from '@/fs/types'
+import { extension, normalizePath } from '@/utils/paths'
 
 type FsStoreState = {
   ready: boolean
@@ -13,6 +23,7 @@ type FsStoreState = {
   nodes: FsNode[]
   wm: WindowManagerApi | null
   registry: Map<string, AppDefinition> | null
+  desktopRevision: number
 }
 
 type FsStoreActions = {
@@ -22,6 +33,7 @@ type FsStoreActions = {
   }) => void
   init: () => Promise<void>
   refreshNodes: () => Promise<void>
+  bumpDesktopRevision: () => void
   listDesktopEntries: () => Promise<DesktopEntry[]>
   listAllNodes: () => Promise<FsNode[]>
   readFile: (path: string) => Promise<string>
@@ -33,6 +45,15 @@ type FsStoreActions = {
   saveDesktopPositions: (
     updates: ReadonlyArray<{ desktopPath: string; gridX: number; gridY: number }>,
   ) => Promise<void>
+  deletePath: (path: string) => Promise<void>
+  renamePath: (oldPath: string, newPath: string) => Promise<void>
+  duplicatePath: (srcPath: string, destDir: string) => Promise<string>
+  movePath: (srcPath: string, destDir: string) => Promise<string>
+  renameDesktopShortcutLabel: (desktopPath: string, label: string) => Promise<void>
+  renameDesktopItem: (desktopPath: string, label: string) => Promise<void>
+  createTextDocumentOnDesktop: () => Promise<string>
+  createFolderIn: (parentDir: string) => Promise<string>
+  createShortcutOnDesktop: (targetPath: string, label?: string) => Promise<string>
 }
 
 export type FsStore = FsStoreState & FsStoreActions
@@ -50,12 +71,18 @@ function requireShell(
   return { wm, registry }
 }
 
+async function afterFsMutation(get: () => FsStore): Promise<void> {
+  await get().refreshNodes()
+  get().bumpDesktopRevision()
+}
+
 export const useFsStore = create<FsStore>((set, get) => ({
   ready: false,
   fs: null,
   nodes: [],
   wm: null,
   registry: null,
+  desktopRevision: 0,
 
   bindShell: ({ wm, registry }) => set({ wm, registry }),
 
@@ -72,6 +99,8 @@ export const useFsStore = create<FsStore>((set, get) => ({
     set({ nodes: await fs.getAllNodes() })
   },
 
+  bumpDesktopRevision: () => set((s) => ({ desktopRevision: s.desktopRevision + 1 })),
+
   listDesktopEntries: async () => listDesktopEntries(requireFs(get().fs)),
 
   listAllNodes: async () => requireFs(get().fs).getAllNodes(),
@@ -80,12 +109,12 @@ export const useFsStore = create<FsStore>((set, get) => ({
 
   writeFile: async (path, content) => {
     await requireFs(get().fs).writeFile(path, content)
-    await get().refreshNodes()
+    await afterFsMutation(get)
   },
 
   mkdir: async (path) => {
     await requireFs(get().fs).mkdir(path)
-    await get().refreshNodes()
+    await afterFsMutation(get)
   },
 
   listChildren: async (dirPath) => requireFs(get().fs).listChildren(dirPath),
@@ -104,4 +133,82 @@ export const useFsStore = create<FsStore>((set, get) => ({
     await updateDesktopPositions(requireFs(get().fs), updates)
     await get().refreshNodes()
   },
+
+  deletePath: async (path) => {
+    const normalized = normalizePath(path)
+    if (isProtectedPath(normalized)) {
+      console.warn(`Cannot delete protected path: ${normalized}`)
+      return
+    }
+    await requireFs(get().fs).deleteNode(normalized)
+    await afterFsMutation(get)
+  },
+
+  renamePath: async (oldPath, newPath) => {
+    const from = normalizePath(oldPath)
+    if (isProtectedPath(from)) {
+      console.warn(`Cannot rename protected path: ${from}`)
+      return
+    }
+    await requireFs(get().fs).renameNode(from, normalizePath(newPath))
+    await afterFsMutation(get)
+  },
+
+  duplicatePath: async (srcPath, destDir) => {
+    const dest = await requireFs(get().fs).duplicateNode(normalizePath(srcPath), normalizePath(destDir))
+    await afterFsMutation(get)
+    return dest
+  },
+
+  movePath: async (srcPath, destDir) => {
+    const dest = await moveNode(requireFs(get().fs), srcPath, destDir)
+    await afterFsMutation(get)
+    return dest
+  },
+
+  renameDesktopShortcutLabel: async (desktopPath, label) => {
+    await renameDesktopLabel(requireFs(get().fs), desktopPath, label)
+    await afterFsMutation(get)
+  },
+
+  renameDesktopItem: async (desktopPath, label) => {
+    const fs = requireFs(get().fs)
+    if (isDesktopShortcutPath(desktopPath)) {
+      await renameDesktopLabel(fs, desktopPath, label)
+    } else {
+      await renameDesktopFile(fs, desktopPath, label)
+    }
+    await afterFsMutation(get)
+  },
+
+  createTextDocumentOnDesktop: async () => {
+    const filePath = await createTextDocument(requireFs(get().fs))
+    await afterFsMutation(get)
+    return filePath
+  },
+
+  createFolderIn: async (parentDir) => {
+    const path = await createFolder(requireFs(get().fs), parentDir)
+    await afterFsMutation(get)
+    return path
+  },
+
+  createShortcutOnDesktop: async (targetPath, label) => {
+    const path = await createDesktopShortcut(requireFs(get().fs), targetPath, label)
+    await afterFsMutation(get)
+    return path
+  },
 }))
+
+export function isDesktopPath(path: string): boolean {
+  const n = normalizePath(path)
+  return n === '/desktop' || n.startsWith('/desktop/')
+}
+
+export function isDesktopShortcutPath(path: string): boolean {
+  return extension(normalizePath(path)) === '.desktop' && isDesktopPath(path)
+}
+
+export function isDirectDesktopFile(path: string): boolean {
+  return isDesktopPath(path) && !isDesktopShortcutPath(path)
+}

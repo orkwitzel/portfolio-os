@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { cursors } from '@/styles/cursors'
 
 export const AppBody = styled.div`
   box-sizing: border-box;
@@ -74,7 +75,7 @@ export const TreeButton = styled.button<{ $selected?: boolean }>`
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   text-align: left;
-  cursor: pointer;
+  cursor: ${cursors.pointer};
   color: ${(p) => (p.$selected ? '#fff' : 'inherit')};
 
   &:hover {
@@ -104,7 +105,7 @@ export const ToolbarBtn = styled.button`
   background: #c0c0c0;
   font-family: var(--font-ui, 'MS Sans Serif', sans-serif);
   font-size: var(--font-size-ui, 12px);
-  cursor: pointer;
+  cursor: ${cursors.pointer};
 
   &:active {
     border-style: inset;

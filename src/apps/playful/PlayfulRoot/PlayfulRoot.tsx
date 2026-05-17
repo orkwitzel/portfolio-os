@@ -27,7 +27,12 @@ export default function PlayfulRoot(props: AppProps) {
 
       {vm.message ? <StatusText>{vm.message}</StatusText> : null}
 
-      <Board role="grid" aria-label="Minesweeper board" onContextMenu={(e) => e.preventDefault()}>
+      <Board
+        role="grid"
+        aria-label="Minesweeper board"
+        data-minesweeper-board
+        onContextMenu={(e) => e.preventDefault()}
+      >
         {vm.board.map((row, r) =>
           row.map((cell, c) => {
             const revealed = cell.revealed

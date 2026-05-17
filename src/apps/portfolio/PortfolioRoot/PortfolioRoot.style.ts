@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { cursors } from '@/styles/cursors'
 
 const FONT = 'var(--font-ui)'
 const TEXT = '13px'
@@ -200,7 +201,7 @@ export const StatBox = styled.div`
     background ${retroEase},
     transform ${retroEase},
     box-shadow ${retroEase};
-  cursor: default;
+  cursor: ${cursors.default};
 
   &:nth-child(1) {
     border-color: #008080;
@@ -285,7 +286,7 @@ export const ToolbarBtn = styled.button`
   background: #c0c0c0;
   font: var(--pf-text) ${FONT};
   color: #000;
-  cursor: pointer;
+  cursor: ${cursors.pointer};
   box-shadow: ${dropSm};
   transition:
     background ${retroEase},
@@ -522,7 +523,7 @@ export const ProjectCard = styled.button`
   border: 2px outset #c0c0c0;
   background: #fff;
   text-align: left;
-  cursor: pointer;
+  cursor: ${cursors.pointer};
   overflow: hidden;
   box-shadow: ${dropSm};
   transition:
@@ -682,7 +683,7 @@ export const SkillChip = styled.div`
   border: 2px outset #c0c0c0;
   background: #fff;
   font: var(--pf-text-sm) ${FONT};
-  cursor: default;
+  cursor: ${cursors.default};
   box-shadow: ${dropSm};
   transition:
     background ${retroEase},

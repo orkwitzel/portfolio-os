@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { cursors } from '@/styles/cursors'
 
 export const Workspace = styled.div`
   position: relative;
@@ -19,7 +20,7 @@ export const Shortcut = styled.button<{ $selected: boolean; $dragging: boolean }
   border: none;
   padding: 4px 6px;
   background: ${(p) => (p.$selected ? 'rgba(0, 0, 128, 0.55)' : 'transparent')};
-  cursor: pointer;
+  cursor: ${cursors.pointer};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,6 +67,18 @@ export const ShortcutGhost = styled.div`
 export const ShortcutLabel = styled.span`
   text-align: center;
   word-break: break-word;
+`
+
+export const RenameInput = styled.input`
+  width: 100%;
+  max-width: 88px;
+  padding: 1px 2px;
+  border: 1px solid #000;
+  font: var(--font-size-ui) var(--font-ui);
+  text-align: center;
+  color: #000;
+  background: #fff;
+  box-sizing: border-box;
 `
 
 export const MarqueeRect = styled.div`

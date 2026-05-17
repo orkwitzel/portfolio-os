@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { cursors } from '@/styles/cursors'
 
 export const RESUME_URL = '/resume.pdf'
 
@@ -28,7 +29,7 @@ export const ToolbarBtn = styled.button`
   background: #c0c0c0;
   font: var(--font-size-ui) var(--font-ui);
   color: #000;
-  cursor: default;
+  cursor: ${cursors.default};
 
   &:active {
     border-style: inset;
@@ -42,7 +43,7 @@ export const ToolbarLink = styled.a`
   background: #c0c0c0;
   font: var(--font-size-ui) var(--font-ui);
   color: #000;
-  cursor: default;
+  cursor: ${cursors.default};
   text-decoration: none;
 
   &:active {

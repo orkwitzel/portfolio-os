@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { cursors } from '@/styles/cursors'
 import { WINDOW_ANIM_EASE, WINDOW_ANIM_MS } from '@/utils/windowFrameAnimation'
 
 /** Shared with resize hit-targets so they align under the title bar. */
@@ -34,7 +35,7 @@ export const TitleBar = styled.div<{ $active: boolean }>`
   height: ${TITLE_BAR_HEIGHT}px;
   padding: 3px 4px;
   flex-shrink: 0;
-  cursor: grab;
+  cursor: ${cursors.move};
   user-select: none;
   background: ${(p) =>
     p.$active
@@ -43,7 +44,7 @@ export const TitleBar = styled.div<{ $active: boolean }>`
   color: ${(p) => (p.$active ? '#fff' : '#c0c0c0')};
 
   &:active {
-    cursor: grabbing;
+    cursor: ${cursors.move};
   }
 `
 
@@ -80,7 +81,7 @@ export const ControlBtn = styled.button`
   border-bottom: 2px solid #404040;
   background: #c0c0c0;
   font: 13px / 1 var(--font-ui);
-  cursor: pointer;
+  cursor: ${cursors.pointer};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,7 +112,7 @@ export const ResizeEast = styled.div`
   right: 0;
   bottom: 0;
   width: 6px;
-  cursor: ew-resize;
+  cursor: ${cursors.ewResize};
   z-index: 2;
 `
 
@@ -121,7 +122,7 @@ export const ResizeSouth = styled.div`
   right: 18px;
   bottom: 0;
   height: 6px;
-  cursor: ns-resize;
+  cursor: ${cursors.nsResize};
   z-index: 2;
 `
 
@@ -131,7 +132,7 @@ export const ResizeGrip = styled.div`
   bottom: 0;
   width: 18px;
   height: 18px;
-  cursor: nwse-resize;
+  cursor: ${cursors.nwseResize};
   z-index: 3;
   box-sizing: border-box;
   background-color: #c0c0c0;

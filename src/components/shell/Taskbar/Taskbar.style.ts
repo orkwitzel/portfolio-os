@@ -62,7 +62,7 @@ export const StartBtn = styled.button<{ $pressed: boolean }>`
   border-bottom: 2px solid ${(p) => (p.$pressed ? '#fff' : '#404040')};
   background: #c0c0c0;
   font: var(--font-size-ui) var(--font-ui);
-  cursor: default;
+  cursor: var(--cursor-default);
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -105,7 +105,7 @@ export const TaskBtn = styled.button<{
   background: #c0c0c0;
   font: var(--font-size-ui) var(--font-ui);
   text-align: left;
-  cursor: pointer;
+  cursor: var(--cursor-pointer);
   color: ${(p) => (p.$minimized ? '#404040' : '#000')};
   display: inline-flex;
   align-items: center;

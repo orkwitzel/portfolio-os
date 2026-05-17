@@ -1,5 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Desktop } from '@/components/shell/Desktop'
+import type { DesktopActions } from '@/components/shell/Desktop/Desktop.logic'
+import { ContextMenuRoot } from '@/components/shell/ContextMenu'
+import { ShellContextMenu } from '@/components/shell/ShellContextMenu/ShellContextMenu'
 import { ShellKeyboard, type DesktopKeyboardContext } from '@/components/shell/ShellKeyboard'
 import { Taskbar } from '@/components/shell/Taskbar'
 import { WindowManagerProvider } from '@/components/shell/WindowManagerProvider'
@@ -28,6 +31,7 @@ function ShellInner({
   })
   const openPrimaryRef = useRef<(() => void) | null>(null)
   const clearSelectionRef = useRef<(() => void) | null>(null)
+  const desktopActionsRef = useRef<DesktopActions | null>(null)
 
   const handleSelectionChange = useCallback(
     (sel: DesktopSelectionState) => {
@@ -45,6 +49,11 @@ function ShellInner({
       openPrimary: () => openPrimaryRef.current?.(),
       clearSelection: () => clearSelectionRef.current?.(),
       hasSelection: desktopSelection.selectedIds.size > 0,
+      copy: () => desktopActionsRef.current?.copy(),
+      cut: () => desktopActionsRef.current?.cut(),
+      paste: () => desktopActionsRef.current?.paste(),
+      deleteSelection: () => desktopActionsRef.current?.deleteSelection(),
+      startRename: () => desktopActionsRef.current?.startRename(),
     }),
     [desktopSelection.selectedIds.size],
   )
@@ -52,7 +61,7 @@ function ShellInner({
   return (
     <FsProvider registry={registry}>
       <ShellKeyboard startMenuOpen={startMenuOpen} desktopCtx={desktopCtx} />
-      <Shell>
+      <Shell data-shell-root>
         <Desktop
           workspaceRef={workspaceRef}
           onSelectionChange={handleSelectionChange}
@@ -60,12 +69,16 @@ function ShellInner({
           onRegisterClearSelection={(fn) => {
             clearSelectionRef.current = fn
           }}
+          onRegisterDesktopActions={(actions) => {
+            desktopActionsRef.current = actions
+          }}
         />
         <Taskbar
           startMenuOpen={startMenuOpen}
           onStartMenuOpenChange={onStartMenuOpenChange}
         />
       </Shell>
+      <ShellContextMenu />
     </FsProvider>
   )
 }
@@ -76,12 +89,14 @@ export default function App() {
   const [startMenuOpen, setStartMenuOpen] = useState(false)
 
   return (
-    <WindowManagerProvider registry={registry} workspaceRef={workspaceRef}>
-      <ShellInner
-        startMenuOpen={startMenuOpen}
-        onStartMenuOpenChange={setStartMenuOpen}
-        workspaceRef={workspaceRef}
-      />
-    </WindowManagerProvider>
+    <ContextMenuRoot>
+      <WindowManagerProvider registry={registry} workspaceRef={workspaceRef}>
+        <ShellInner
+          startMenuOpen={startMenuOpen}
+          onStartMenuOpenChange={setStartMenuOpen}
+          workspaceRef={workspaceRef}
+        />
+      </WindowManagerProvider>
+    </ContextMenuRoot>
   )
 }

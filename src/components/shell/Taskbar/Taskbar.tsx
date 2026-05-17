@@ -26,7 +26,7 @@ export function Taskbar(props: TaskbarProps) {
   } = useTaskbar(props)
 
   return (
-    <Bar>
+    <Bar data-taskbar>
       <StartBtn
         ref={startRef}
         id={startButtonId}
