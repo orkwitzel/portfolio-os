@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useContextMenuApi } from '@/components/shell/ContextMenu'
+import { useShellModal } from '@/components/shell/ShellModal'
 import { useFsStore } from '@/store/fsStore'
 import { useShellClipboard } from '@/store/shellClipboard'
 import { useWindowManager } from '@/hooks/useWindowManager'
@@ -20,6 +21,7 @@ import { readWorkspaceFrame } from '@/utils/workspaceFrame'
 
 export function ShellContextMenu() {
   const { openMenu } = useContextMenuApi()
+  const shellModal = useShellModal()
   const wm = useWindowManager()
   const fs = useFsStore((s) => s.fs)
   const nodes = useFsStore((s) => s.nodes)
@@ -90,12 +92,22 @@ export function ShellContextMenu() {
             onDelete: async () => {
               if (node.kind === 'directory') {
                 const children = nodes.filter((n) => n.parentPath === fsPath || n.path.startsWith(fsPath + '/'))
-                if (children.length > 1 && !window.confirm(`Delete "${node.name}" and its contents?`)) return
+                if (children.length > 1) {
+                  const ok = await shellModal.confirm({
+                    title: 'Confirm Delete',
+                    message: `Are you sure you want to delete "${node.name}" and its contents?`,
+                  })
+                  if (!ok) return
+                }
               }
               await fsStore.deletePath(fsPath)
             },
-            onRename: () => {
-              const next = window.prompt('Rename to:', node.name)
+            onRename: async () => {
+              const next = await shellModal.prompt({
+                title: 'Rename',
+                message: 'Rename to:',
+                defaultValue: node.name,
+              })
               if (!next || next === node.name) return
               const parent = node.parentPath ?? '/'
               const dest = parent === '/' ? `/${next}` : `${parent}/${next}`
@@ -141,7 +153,7 @@ export function ShellContextMenu() {
 
     document.addEventListener('contextmenu', onContextMenu, true)
     return () => document.removeEventListener('contextmenu', onContextMenu, true)
-  }, [openMenu, wm, fs, nodes, fsStore, clipboard])
+  }, [openMenu, shellModal, wm, fs, nodes, fsStore, clipboard])
 
   return null
 }

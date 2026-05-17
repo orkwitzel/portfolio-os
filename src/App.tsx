@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { Desktop } from '@/components/shell/Desktop'
 import type { DesktopActions } from '@/components/shell/Desktop/Desktop.logic'
 import { ContextMenuRoot } from '@/components/shell/ContextMenu'
+import { ShellModalProvider } from '@/components/shell/ShellModal'
 import { ShellContextMenu } from '@/components/shell/ShellContextMenu/ShellContextMenu'
 import { ShellKeyboard, type DesktopKeyboardContext } from '@/components/shell/ShellKeyboard'
 import { Taskbar } from '@/components/shell/Taskbar'
@@ -90,13 +91,15 @@ export default function App() {
 
   return (
     <ContextMenuRoot>
-      <WindowManagerProvider registry={registry} workspaceRef={workspaceRef}>
-        <ShellInner
-          startMenuOpen={startMenuOpen}
-          onStartMenuOpenChange={setStartMenuOpen}
-          workspaceRef={workspaceRef}
-        />
-      </WindowManagerProvider>
+      <ShellModalProvider>
+        <WindowManagerProvider registry={registry} workspaceRef={workspaceRef}>
+          <ShellInner
+            startMenuOpen={startMenuOpen}
+            onStartMenuOpenChange={setStartMenuOpen}
+            workspaceRef={workspaceRef}
+          />
+        </WindowManagerProvider>
+      </ShellModalProvider>
     </ContextMenuRoot>
   )
 }

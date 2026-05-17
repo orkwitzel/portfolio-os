@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type RefObject } from 'react'
 import { useContextMenuApi } from '@/components/shell/ContextMenu'
+import { useShellModal } from '@/components/shell/ShellModal'
 import { useFsStore } from '@/store/fsStore'
 import { useShellClipboard } from '@/store/shellClipboard'
 import type { ShellLaunchItem } from '@/utils/shellCatalog'
@@ -215,6 +216,7 @@ export function useDesktop({
   const resolveDesktopIcon = useFsStore((s) => s.resolveDesktopIcon)
   const saveDesktopPositions = useFsStore((s) => s.saveDesktopPositions)
   const { openMenu } = useContextMenuApi()
+  const shellModal = useShellModal()
   const shellClipboard = useShellClipboard()
   const [renamingId, setRenamingId] = useState<string | null>(null)
 
@@ -280,13 +282,17 @@ export function useDesktop({
   const handleDelete = useCallback(async () => {
     const paths = selectedPaths()
     if (paths.length === 0) return
-    if (!window.confirm(`Delete ${paths.length} item(s)?`)) return
+    const message =
+      paths.length === 1
+        ? 'Are you sure you want to delete this item?'
+        : `Are you sure you want to delete these ${paths.length} items?`
+    if (!(await shellModal.confirm({ title: 'Confirm Delete', message }))) return
     for (const p of paths) {
       await fsStore.deletePath(p)
     }
     dispatch({ type: 'CLEAR_SELECTION' })
     await reloadDesktop()
-  }, [selectedPaths, fsStore, reloadDesktop])
+  }, [selectedPaths, fsStore, reloadDesktop, shellModal])
 
   const handleStartRename = useCallback(() => {
     const s = stateRef.current
@@ -334,11 +340,16 @@ export function useDesktop({
         const item = stateRef.current.items.find((i) => i.id === paths[0])
         if (!item) return
         const isShortcut = item.desktopPath !== item.targetPath
-        window.alert(
-          isShortcut
-            ? `Shortcut: ${item.desktopPath}\nTarget: ${item.targetPath}\nPosition: (${item.gridX}, ${item.gridY})`
-            : `File: ${item.desktopPath}\nPosition: (${item.gridX}, ${item.gridY})`,
-        )
+        shellModal.showProperties({
+          title: `${item.label} Properties`,
+          name: item.label,
+          icon: item.icon,
+          kind: isShortcut ? 'shortcut' : 'file',
+          path: item.desktopPath,
+          targetPath: isShortcut ? item.targetPath : undefined,
+          gridX: item.gridX,
+          gridY: item.gridY,
+        })
       },
     }),
     [
@@ -353,6 +364,7 @@ export function useDesktop({
       reloadDesktop,
       fsStore,
       fs,
+      shellModal,
     ],
   )
 
