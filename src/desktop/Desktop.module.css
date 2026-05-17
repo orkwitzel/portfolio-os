@@ -39,16 +39,6 @@
   outline-offset: 2px;
 }
 
-.shortcutIcon {
-  width: 38px;
-  height: 38px;
-  background: #c0c0c0;
-  border: 2px solid #fff;
-  box-shadow:
-    inset -2px -2px #404040,
-    inset 2px 2px #fff;
-}
-
 .shortcutLabel {
   text-align: center;
   word-break: break-word;

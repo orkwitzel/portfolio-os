@@ -1,4 +1,5 @@
 import type { ComponentType, LazyExoticComponent } from 'react'
+import type { IconSource } from './icons/types'
 
 export type WindowId = string
 
@@ -39,6 +40,7 @@ export type AppDefinition = {
   defaultTitle: string
   defaultBounds: { width: number; height: number }
   Root: LazyExoticComponent<ComponentType<AppProps>>
+  icon?: IconSource
 }
 
 export type WMAction =

@@ -55,7 +55,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | P1.1-2 | Render menu panel with Win95-style borders; position above taskbar Start button. | Done | `StartMenu.tsx` + module CSS. |
 | P1.1-3 | Populate program list from `appDefinitions` (or derived config); call `openApp(id)` on click. | Done | `wm.registry` list. |
 | P1.1-4 | Dismiss: pointer outside, Escape; optionally click Start toggles. | Done | Capture-phase pointer + Escape + Start toggle. |
-| P1.1-5 | (Optional) Divider + external links section (see Phase 2.1 if reused). | Todo | |
+| P1.1-5 | (Optional) Divider + external links section (see Phase 2.1 if reused). | Done | 2026-05-17 — Links + `ShellIcon` favicons; opens in new tab. |
 
 ### 1.2 Desktop icon polish
 
@@ -63,8 +63,8 @@ Living document: update **Status** and **Notes** when you start or finish work s
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P1.2-1 | Freeze icon grid layout spec (spacing, label width) in CSS modules. | Todo | |
-| P1.2-2 | Add bitmap/SVG assets per shortcut; swap placeholder squares. | Todo | |
+| P1.2-1 | Freeze icon grid layout spec (spacing, label width) in CSS modules. | Done | `ShellIcon` menu/desktop sizes + desktop shortcut grid unchanged. |
+| P1.2-2 | Add bitmap/SVG assets per shortcut; swap placeholder squares. | In progress | Infra done; per-app `icon: asset` still optional. |
 | P1.2-3 | Single-selection highlight state on desktop (optional second pass). | Todo | |
 
 ### 1.3 Clock / tray
@@ -98,8 +98,8 @@ Living document: update **Status** and **Notes** when you start or finish work s
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P2.1-1 | Define config shape (`label`, `url`, `icon?`) for external links. | Todo | |
-| P2.1-2 | Desktop and/or Start entries rendering from config; `window.open(url, '_blank', 'noopener,noreferrer')`. | Todo | |
+| P2.1-1 | Define config shape (`label`, `url`, `icon?`) for external links. | Done | `links.ts` + `IconSource`. |
+| P2.1-2 | Desktop and/or Start entries rendering from config; `window.open(url, '_blank', 'noopener,noreferrer')`. | Done | `shellCatalog.ts`; edit URLs in `links.ts`. |
 | P2.1-3 | Optional “browser” window shell that iframe/embeds—only if framed UX is desired. | Todo | Deferred by default (third-party framing limits). |
 
 ### 2.2 Richer demo apps

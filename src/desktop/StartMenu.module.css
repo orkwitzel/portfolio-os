@@ -19,16 +19,32 @@
 }
 
 .item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
   margin: 0;
-  padding: 4px 24px 4px 8px;
+  padding: 4px 8px;
   border: none;
   background: transparent;
   font: var(--font-size-ui) var(--font-ui);
   text-align: left;
   cursor: default;
   color: #000;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.divider {
+  height: 0;
+  margin: 3px 2px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid #808080;
+  border-bottom: 1px solid #fff;
 }
 
 .item:hover,

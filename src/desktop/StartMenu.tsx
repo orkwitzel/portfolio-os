@@ -5,6 +5,10 @@ import {
   useState,
   type RefObject,
 } from 'react'
+import { externalLinks } from './links'
+import { ShellIcon } from './icons/ShellIcon'
+import type { IconSource } from './icons/types'
+import { buildLinkItems, buildProgramItems } from './shellCatalog'
 import { useWindowManager } from './windowManagerContext'
 import styles from './StartMenu.module.css'
 
@@ -17,12 +21,30 @@ type StartMenuProps = {
   startButtonId: string
 }
 
+function StartMenuItem({
+  label,
+  icon,
+  onActivate,
+}: {
+  label: string
+  icon: IconSource
+  onActivate: () => void
+}) {
+  return (
+    <button type="button" role="menuitem" className={styles.item} onClick={onActivate}>
+      <ShellIcon source={icon} size="menu" />
+      <span className={styles.itemLabel}>{label}</span>
+    </button>
+  )
+}
+
 export function StartMenu({ open, onClose, anchorRef, startButtonId }: StartMenuProps) {
   const wm = useWindowManager()
   const menuRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState<{ left: number; bottom: number } | null>(null)
 
-  const apps = Array.from(wm.registry.values())
+  const programs = buildProgramItems(wm)
+  const links = buildLinkItems(externalLinks)
 
   useLayoutEffect(() => {
     if (!open) return
@@ -64,6 +86,11 @@ export function StartMenu({ open, onClose, anchorRef, startButtonId }: StartMenu
 
   if (!open || !position) return null
 
+  const activate = (launch: () => void) => {
+    launch()
+    onClose()
+  }
+
   return (
     <div
       ref={menuRef}
@@ -74,19 +101,23 @@ export function StartMenu({ open, onClose, anchorRef, startButtonId }: StartMenu
       style={{ left: position.left, bottom: position.bottom }}
     >
       <ul className={styles.list}>
-        {apps.map((def) => (
-          <li key={def.id}>
-            <button
-              type="button"
-              role="menuitem"
-              className={styles.item}
-              onClick={() => {
-                wm.openApp(def.id)
-                onClose()
-              }}
-            >
-              {def.defaultTitle}
-            </button>
+        {programs.map((item) => (
+          <li key={item.id}>
+            <StartMenuItem
+              label={item.label}
+              icon={item.icon}
+              onActivate={() => activate(item.launch)}
+            />
+          </li>
+        ))}
+        {links.length > 0 ? <li className={styles.divider} role="separator" /> : null}
+        {links.map((item) => (
+          <li key={item.id}>
+            <StartMenuItem
+              label={item.label}
+              icon={item.icon}
+              onActivate={() => activate(item.launch)}
+            />
           </li>
         ))}
       </ul>
