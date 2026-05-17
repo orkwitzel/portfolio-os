@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { AppDefinition } from '../desktop/sessionTypes'
 import type { IconSource } from '../desktop/icons/types'
 import type { WindowManagerApi } from '../desktop/windowManagerContext'
-import { listDesktopEntries, resolveDesktopIcon } from './desktop'
+import { listDesktopEntries, resolveDesktopIcon, updateDesktopPositions } from './desktop'
 import { openPath as routeOpenPath } from './extensionRouter'
 import { openFs, type FsApi } from './fsDb'
 import type { DesktopEntry, FsNode } from './types'
@@ -30,6 +30,9 @@ type FsStoreActions = {
   listChildren: (dirPath: string) => Promise<FsNode[]>
   openPath: (path: string) => Promise<void>
   resolveDesktopIcon: (entry: DesktopEntry) => Promise<IconSource>
+  saveDesktopPositions: (
+    updates: ReadonlyArray<{ desktopPath: string; gridX: number; gridY: number }>,
+  ) => Promise<void>
 }
 
 export type FsStore = FsStoreState & FsStoreActions
@@ -95,5 +98,10 @@ export const useFsStore = create<FsStore>((set, get) => ({
   resolveDesktopIcon: async (entry) => {
     const { registry } = requireShell(get().wm, get().registry)
     return resolveDesktopIcon(entry, requireFs(get().fs), registry)
+  },
+
+  saveDesktopPositions: async (updates) => {
+    await updateDesktopPositions(requireFs(get().fs), updates)
+    await get().refreshNodes()
   },
 }))

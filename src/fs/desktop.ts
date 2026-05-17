@@ -14,6 +14,24 @@ export function parseDesktopFile(content: string): DesktopFile | null {
   }
 }
 
+/**
+ * Assign stable default grid positions to entries that lack saved coordinates.
+ * Places icons in a single column (col 0), one per row, in the order given.
+ * Mutates in place and returns the same array.
+ */
+export function applyDefaultDesktopPositions(entries: DesktopEntry[]): DesktopEntry[] {
+  let nextRow = 0
+  for (const entry of entries) {
+    if (entry.gridX === -1 && entry.gridY === -1) {
+      entry.gridX = 0
+      entry.gridY = nextRow++
+    } else {
+      nextRow = Math.max(nextRow, entry.gridY + 1)
+    }
+  }
+  return entries
+}
+
 export async function listDesktopEntries(fs: FsApi): Promise<DesktopEntry[]> {
   const children = await fs.listChildren('/desktop')
   const entries: DesktopEntry[] = []
@@ -31,10 +49,41 @@ export async function listDesktopEntries(fs: FsApi): Promise<DesktopEntry[]> {
       name: parsed.name,
       targetPath: parsed.path,
       explicitIcon: parsed.icon,
+      // Sentinel -1 means "not saved"; applyDefaultDesktopPositions will assign.
+      gridX: typeof parsed.x === 'number' ? parsed.x : -1,
+      gridY: typeof parsed.y === 'number' ? parsed.y : -1,
     })
   }
 
-  return entries.sort((a, b) => a.name.localeCompare(b.name))
+  const sorted = entries.sort((a, b) => a.name.localeCompare(b.name))
+  return applyDefaultDesktopPositions(sorted)
+}
+
+/**
+ * Persist new grid coordinates for a single .desktop file.
+ */
+export async function updateDesktopPosition(
+  fs: FsApi,
+  desktopPath: string,
+  gridX: number,
+  gridY: number,
+): Promise<void> {
+  const content = await fs.readFile(desktopPath)
+  const parsed = parseDesktopFile(content)
+  if (!parsed) return
+  await fs.writeFile(desktopPath, JSON.stringify({ ...parsed, x: gridX, y: gridY }))
+}
+
+/**
+ * Persist new grid coordinates for multiple .desktop files in parallel.
+ */
+export async function updateDesktopPositions(
+  fs: FsApi,
+  updates: ReadonlyArray<{ desktopPath: string; gridX: number; gridY: number }>,
+): Promise<void> {
+  await Promise.all(updates.map(({ desktopPath, gridX, gridY }) =>
+    updateDesktopPosition(fs, desktopPath, gridX, gridY),
+  ))
 }
 
 function parseWww(content: string): WwwFile | null {

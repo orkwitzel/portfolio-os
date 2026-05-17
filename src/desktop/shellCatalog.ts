@@ -4,11 +4,21 @@ import { placeholderIcon, type IconSource } from './icons/types'
 import type { WindowManagerApi } from './windowManagerContext'
 
 export type ShellLaunchItem = {
-  kind: 'app' | 'link' | 'desktop'
+  kind: 'app' | 'link'
   id: string
   label: string
   icon: IconSource
   launch: () => void
+} | {
+  kind: 'desktop'
+  id: string
+  /** Path of the `.desktop` file — used as the unique id for selection/persistence. */
+  desktopPath: string
+  label: string
+  icon: IconSource
+  launch: () => void
+  gridX: number
+  gridY: number
 }
 
 export function buildProgramItems(wm: WindowManagerApi): ShellLaunchItem[] {
@@ -31,9 +41,12 @@ export async function buildDesktopItems(
     items.push({
       kind: 'desktop',
       id: entry.desktopPath,
+      desktopPath: entry.desktopPath,
       label: entry.name,
       icon: await resolveIcon(entry),
       launch: () => void openPath(entry.targetPath),
+      gridX: entry.gridX,
+      gridY: entry.gridY,
     })
   }
   return items
