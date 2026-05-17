@@ -1,0 +1,8 @@
+/* GohuFont 11 — bitmap pixel face, Nerd Font patched (OFL). Source: nerd-fonts / gohufont. */
+@font-face {
+  font-family: 'GohuFont Nerd Font';
+  src: url('/fonts/GohuFont11NerdFontPropo-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

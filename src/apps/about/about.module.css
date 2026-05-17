@@ -6,10 +6,7 @@
   gap: 10px;
   padding: 10px 12px;
   min-height: 0;
-  font:
-    11px/1.45 Tahoma,
-    'MS Sans Serif',
-    sans-serif;
+  font: var(--font-size-ui) / 1.45 var(--font-ui);
   color: #000;
 }
 

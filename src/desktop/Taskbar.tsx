@@ -1,4 +1,6 @@
 import { useWindowManager } from './windowManagerContext'
+import { nerd } from './nerdIcons'
+import { TrayClock } from './TrayClock'
 import styles from './Taskbar.module.css'
 
 export function Taskbar() {
@@ -7,7 +9,12 @@ export function Taskbar() {
 
   return (
     <div className={styles.bar}>
-      <div className={styles.startBtn}>Start</div>
+      <button type="button" className={styles.startBtn} aria-label="Start">
+        <span className={styles.startIcon} aria-hidden>
+          {nerd.windowsClassic}
+        </span>
+        <span className={styles.startLabel}>Start</span>
+      </button>
       <div className={styles.tasks}>
         {session.order.map((id) => {
           const w = session.windows[id]
@@ -31,7 +38,9 @@ export function Taskbar() {
           )
         })}
       </div>
-      <div className={styles.tray} aria-hidden />
+      <div className={styles.tray}>
+        <TrayClock />
+      </div>
     </div>
   )
 }

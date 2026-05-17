@@ -31,10 +31,7 @@
     -1px 0 #000,
     0 1px #000,
     0 -1px #000;
-  font:
-    11px Tahoma,
-    'MS Sans Serif',
-    sans-serif;
+  font: var(--font-size-ui) var(--font-ui);
 }
 
 .shortcut:focus-visible {

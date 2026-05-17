@@ -11,18 +11,29 @@
 }
 
 .startBtn {
+  margin: 0;
   height: 22px;
-  padding: 0 10px;
+  padding: 0 8px 0 6px;
   border-top: 2px solid #fff;
   border-left: 2px solid #fff;
   border-right: 2px solid #404040;
   border-bottom: 2px solid #404040;
   background: #c0c0c0;
-  font:
-    bold 11px Tahoma,
-    'MS Sans Serif',
-    sans-serif;
+  font: var(--font-size-ui) var(--font-ui);
   cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.startIcon {
+  font-size: var(--font-size-ui);
+  line-height: 1;
+}
+
+.startLabel {
+  font-weight: bold;
+  line-height: 1;
 }
 
 .tasks {
@@ -43,10 +54,7 @@
   border-right: 2px solid #404040;
   border-bottom: 2px solid #404040;
   background: #c0c0c0;
-  font:
-    11px Tahoma,
-    'MS Sans Serif',
-    sans-serif;
+  font: var(--font-size-ui) var(--font-ui);
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -66,8 +74,13 @@
 }
 
 .tray {
-  width: 72px;
+  min-width: 72px;
   height: 22px;
+  padding: 0 4px;
+  box-sizing: border-box;
   border: 2px inset #c0c0c0;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

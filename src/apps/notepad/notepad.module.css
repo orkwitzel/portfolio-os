@@ -11,10 +11,7 @@
   margin: 2px;
   border: 2px inset #c0c0c0;
   padding: 6px;
-  font:
-    11px/1.35 Tahoma,
-    'MS Sans Serif',
-    sans-serif;
+  font: var(--font-size-ui) / 1.35 var(--font-ui);
   resize: none;
   outline: none;
   background: #fff;

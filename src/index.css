@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  --font-ui: 'GohuFont Nerd Font', monospace;
+  --font-size-ui: 11px;
+}
+
 html,
 body {
   height: 100%;
@@ -12,6 +17,10 @@ body {
 body {
   margin: 0;
   background: #000;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-ui);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 #root {

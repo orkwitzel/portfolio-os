@@ -71,13 +71,33 @@ Use `useWindowManager()` only when the app must talk to the shell (close self, s
 
 Pull requests should summarize behavior changes and include verification (`npm run build`, `npm run lint`) unless trivial docs-only edits.
 
+## Roadmap ([ROADMAP.md](./ROADMAP.md))
+
+**Always update the roadmap in the same change series** (commit or PR) when you ship or materially advance work — do not leave status for a follow-up.
+
+Treat an update as **significant** when it affects any of:
+
+- Phase or step completion (foundation, shell fidelity, apps, hardening, mobile, deployment).
+- New or changed apps registered in the shell.
+- Architecture or session/window-manager behavior that shifts what is Done vs still Todo.
+- Blockers, deferrals, or reprioritization agreed in discussion.
+
+When updating [ROADMAP.md](./ROADMAP.md):
+
+1. Set **Status** on the relevant phase/step rows (see the legend at the top of that file).
+2. Add or refresh **Notes** (e.g. initials + date for **In progress**; a short line for **Done** or **Blocked**).
+3. Update the **Plan status (summary)** table when a whole phase moves (e.g. Phase 1 from Todo → In progress).
+
+Small fixes (typos, copy, CSS-only tweaks with no milestone impact) do not require roadmap edits.
+
 ## Review checklist
 
 - [ ] Build passes (`npm run build`).
 - [ ] Lint passes (`npm run lint`).
 - [ ] New apps registered + reachable from desktop or another sanctioned entry point.
 - [ ] Session updates flow through reducer verbs — no parallel sources of truth for geometry/z-order.
-- [ ] Docs updated when behavior or architecture materially changes (`../agents.md`, this file, [README.md](../README.md), or [ROADMAP.md](./ROADMAP.md)).
+- [ ] **[ROADMAP.md](./ROADMAP.md) updated** for every significant change (status, notes, summary table) — same PR/commit as the implementation.
+- [ ] Other docs updated when behavior or architecture materially changes (`../agents.md`, this file, [README.md](../README.md)).
 
 ## Communication with agents
 
