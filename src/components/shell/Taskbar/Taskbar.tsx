@@ -1,13 +1,23 @@
 import { StartMenu, START_MENU_ID } from '@/components/shell/StartMenu'
+import { ShellIcon } from '@/components/shell/ShellIcon'
 import { TrayClock } from '@/components/shell/TrayClock'
 import { nerd } from '@/utils/nerdIcons'
 import { useTaskbar, type TaskbarProps } from './Taskbar.logic'
-import { Bar, StartBtn, StartIcon, StartLabel, TaskBtn, Tasks, Tray } from './Taskbar.style'
+import {
+  Bar,
+  StartBtn,
+  StartIcon,
+  StartLabel,
+  TaskBtn,
+  TaskBtnLabel,
+  Tasks,
+  Tray,
+} from './Taskbar.style'
 
 export function Taskbar(props: TaskbarProps) {
   const {
     wm,
-    session,
+    tasks,
     startRef,
     startButtonId,
     startMenuOpen,
@@ -38,28 +48,26 @@ export function Taskbar(props: TaskbarProps) {
         startButtonId={startButtonId}
       />
       <Tasks>
-        {session.order.map((id) => {
-          const w = session.windows[id]
-          if (!w) return null
-
-          const minimized = w.geometry.mode === 'minimized'
-          const active = session.focusedWindowId === w.id && !minimized
-
-          return (
-            <TaskBtn
-              key={id}
-              type="button"
-              $active={active}
-              $minimized={minimized}
-              onClick={() => {
-                if (minimized) wm.restoreWindow(id)
-                else wm.focusWindow(id)
-              }}
-            >
-              {w.title}
-            </TaskBtn>
-          )
-        })}
+        {tasks.map((task) => (
+          <TaskBtn
+            key={task.id}
+            type="button"
+            $active={task.active}
+            $minimized={task.minimized}
+            $entering={task.entering}
+            $exiting={task.exiting}
+            aria-label={task.title}
+            disabled={task.exiting}
+            onClick={() => {
+              if (task.exiting) return
+              if (task.minimized) wm.restoreWindow(task.id)
+              else wm.focusWindow(task.id)
+            }}
+          >
+            <ShellIcon source={task.icon} size="taskbar" />
+            <TaskBtnLabel>{task.title}</TaskBtnLabel>
+          </TaskBtn>
+        ))}
       </Tasks>
       <Tray>
         <TrayClock />

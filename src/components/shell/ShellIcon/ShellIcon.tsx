@@ -1,30 +1,34 @@
 import { useState } from 'react'
 import { faviconUrl } from './favicon'
 import type { IconSource, ShellIconSize } from './types'
-import { Frame, Img, Placeholder } from './ShellIcon.style'
+import { Frame, Img, NerdGlyph, Placeholder } from './ShellIcon.style'
 
 type ShellIconProps = {
   source: IconSource
   size: ShellIconSize
 }
 
+function isCompact(size: ShellIconSize): boolean {
+  return size === 'menu' || size === 'taskbar'
+}
+
 export function ShellIcon({ source, size }: ShellIconProps) {
   const [faviconFailed, setFaviconFailed] = useState(false)
-  const menu = size === 'menu'
+  const compact = isCompact(size)
 
   if (source.kind === 'asset') {
     return (
-      <Frame $menu={menu} aria-hidden>
-        <Img $desktop={!menu} src={source.src} alt="" draggable={false} />
+      <Frame $compact={compact} aria-hidden>
+        <Img $desktop={!compact} src={source.src} alt="" draggable={false} />
       </Frame>
     )
   }
 
   if (source.kind === 'favicon' && !faviconFailed) {
     return (
-      <Frame $menu={menu} aria-hidden>
+      <Frame $compact={compact} aria-hidden>
         <Img
-          $desktop={!menu}
+          $desktop={!compact}
           src={faviconUrl(source.url)}
           alt=""
           draggable={false}
@@ -34,9 +38,17 @@ export function ShellIcon({ source, size }: ShellIconProps) {
     )
   }
 
+  if (source.kind === 'nerd') {
+    return (
+      <Frame $compact={compact} aria-hidden>
+        <NerdGlyph>{source.glyph}</NerdGlyph>
+      </Frame>
+    )
+  }
+
   return (
-    <Frame $menu={menu} aria-hidden>
-      <Placeholder $menu={menu} />
+    <Frame $compact={compact} aria-hidden>
+      <Placeholder $compact={compact} />
     </Frame>
   )
 }

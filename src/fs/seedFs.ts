@@ -2,9 +2,10 @@ import readme from '../content/seed/README.md?raw'
 import keyboardShortcuts from '../content/seed/docs/keyboard-shortcuts.md?raw'
 import notes from '../content/seed/docs/notes.txt?raw'
 import type { FsNode } from './types'
+import { appIcons, wwwIcons } from '@/utils/appIcons'
 import { basename, join, parentPath } from '@/utils/paths'
 
-export const SEED_VERSION = 2
+export const SEED_VERSION = 4
 
 function dir(path: string, now: number): FsNode {
   return {
@@ -90,35 +91,35 @@ export function buildSeedNodes(): FsNode[] {
   nodes.push(
     jsonFile(
       join('/desktop', 'portfolio.desktop'),
-      { name: 'Or Kwitzel', path: '/apps/portfolio.app' },
+      { name: 'Or Kwitzel', path: '/apps/portfolio.app', icon: appIcons.portfolio },
       now,
     ),
   )
   nodes.push(
     jsonFile(
       join('/desktop', 'my-computer.desktop'),
-      { name: 'My Computer', path: '/apps/computer.app' },
+      { name: 'My Computer', path: '/apps/computer.app', icon: appIcons.computer },
       now,
     ),
   )
   nodes.push(
     jsonFile(
       join('/desktop', 'notepad.desktop'),
-      { name: 'Notepad', path: '/apps/notepad.app' },
+      { name: 'Notepad', path: '/apps/notepad.app', icon: appIcons.notepad },
       now,
     ),
   )
   nodes.push(
     jsonFile(
       join('/desktop', 'github.desktop'),
-      { name: 'GitHub', path: '/www/github.www', icon: null },
+      { name: 'GitHub', path: '/www/github.www', icon: wwwIcons.github },
       now,
     ),
   )
   nodes.push(
     jsonFile(
       join('/desktop', 'linkedin.desktop'),
-      { name: 'LinkedIn', path: '/www/linkedin.www', icon: null },
+      { name: 'LinkedIn', path: '/www/linkedin.www', icon: wwwIcons.linkedin },
       now,
     ),
   )
