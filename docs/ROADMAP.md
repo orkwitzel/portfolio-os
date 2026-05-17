@@ -19,7 +19,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | Phase | Focus | Status | Notes |
 |-------|--------|--------|--------|
 | **0** | Foundation (desktop shell MVP) | **Done** | Window manager, taskbar, lazy apps, stubs. |
-| **1** | Shell fidelity | **In progress** | Start menu done; icons + keyboard remain. Tray clock done. |
+| **1** | Shell fidelity | **Done** | Start menu, tray clock, keyboard shortcuts shipped. P1.2-2 app icon assets optional; P1.2-3 desktop selection deferred. |
 | **2** | Apps & content | **Todo** | Social links, real demos, hub app. |
 | **3** | Technical hardening | **Todo** | Clamp, persistence, tests, CI. |
 | **4** | Mobile & accessibility | **Todo** | Responsive shell, a11y pass. |
@@ -83,10 +83,10 @@ Living document: update **Status** and **Notes** when you start or finish work s
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P1.4-1 | Global key listener registry (shell-level) with cleanup on unmount. | Todo | |
-| P1.4-2 | **Escape:** close focused window unless focus inside editable (`textarea`, `input`, `contentEditable`). | Todo | |
-| P1.4-3 | **Alt+Tab** (or chosen chord): cycle focus/z-order through visible windows. | Todo | |
-| P1.4-4 | Document shortcuts in README or `docs/`. | Todo | |
+| P1.4-1 | Global key listener registry (shell-level) with cleanup on unmount. | Done | `ShellKeyboard.tsx` shortcut table + bubble-phase listener. |
+| P1.4-2 | **Escape:** close focused window unless focus inside editable (`textarea`, `input`, `contentEditable`). | Done | Skips when Start menu open; see `docs/keyboard-shortcuts.md`. |
+| P1.4-3 | Cycle focus/z-order through visible windows (**Ctrl+`** chord). | Done | `getNextFocusWindowId` in `shellKeyboard.ts`; Alt+Tab reserved by OS. |
+| P1.4-4 | Document shortcuts in README or `docs/`. | Done | Canonical: `docs/keyboard-shortcuts.md`; linked from README + `agents.md`. |
 
 ---
 

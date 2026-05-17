@@ -1,14 +1,18 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useRef } from 'react'
 import { useWindowManager } from './windowManagerContext'
 import { nerd } from './nerdIcons'
 import { StartMenu, START_MENU_ID } from './StartMenu'
 import { TrayClock } from './TrayClock'
 import styles from './Taskbar.module.css'
 
-export function Taskbar() {
+type TaskbarProps = {
+  startMenuOpen: boolean
+  onStartMenuOpenChange: (open: boolean) => void
+}
+
+export function Taskbar({ startMenuOpen, onStartMenuOpenChange }: TaskbarProps) {
   const wm = useWindowManager()
   const { session } = wm
-  const [menuOpen, setMenuOpen] = useState(false)
   const startRef = useRef<HTMLButtonElement>(null)
   const startButtonId = useId()
 
@@ -18,12 +22,12 @@ export function Taskbar() {
         ref={startRef}
         id={startButtonId}
         type="button"
-        className={`${styles.startBtn} ${menuOpen ? styles.startBtnPressed : ''}`}
+        className={`${styles.startBtn} ${startMenuOpen ? styles.startBtnPressed : ''}`}
         aria-label="Start"
         aria-haspopup="menu"
-        aria-expanded={menuOpen}
-        aria-controls={menuOpen ? START_MENU_ID : undefined}
-        onClick={() => setMenuOpen((open) => !open)}
+        aria-expanded={startMenuOpen}
+        aria-controls={startMenuOpen ? START_MENU_ID : undefined}
+        onClick={() => onStartMenuOpenChange(!startMenuOpen)}
       >
         <span className={styles.startIcon} aria-hidden>
           {nerd.windowsClassic}
@@ -31,8 +35,8 @@ export function Taskbar() {
         <span className={styles.startLabel}>Start</span>
       </button>
       <StartMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
+        open={startMenuOpen}
+        onClose={() => onStartMenuOpenChange(false)}
         anchorRef={startRef}
         startButtonId={startButtonId}
       />

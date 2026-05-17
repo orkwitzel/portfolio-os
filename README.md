@@ -26,6 +26,7 @@ npm run preview # serve dist locally
 | [agents.md](./agents.md) | Short guidance for coding agents (architecture boundaries, verification commands). |
 | [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) | Rules for humans and agents: repo layout, code style, commits, review checklist. |
 | [docs/ROADMAP.md](./docs/ROADMAP.md) | Phased implementation plan with tasks, IDs, and status tracking. |
+| [docs/keyboard-shortcuts.md](./docs/keyboard-shortcuts.md) | Shell keyboard chords and edge cases. |
 
 ## Architecture (overview)
 

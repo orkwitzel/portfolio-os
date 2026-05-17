@@ -10,6 +10,7 @@ This file is for **automated coding agents** (and humans acting like them). Read
 
 - `docs/CONTRIBUTING.md` — commit style, code rules, repo layout, and review expectations (applies to agents and humans).
 - `docs/ROADMAP.md` — phased plan with step IDs and **Status** columns; pick tasks there when scope is open-ended.
+- `docs/keyboard-shortcuts.md` — shell keyboard chords; new global shortcuts must be documented there and implemented in `ShellKeyboard.tsx`.
 
 ## Architectural boundaries (do not break casually)
 
@@ -39,6 +40,7 @@ Run both before claiming a task is done.
 | Taskbar behavior | `Taskbar.tsx` + reducer actions if semantics change. |
 | Window chrome / drag-resize | `WindowFrame.tsx` + CSS modules under `src/wm/`. |
 | Session semantics | `sessionTypes.ts`, then `sessionReducer.ts`, then `WindowManagerProvider` surface if verbs change. |
+| Shell keyboard shortcuts | `ShellKeyboard.tsx`, `shellKeyboard.ts`; update `docs/keyboard-shortcuts.md`. |
 
 ## Defaults unless the user overrides
 
