@@ -1,1 +1,1 @@
-export { FsProvider } from './FsProviderImpl'
+export { FsBootstrap as FsProvider } from './FsBootstrap'

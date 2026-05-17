@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { MarkdownView } from '../_shared/MarkdownView'
 import { openExternalLink } from '../../desktop/openExternalLink'
-import { useFs } from '../../fs/fsContext'
+import { useFsStore } from '../../fs/fsStore'
 import { basename, extension } from '../../fs/paths'
 import type { AppFile, WwwFile } from '../../fs/types'
 import { useWindowManager } from '../../desktop/windowManagerContext'
@@ -73,17 +73,18 @@ function AppDetail({
 }
 
 export function FsDetailPane({ selectedPath }: FsDetailPaneProps) {
-  const fs = useFs()
+  const ready = useFsStore((s) => s.ready)
+  const readFile = useFsStore((s) => s.readFile)
+  const openPath = useFsStore((s) => s.openPath)
   const wm = useWindowManager()
   const [content, setContent] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!selectedPath || !fs.ready) return
+    if (!selectedPath || !ready) return
 
     let cancelled = false
-    fs
-      .readFile(selectedPath)
+    readFile(selectedPath)
       .then((text) => {
         if (!cancelled) {
           setContent(text)
@@ -100,7 +101,7 @@ export function FsDetailPane({ selectedPath }: FsDetailPaneProps) {
     return () => {
       cancelled = true
     }
-  }, [fs, fs.ready, selectedPath])
+  }, [ready, readFile, selectedPath])
 
   const ext = selectedPath ? extension(selectedPath) : ''
 
@@ -133,7 +134,7 @@ export function FsDetailPane({ selectedPath }: FsDetailPaneProps) {
       case '.app': {
         const app = parseApp(content)
         body = app ? (
-          <AppDetail app={app} onOpen={() => void fs.openPath(selectedPath)} />
+          <AppDetail app={app} onOpen={() => void openPath(selectedPath)} />
         ) : (
           <p className={styles.detailMessage}>Invalid .app JSON.</p>
         )

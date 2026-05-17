@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AppProps } from '../../desktop/sessionTypes'
-import { useFs } from '../../fs/fsContext'
+import { useFsStore } from '../../fs/fsStore'
 import { basename, join } from '../../fs/paths'
 import styles from './notepad.module.css'
 
@@ -17,7 +17,10 @@ async function nextUntitledPath(
 }
 
 export function NotepadRoot({ launch }: AppProps) {
-  const fs = useFs()
+  const ready = useFsStore((s) => s.ready)
+  const readFile = useFsStore((s) => s.readFile)
+  const writeFile = useFsStore((s) => s.writeFile)
+  const listChildren = useFsStore((s) => s.listChildren)
   const [value, setValue] = useState('')
   const [path, setPath] = useState<string | null>(launch?.path ?? null)
   const [dirty, setDirty] = useState(false)
@@ -28,11 +31,10 @@ export function NotepadRoot({ launch }: AppProps) {
   }, [path])
 
   useEffect(() => {
-    if (!launch?.path || !fs.ready) return
+    if (!launch?.path || !ready) return
 
     let cancelled = false
-    fs
-      .readFile(launch.path)
+    readFile(launch.path)
       .then((text) => {
         if (!cancelled) {
           setValue(text)
@@ -49,18 +51,18 @@ export function NotepadRoot({ launch }: AppProps) {
     return () => {
       cancelled = true
     }
-  }, [fs, fs.ready, launch?.path])
+  }, [ready, readFile, launch?.path])
 
   const save = useCallback(async () => {
     let target = pathRef.current
     if (!target) {
-      target = await nextUntitledPath(fs.listChildren)
+      target = await nextUntitledPath(listChildren)
       setPath(target)
       pathRef.current = target
     }
-    await fs.writeFile(target, value)
+    await writeFile(target, value)
     setDirty(false)
-  }, [fs, value])
+  }, [listChildren, writeFile, value])
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {

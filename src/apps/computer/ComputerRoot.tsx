@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import type { AppProps } from '../../desktop/sessionTypes'
-import { useFs } from '../../fs/fsContext'
+import { useFsStore } from '../../fs/fsStore'
 import { basename, extension } from '../../fs/paths'
 import { useWindowManager } from '../../desktop/windowManagerContext'
 import { FsDetailPane } from './FsDetailPane'
@@ -15,7 +15,7 @@ function initialPath(launch?: { path: string }): string {
 }
 
 export function ComputerRoot({ launch }: AppProps) {
-  const fs = useFs()
+  const nodes = useFsStore((s) => s.nodes)
   const wm = useWindowManager()
   const [selectedPath, setSelectedPath] = useState(() => initialPath(launch))
 
@@ -36,7 +36,7 @@ export function ComputerRoot({ launch }: AppProps) {
     <div className={styles.appBody}>
       <div className={styles.treePane}>
         <FsTree
-          nodes={fs.nodes}
+          nodes={nodes}
           selectedPath={selectedPath}
           onSelectFile={onSelectFile}
         />

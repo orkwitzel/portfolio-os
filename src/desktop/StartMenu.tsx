@@ -5,7 +5,7 @@ import {
   useState,
   type RefObject,
 } from 'react'
-import { useFs } from '../fs/fsContext'
+import { useFsStore } from '../fs/fsStore'
 import { ShellIcon } from './icons/ShellIcon'
 import type { IconSource } from './icons/types'
 import { buildProgramItems, buildStartLinkItems } from './shellCatalog'
@@ -41,27 +41,26 @@ function StartMenuItem({
 
 export function StartMenu({ open, onClose, anchorRef, startButtonId }: StartMenuProps) {
   const wm = useWindowManager()
-  const fs = useFs()
+  const ready = useFsStore((s) => s.ready)
+  const listDesktopEntries = useFsStore((s) => s.listDesktopEntries)
+  const openPath = useFsStore((s) => s.openPath)
+  const resolveDesktopIcon = useFsStore((s) => s.resolveDesktopIcon)
   const menuRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState<{ left: number; bottom: number } | null>(null)
   const [links, setLinks] = useState<ShellLaunchItem[]>([])
 
   useEffect(() => {
-    if (!fs.ready) return
+    if (!ready) return
     let cancelled = false
     ;(async () => {
-      const entries = await fs.listDesktopEntries()
-      const built = await buildStartLinkItems(
-        entries,
-        fs.openPath,
-        fs.resolveDesktopIcon,
-      )
+      const entries = await listDesktopEntries()
+      const built = await buildStartLinkItems(entries, openPath, resolveDesktopIcon)
       if (!cancelled) setLinks(built)
     })()
     return () => {
       cancelled = true
     }
-  }, [fs, fs.ready, fs.listDesktopEntries, fs.openPath, fs.resolveDesktopIcon])
+  }, [ready, listDesktopEntries, openPath, resolveDesktopIcon])
 
   const programs = buildProgramItems(wm)
 
