@@ -2,7 +2,35 @@
   box-sizing: border-box;
   flex: 1;
   display: flex;
+  flex-direction: column;
   min-height: 0;
+}
+
+.toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+  border-bottom: 1px solid #808080;
+  background: #c0c0c0;
+}
+
+.toolBtn {
+  padding: 2px 12px;
+  border: 2px outset #dfdfdf;
+  background: #c0c0c0;
+  font: inherit;
+  cursor: default;
+}
+
+.toolBtn:active {
+  border-style: inset;
+}
+
+.pathLabel {
+  font: var(--font-size-ui) / 1.35 var(--font-ui);
+  color: #000;
 }
 
 .notepadField {
@@ -16,4 +44,5 @@
   outline: none;
   background: #fff;
   color: #000;
+  min-height: 0;
 }

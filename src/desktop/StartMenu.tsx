@@ -5,10 +5,11 @@ import {
   useState,
   type RefObject,
 } from 'react'
-import { externalLinks } from './links'
+import { useFs } from '../fs/fsContext'
 import { ShellIcon } from './icons/ShellIcon'
 import type { IconSource } from './icons/types'
-import { buildLinkItems, buildProgramItems } from './shellCatalog'
+import { buildProgramItems, buildStartLinkItems } from './shellCatalog'
+import type { ShellLaunchItem } from './shellCatalog'
 import { useWindowManager } from './windowManagerContext'
 import styles from './StartMenu.module.css'
 
@@ -40,11 +41,29 @@ function StartMenuItem({
 
 export function StartMenu({ open, onClose, anchorRef, startButtonId }: StartMenuProps) {
   const wm = useWindowManager()
+  const fs = useFs()
   const menuRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState<{ left: number; bottom: number } | null>(null)
+  const [links, setLinks] = useState<ShellLaunchItem[]>([])
+
+  useEffect(() => {
+    if (!fs.ready) return
+    let cancelled = false
+    ;(async () => {
+      const entries = await fs.listDesktopEntries()
+      const built = await buildStartLinkItems(
+        entries,
+        fs.openPath,
+        fs.resolveDesktopIcon,
+      )
+      if (!cancelled) setLinks(built)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [fs, fs.ready, fs.listDesktopEntries, fs.openPath, fs.resolveDesktopIcon])
 
   const programs = buildProgramItems(wm)
-  const links = buildLinkItems(externalLinks)
 
   useLayoutEffect(() => {
     if (!open) return

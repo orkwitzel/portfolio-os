@@ -1,13 +1,23 @@
 import { createContext, useContext } from 'react'
 import type { RefObject } from 'react'
-import type { AppDefinition, DesktopSession, NormalGeometry, WindowId, WMAction } from './sessionTypes'
+import type {
+  AppDefinition,
+  DesktopSession,
+  NormalGeometry,
+  WindowId,
+  WindowLaunch,
+  WMAction,
+} from './sessionTypes'
 
 export type WindowManagerApi = {
   session: DesktopSession
   registry: Map<string, AppDefinition>
   workspaceRef: RefObject<HTMLElement | null>
   dispatch: (action: WMAction) => void
-  openApp: (appId: string, options?: { title?: string }) => void
+  openApp: (
+    appId: string,
+    options?: { title?: string; launch?: WindowLaunch },
+  ) => void
   closeWindow: (windowId: WindowId) => void
   focusWindow: (windowId: WindowId) => void
   minimizeWindow: (windowId: WindowId) => void

@@ -20,7 +20,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 |-------|--------|--------|--------|
 | **0** | Foundation (desktop shell MVP) | **Done** | Window manager, taskbar, lazy apps, stubs. |
 | **1** | Shell fidelity | **Done** | Start menu, tray clock, keyboard shortcuts shipped. P1.2-2 app icon assets optional; P1.2-3 desktop selection deferred. |
-| **2** | Apps & content | **In progress** | P2.1 social links done; P2.2 demo apps done 2026-05-17; P2.3 hub todo. |
+| **2** | Apps & content | **Done** | P2.1–P2.3 shipped 2026-05-17 — social links, demo apps, My Computer / IDB hub. |
 | **3** | Technical hardening | **Todo** | Clamp, persistence, tests, CI. |
 | **4** | Mobile & accessibility | **Todo** | Responsive shell, a11y pass. |
 | **5** | Deployment & polish | **Todo** | Hosting, SEO/meta. |
@@ -98,8 +98,8 @@ Living document: update **Status** and **Notes** when you start or finish work s
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P2.1-1 | Define config shape (`label`, `url`, `icon?`) for external links. | Done | `links.ts` + `IconSource`. |
-| P2.1-2 | Desktop and/or Start entries rendering from config; `window.open(url, '_blank', 'noopener,noreferrer')`. | Done | `shellCatalog.ts`; edit URLs in `links.ts`. |
+| P2.1-1 | Define config shape (`label`, `url`, `icon?`) for external links. | Done | `.www` files in IDB + `IconSource`. |
+| P2.1-2 | Desktop and/or Start entries rendering from config; `window.open(url, '_blank', 'noopener,noreferrer')`. | Done | `/desktop/*.desktop` → `.www` targets; Start Links section. |
 | P2.1-3 | Optional “browser” window shell that iframe/embeds—only if framed UX is desired. | Todo | Deferred by default (third-party framing limits). |
 
 ### 2.2 Richer demo apps
@@ -109,18 +109,18 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
 | P2.2-1 | List target demos (skills to showcase); one app folder each under `src/apps/`. | Done | Spec: `docs/superpowers/specs/2026-05-17-phase-2-2-demo-apps-design.md` — `about`, `resume`, `playful`. |
-| P2.2-2 | Replace or slim `Notepad` / `About` per content strategy; keep `AppProps` contract. | Done | About (MD), Resume (PDF iframe), Minesweeper; Notepad removed from registry. |
+| P2.2-2 | Replace or slim `Notepad` / `About` per content strategy; keep `AppProps` contract. | Done | About (MD), Resume (PDF), Minesweeper; Notepad re-added with IDB save (P2.3). |
 | P2.2-3 | Audit bundle: heavy deps only inside their lazy chunks. | Done | `react-markdown` in About chunk only; `resume.pdf` static; see spec lazy chunk map. |
 
 ### 2.3 “My Computer” / readme hub
 
-**Outcome:** Low-JS overview surface for visitors who expect a traditional landing.
+**Outcome:** Persistent virtual FS in IndexedDB; tree browser + extension handlers; desktop shortcuts from `/desktop/*.desktop` only.
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P2.3-1 | Spec minimal UI (tree vs flat list vs markdown viewer inside window). | Todo | |
-| P2.3-2 | Implement hub app; wire shortcut + optional Start entry. | Todo | |
-| P2.3-3 | Pull copy from single source (e.g. static TS/JSON/MD) to avoid duplication. | Todo | |
+| P2.3-1 | Spec: IDB schema, extensions, `.desktop`, bootstrap, tree UI. | Done | `docs/superpowers/specs/2026-05-17-phase-2-3-computer-hub-design.md` |
+| P2.3-2 | Implement hub app + `src/fs/` layer; re-register `computer` + `notepad`. | Done | `FsProvider`, `ComputerRoot`, Notepad save to IDB; `links.ts` removed. |
+| P2.3-3 | Seed content from `src/content/seed/` via `seedFs.ts`; bump `SEED_VERSION` on layout changes. | Done | Destructive reseed on version bump (documented in CONTRIBUTING). |
 
 ---
 

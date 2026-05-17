@@ -15,12 +15,17 @@ export type WindowGeometryState =
   | { mode: 'maximized'; restored: NormalGeometry; frame: NormalGeometry }
   | { mode: 'minimized'; restored: NormalGeometry }
 
+export type WindowLaunch = {
+  path: string
+}
+
 export type WindowRecord = {
   id: WindowId
   appId: string
   title: string
   geometry: WindowGeometryState
   zIndex: number
+  launch?: WindowLaunch
 }
 
 export type DesktopSession = {
@@ -33,6 +38,7 @@ export type DesktopSession = {
 
 export type AppProps = {
   windowId: WindowId
+  launch?: WindowLaunch
 }
 
 export type AppDefinition = {

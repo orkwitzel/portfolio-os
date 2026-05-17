@@ -1,0 +1,3 @@
+Welcome to Notepad.
+
+Edit this file and press Save (or Ctrl+S). Your changes are stored in IndexedDB and survive reloads.

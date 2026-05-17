@@ -1,0 +1,5 @@
+Welcome to Notepad on portfolio-os.
+
+Edit this file and press Save (or Ctrl+S). Your changes persist in IndexedDB across reloads.
+
+Try opening other .txt files from My Computer.

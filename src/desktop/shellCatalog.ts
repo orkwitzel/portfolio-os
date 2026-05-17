@@ -1,10 +1,10 @@
-import type { ExternalLinkDefinition } from './links'
+import type { DesktopEntry } from '../fs/types'
+import { isWwwTarget } from '../fs/desktop'
 import { placeholderIcon, type IconSource } from './icons/types'
-import { openExternalLink } from './openExternalLink'
 import type { WindowManagerApi } from './windowManagerContext'
 
 export type ShellLaunchItem = {
-  kind: 'app' | 'link'
+  kind: 'app' | 'link' | 'desktop'
   id: string
   label: string
   icon: IconSource
@@ -21,12 +21,39 @@ export function buildProgramItems(wm: WindowManagerApi): ShellLaunchItem[] {
   }))
 }
 
-export function buildLinkItems(links: ExternalLinkDefinition[]): ShellLaunchItem[] {
-  return links.map((link) => ({
-    kind: 'link',
-    id: link.id,
-    label: link.label,
-    icon: link.icon ?? { kind: 'favicon', url: link.url },
-    launch: () => openExternalLink(link.url),
-  }))
+export async function buildDesktopItems(
+  entries: DesktopEntry[],
+  openPath: (path: string) => void | Promise<void>,
+  resolveIcon: (entry: DesktopEntry) => Promise<IconSource>,
+): Promise<ShellLaunchItem[]> {
+  const items: ShellLaunchItem[] = []
+  for (const entry of entries) {
+    items.push({
+      kind: 'desktop',
+      id: entry.desktopPath,
+      label: entry.name,
+      icon: await resolveIcon(entry),
+      launch: () => void openPath(entry.targetPath),
+    })
+  }
+  return items
+}
+
+export async function buildStartLinkItems(
+  entries: DesktopEntry[],
+  openPath: (path: string) => void | Promise<void>,
+  resolveIcon: (entry: DesktopEntry) => Promise<IconSource>,
+): Promise<ShellLaunchItem[]> {
+  const wwwEntries = entries.filter((e) => isWwwTarget(e.targetPath))
+  const items: ShellLaunchItem[] = []
+  for (const entry of wwwEntries) {
+    items.push({
+      kind: 'link',
+      id: entry.desktopPath,
+      label: entry.name,
+      icon: await resolveIcon(entry),
+      launch: () => void openPath(entry.targetPath),
+    })
+  }
+  return items
 }

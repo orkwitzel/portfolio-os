@@ -6,7 +6,9 @@ Rules here apply to **human contributors** and to **coding agents**. Humans own 
 
 ```
 src/
-  App.tsx                    # Shell wiring + workspace ref + provider
+  App.tsx                    # Shell wiring + workspace ref + providers
+  fs/                        # IndexedDB virtual FS (seed, openPath, desktop entries)
+  content/seed/              # Canonical copies for seeded .md / .txt files
   desktop/
     windowManagerContext.tsx # Context type + useWindowManager hook
     WindowManagerProvider.tsx# Session reducer + imperative API
@@ -22,6 +24,10 @@ src/
     *.module.css
   apps/
     <app-name>/              # One folder per program (lazy-loaded roots + CSS)
+  fs/
+    FsProviderImpl.tsx       # IndexedDB virtual FS context
+    seedFs.ts                # SEED_VERSION + default tree (bump to reseed)
+  content/seed/              # Canonical copies of seeded .md / .txt files
 ```
 
 **Naming**
@@ -44,9 +50,17 @@ src/
 1. Create `src/apps/<slug>/<Slug>Root.tsx` accepting `AppProps` from `sessionTypes.ts`.
 2. Add styles beside it (`*.module.css`).
 3. Append an entry to `appDefinitions` in `registry.tsx` with unique `id`, titles, default bounds, and `lazy(() => import(...))`.
-4. Optionally add a desktop shortcut in `Desktop.tsx`.
+4. Add a launcher stub at `/apps/<slug>.app` in `seedFs.ts` (JSON: `{ "appId", "title?" }`).
+5. Optionally pin to the wallpaper with `/desktop/<name>.desktop` pointing at that `.app` (or a `.www` / `.txt` target).
 
 Use `useWindowManager()` only when the app must talk to the shell (close self, spawn sibling windows). Prefer local React state for app internals.
+
+### Virtual filesystem (IndexedDB)
+
+- Default tree is built in `src/fs/seedFs.ts` (`SEED_VERSION`, `buildSeedNodes()`). Text bodies live in `src/content/seed/` and are imported with Vite `?raw`.
+- On first visit (or when `SEED_VERSION` increases), the DB is **cleared and reseeded** — local edits in the browser are lost unless we add export later. Bump `SEED_VERSION` whenever the default tree layout or seed files change.
+- External URLs: add `/www/<name>.www` JSON (`{ "name", "url" }`), then a `/desktop/*.desktop` shortcut with `"path": "/www/..."` if you want a wallpaper pin.
+- Wallpaper shows **only** `/desktop/*.desktop` entries — not every registry app or every `.www` file.
 
 ## Git & commits
 

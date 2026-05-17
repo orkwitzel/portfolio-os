@@ -11,6 +11,22 @@ export function createAppRegistry(defs: AppDefinition[]): Map<string, AppDefinit
 
 export const appDefinitions: AppDefinition[] = [
   {
+    id: 'computer',
+    defaultTitle: 'My Computer',
+    defaultBounds: { width: 600, height: 440 },
+    Root: lazy(() =>
+      import('../apps/computer/ComputerRoot').then((m) => ({ default: m.ComputerRoot })),
+    ),
+  },
+  {
+    id: 'notepad',
+    defaultTitle: 'Notepad',
+    defaultBounds: { width: 400, height: 300 },
+    Root: lazy(() =>
+      import('../apps/notepad/NotepadRoot').then((m) => ({ default: m.NotepadRoot })),
+    ),
+  },
+  {
     id: 'about',
     defaultTitle: 'About portfolio-os',
     defaultBounds: { width: 480, height: 360 },

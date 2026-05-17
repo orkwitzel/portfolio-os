@@ -154,7 +154,7 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
       <div className={styles.client}>
         {Root ? (
           <Suspense fallback={<div className={styles.loadFallback}>Loading…</div>}>
-            <Root windowId={win.id} />
+            <Root windowId={win.id} launch={win.launch} />
           </Suspense>
         ) : (
           <div className={styles.loadFallback}>Missing app: {win.appId}</div>

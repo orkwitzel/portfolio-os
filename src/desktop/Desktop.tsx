@@ -1,9 +1,8 @@
-import type { RefObject } from 'react'
-import { externalLinks } from './links'
+import { useEffect, useState, type RefObject } from 'react'
+import { useFs } from '../fs/fsContext'
 import { ShellIcon } from './icons/ShellIcon'
 import type { ShellLaunchItem } from './shellCatalog'
-import { buildLinkItems, buildProgramItems } from './shellCatalog'
-import { useWindowManager } from './windowManagerContext'
+import { buildDesktopItems } from './shellCatalog'
 import { WindowLayer } from '../wm/WindowLayer'
 import styles from './Desktop.module.css'
 
@@ -17,8 +16,25 @@ function DesktopShortcut({ item }: { item: ShellLaunchItem }) {
 }
 
 export function Desktop({ workspaceRef }: { workspaceRef: RefObject<HTMLDivElement | null> }) {
-  const wm = useWindowManager()
-  const items = [...buildProgramItems(wm), ...buildLinkItems(externalLinks)]
+  const fs = useFs()
+  const [items, setItems] = useState<ShellLaunchItem[]>([])
+
+  useEffect(() => {
+    if (!fs.ready) return
+    let cancelled = false
+    ;(async () => {
+      const entries = await fs.listDesktopEntries()
+      const built = await buildDesktopItems(
+        entries,
+        fs.openPath,
+        fs.resolveDesktopIcon,
+      )
+      if (!cancelled) setItems(built)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [fs, fs.ready, fs.listDesktopEntries, fs.openPath, fs.resolveDesktopIcon])
 
   return (
     <div ref={workspaceRef} className={styles.workspace}>

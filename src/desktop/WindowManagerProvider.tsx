@@ -8,7 +8,13 @@ import {
   type RefObject,
 } from 'react'
 import { createInitialSession, reduceSession } from './sessionReducer'
-import type { AppDefinition, NormalGeometry, WindowId, WindowRecord } from './sessionTypes'
+import type {
+  AppDefinition,
+  NormalGeometry,
+  WindowId,
+  WindowLaunch,
+  WindowRecord,
+} from './sessionTypes'
 import { WindowManagerContext, type WindowManagerApi } from './windowManagerContext'
 
 export function WindowManagerProvider({
@@ -28,7 +34,7 @@ export function WindowManagerProvider({
   }, [session])
 
   const openApp = useCallback(
-    (appId: string, options?: { title?: string }) => {
+    (appId: string, options?: { title?: string; launch?: WindowLaunch }) => {
       const def = registry.get(appId)
       if (!def) {
         console.warn(`Unknown app id: ${appId}`)
@@ -52,6 +58,7 @@ export function WindowManagerProvider({
         title: options?.title ?? def.defaultTitle,
         geometry: { mode: 'normal', geometry },
         zIndex: nextZ,
+        launch: options?.launch,
       }
 
       dispatch({ type: 'OPEN_WINDOW', window })
