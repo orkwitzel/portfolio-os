@@ -19,18 +19,23 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
   const vm = useWindowFrame(win)
   const Root = vm.Root
 
-  if (vm.minimized) return null
-
   return (
     <Window
+      data-window-frame
+      $animating={vm.animating}
       style={{
         zIndex: win.zIndex,
         left: vm.rect.x,
         top: vm.rect.y,
         width: vm.rect.width,
         height: vm.rect.height,
+        opacity: vm.hidden ? 0 : vm.visualOpacity,
+        visibility: vm.hidden ? 'hidden' : 'visible',
+        pointerEvents: vm.hidden ? 'none' : 'auto',
       }}
+      onPointerDown={vm.onWindowPointerDown}
       onMouseDown={() => vm.wm.focusWindow(win.id)}
+      onTransitionEnd={vm.onTransitionEnd}
     >
       <TitleBar
         $active={vm.focused}
@@ -44,7 +49,7 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
             type="button"
             aria-label="Minimize"
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => vm.wm.minimizeWindow(win.id)}
+            onClick={vm.requestMinimize}
           >
             _
           </ControlBtn>
@@ -60,7 +65,7 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
             type="button"
             aria-label="Close"
             onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => vm.wm.closeWindow(win.id)}
+            onClick={vm.requestClose}
           >
             ×
           </ControlBtn>

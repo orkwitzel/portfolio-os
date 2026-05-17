@@ -20,6 +20,7 @@ import {
   type DesktopItem,
   type DesktopSelectionState,
 } from '@/utils/desktopSelection'
+import { isWindowPointerInteractionActive } from '@/utils/windowInteraction'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -357,12 +358,19 @@ export function useDesktop({
       // Only handle clicks directly on the workspace or shortcuts container.
       const target = e.target as HTMLElement
       if (target.closest('button')) return
+      if (target.closest('[data-window-frame]')) return
+      if (isWindowPointerInteractionActive()) return
 
       const addMode = e.ctrlKey || e.metaKey
       const startClient = { x: e.clientX, y: e.clientY }
       let marqueeStarted = false
 
       const onMove = (ev: PointerEvent) => {
+        if (isWindowPointerInteractionActive()) {
+          detachListeners()
+          if (marqueeStarted) dispatch({ type: 'MARQUEE_END' })
+          return
+        }
         const dx = ev.clientX - startClient.x
         const dy = ev.clientY - startClient.y
         if (!marqueeStarted && Math.hypot(dx, dy) >= DRAG_THRESHOLD) {

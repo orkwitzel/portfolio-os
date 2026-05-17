@@ -1,6 +1,10 @@
 import styled from 'styled-components'
+import { WINDOW_ANIM_EASE, WINDOW_ANIM_MS } from '@/utils/windowFrameAnimation'
 
-export const Window = styled.div`
+/** Shared with resize hit-targets so they align under the title bar. */
+export const TITLE_BAR_HEIGHT = 28
+
+export const Window = styled.div<{ $animating?: boolean }>`
   position: absolute;
   box-sizing: border-box;
   background: #c0c0c0;
@@ -16,14 +20,19 @@ export const Window = styled.div`
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  transition: ${(p) =>
+    p.$animating
+      ? `left ${WINDOW_ANIM_MS}ms ${WINDOW_ANIM_EASE}, top ${WINDOW_ANIM_MS}ms ${WINDOW_ANIM_EASE}, width ${WINDOW_ANIM_MS}ms ${WINDOW_ANIM_EASE}, height ${WINDOW_ANIM_MS}ms ${WINDOW_ANIM_EASE}, opacity ${WINDOW_ANIM_MS}ms ${WINDOW_ANIM_EASE}`
+      : 'none'};
+  will-change: ${(p) => (p.$animating ? 'left, top, width, height, opacity' : 'auto')};
 `
 
 export const TitleBar = styled.div<{ $active: boolean }>`
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 22px;
-  padding: 2px 3px;
+  gap: 5px;
+  height: ${TITLE_BAR_HEIGHT}px;
+  padding: 3px 4px;
   flex-shrink: 0;
   cursor: grab;
   user-select: none;
@@ -39,8 +48,8 @@ export const TitleBar = styled.div<{ $active: boolean }>`
 `
 
 export const TitleIcon = styled.span`
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   background: #fff;
   border: 1px solid #000;
@@ -48,7 +57,7 @@ export const TitleIcon = styled.span`
 
 export const TitleText = styled.span`
   flex: 1;
-  font: bold var(--font-size-ui) / 1 var(--font-ui);
+  font: bold 13px / 1 var(--font-ui);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -56,13 +65,13 @@ export const TitleText = styled.span`
 
 export const Controls = styled.div`
   display: flex;
-  gap: 2px;
+  gap: 3px;
   flex-shrink: 0;
 `
 
 export const ControlBtn = styled.button`
-  width: 16px;
-  height: 14px;
+  width: 20px;
+  height: 18px;
   padding: 0;
   box-sizing: border-box;
   border-top: 2px solid #fff;
@@ -70,7 +79,7 @@ export const ControlBtn = styled.button`
   border-right: 2px solid #404040;
   border-bottom: 2px solid #404040;
   background: #c0c0c0;
-  font: var(--font-size-ui) / 1 var(--font-ui);
+  font: 13px / 1 var(--font-ui);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -98,7 +107,7 @@ export const Client = styled.div`
 
 export const ResizeEast = styled.div`
   position: absolute;
-  top: 22px;
+  top: ${TITLE_BAR_HEIGHT}px;
   right: 0;
   bottom: 0;
   width: 6px;
