@@ -11,19 +11,27 @@ export function createAppRegistry(defs: AppDefinition[]): Map<string, AppDefinit
 
 export const appDefinitions: AppDefinition[] = [
   {
-    id: 'notepad',
-    defaultTitle: 'Notepad',
-    defaultBounds: { width: 420, height: 320 },
+    id: 'about',
+    defaultTitle: 'About portfolio-os',
+    defaultBounds: { width: 480, height: 360 },
     Root: lazy(() =>
-      import('../apps/notepad/NotepadRoot').then((m) => ({ default: m.NotepadRoot })),
+      import('../apps/about/AboutRoot').then((m) => ({ default: m.AboutRoot })),
     ),
   },
   {
-    id: 'about',
-    defaultTitle: 'About',
-    defaultBounds: { width: 360, height: 260 },
+    id: 'resume',
+    defaultTitle: 'Resume',
+    defaultBounds: { width: 560, height: 720 },
     Root: lazy(() =>
-      import('../apps/about/AboutRoot').then((m) => ({ default: m.AboutRoot })),
+      import('../apps/resume/ResumeRoot').then((m) => ({ default: m.ResumeRoot })),
+    ),
+  },
+  {
+    id: 'playful',
+    defaultTitle: 'Minesweeper',
+    defaultBounds: { width: 320, height: 360 },
+    Root: lazy(() =>
+      import('../apps/playful/PlayfulRoot').then((m) => ({ default: m.PlayfulRoot })),
     ),
   },
 ]

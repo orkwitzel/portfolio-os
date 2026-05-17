@@ -20,7 +20,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 |-------|--------|--------|--------|
 | **0** | Foundation (desktop shell MVP) | **Done** | Window manager, taskbar, lazy apps, stubs. |
 | **1** | Shell fidelity | **Done** | Start menu, tray clock, keyboard shortcuts shipped. P1.2-2 app icon assets optional; P1.2-3 desktop selection deferred. |
-| **2** | Apps & content | **Todo** | Social links, real demos, hub app. |
+| **2** | Apps & content | **In progress** | P2.1 social links done; P2.2 demo apps done 2026-05-17; P2.3 hub todo. |
 | **3** | Technical hardening | **Todo** | Clamp, persistence, tests, CI. |
 | **4** | Mobile & accessibility | **Todo** | Responsive shell, a11y pass. |
 | **5** | Deployment & polish | **Todo** | Hosting, SEO/meta. |
@@ -108,9 +108,9 @@ Living document: update **Status** and **Notes** when you start or finish work s
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P2.2-1 | List target demos (skills to showcase); one app folder each under `src/apps/`. | Todo | |
-| P2.2-2 | Replace or slim `Notepad` / `About` per content strategy; keep `AppProps` contract. | Todo | |
-| P2.2-3 | Audit bundle: heavy deps only inside their lazy chunks. | Todo | |
+| P2.2-1 | List target demos (skills to showcase); one app folder each under `src/apps/`. | Done | Spec: `docs/superpowers/specs/2026-05-17-phase-2-2-demo-apps-design.md` — `about`, `resume`, `playful`. |
+| P2.2-2 | Replace or slim `Notepad` / `About` per content strategy; keep `AppProps` contract. | Done | About (MD), Resume (PDF iframe), Minesweeper; Notepad removed from registry. |
+| P2.2-3 | Audit bundle: heavy deps only inside their lazy chunks. | Done | `react-markdown` in About chunk only; `resume.pdf` static; see spec lazy chunk map. |
 
 ### 2.3 “My Computer” / readme hub
 

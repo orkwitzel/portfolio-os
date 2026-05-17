@@ -1,0 +1,132 @@
+.appBody {
+  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  min-height: 0;
+  font: var(--font-size-ui) var(--font-ui);
+  color: #000;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  padding: 4px 6px;
+  border: 2px inset #c0c0c0;
+  background: #c0c0c0;
+}
+
+.counter {
+  box-sizing: border-box;
+  min-width: 36px;
+  padding: 2px 4px;
+  border: 2px inset #c0c0c0;
+  background: #000;
+  color: #f00;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.faceBtn {
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  font: 14px/1 var(--font-ui);
+  cursor: default;
+}
+
+.faceBtn:active {
+  border-style: inset;
+}
+
+.statusText {
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, 22px);
+  gap: 0;
+  border: 3px solid;
+  border-color: #808080 #fff #fff #808080;
+  background: #c0c0c0;
+}
+
+.cell {
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  font: bold 12px/22px var(--font-ui);
+  text-align: center;
+  cursor: default;
+  color: #000;
+}
+
+.cell:active:not(:disabled) {
+  border-style: inset;
+}
+
+.cellRevealed {
+  border: 1px solid #808080;
+  background: #c0c0c0;
+  cursor: default;
+}
+
+.cellRevealed:active {
+  border-style: solid;
+}
+
+.cellFlagged {
+  color: #f00;
+  font-weight: 700;
+}
+
+.cellMine {
+  color: #000;
+}
+
+.cellMineHit {
+  background: #f00;
+}
+
+.n1 {
+  color: #0000ff;
+}
+.n2 {
+  color: #008000;
+}
+.n3 {
+  color: #ff0000;
+}
+.n4 {
+  color: #000080;
+}
+.n5 {
+  color: #800000;
+}
+.n6 {
+  color: #008080;
+}
+.n7 {
+  color: #000;
+}
+.n8 {
+  color: #808080;
+}
