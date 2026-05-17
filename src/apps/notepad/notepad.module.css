@@ -1,0 +1,22 @@
+.appBody {
+  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.notepadField {
+  flex: 1;
+  box-sizing: border-box;
+  margin: 2px;
+  border: 2px inset #c0c0c0;
+  padding: 6px;
+  font:
+    11px/1.35 Tahoma,
+    'MS Sans Serif',
+    sans-serif;
+  resize: none;
+  outline: none;
+  background: #fff;
+  color: #000;
+}

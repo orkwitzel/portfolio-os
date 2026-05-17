@@ -1,0 +1,73 @@
+.bar {
+  height: 32px;
+  flex-shrink: 0;
+  background: #c0c0c0;
+  border-top: 2px solid #dfdfdf;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
+
+.startBtn {
+  height: 22px;
+  padding: 0 10px;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  background: #c0c0c0;
+  font:
+    bold 11px Tahoma,
+    'MS Sans Serif',
+    sans-serif;
+  cursor: default;
+}
+
+.tasks {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.taskBtn {
+  height: 22px;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 0 8px;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+  background: #c0c0c0;
+  font:
+    11px Tahoma,
+    'MS Sans Serif',
+    sans-serif;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.taskBtnActive {
+  border-top: 2px solid #404040;
+  border-left: 2px solid #404040;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+
+.taskBtnMinimized {
+  color: #404040;
+}
+
+.tray {
+  width: 72px;
+  height: 22px;
+  border: 2px inset #c0c0c0;
+  flex-shrink: 0;
+}

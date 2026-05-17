@@ -1,0 +1,58 @@
+.workspace {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #018281;
+}
+
+.shortcuts {
+  position: absolute;
+  inset: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  z-index: 0;
+}
+
+.shortcut {
+  width: 92px;
+  border: none;
+  padding: 4px 6px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  text-shadow:
+    1px 0 #000,
+    -1px 0 #000,
+    0 1px #000,
+    0 -1px #000;
+  font:
+    11px Tahoma,
+    'MS Sans Serif',
+    sans-serif;
+}
+
+.shortcut:focus-visible {
+  outline: 2px dotted #fff;
+  outline-offset: 2px;
+}
+
+.shortcutIcon {
+  width: 38px;
+  height: 38px;
+  background: #c0c0c0;
+  border: 2px solid #fff;
+  box-shadow:
+    inset -2px -2px #404040,
+    inset 2px 2px #fff;
+}
+
+.shortcutLabel {
+  text-align: center;
+  word-break: break-word;
+}
