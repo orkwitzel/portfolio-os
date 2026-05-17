@@ -16,7 +16,12 @@ export type WindowManagerApi = {
   dispatch: (action: WMAction) => void
   openApp: (
     appId: string,
-    options?: { title?: string; launch?: WindowLaunch },
+    options?: {
+      title?: string
+      launch?: WindowLaunch
+      maximize?: boolean
+      center?: boolean
+    },
   ) => void
   closeWindow: (windowId: WindowId) => void
   focusWindow: (windowId: WindowId) => void

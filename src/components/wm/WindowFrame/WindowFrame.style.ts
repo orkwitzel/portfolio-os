@@ -8,7 +8,9 @@ export const Window = styled.div`
   border-left: 2px solid #fff;
   border-right: 2px solid #404040;
   border-bottom: 2px solid #404040;
-  box-shadow: 1px 1px 0 #000;
+  box-shadow:
+    1px 1px 0 #000,
+    0 10px 28px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -94,14 +96,49 @@ export const Client = styled.div`
   background: #c0c0c0;
 `
 
-export const ResizeCorner = styled.div`
+export const ResizeEast = styled.div`
   position: absolute;
-  width: 14px;
-  height: 14px;
-  right: 2px;
-  bottom: 2px;
+  top: 22px;
+  right: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  z-index: 2;
+`
+
+export const ResizeSouth = styled.div`
+  position: absolute;
+  left: 0;
+  right: 18px;
+  bottom: 0;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 2;
+`
+
+export const ResizeGrip = styled.div`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
   cursor: nwse-resize;
-  background: transparent;
+  z-index: 3;
+  box-sizing: border-box;
+  background-color: #c0c0c0;
+  background-image:
+    linear-gradient(
+      135deg,
+      transparent 0 35%,
+      #808080 35% 40%,
+      transparent 40% 50%,
+      #808080 50% 55%,
+      transparent 55% 65%,
+      #808080 65% 70%,
+      transparent 70% 100%
+    );
+  border-top: 1px solid #fff;
+  border-left: 1px solid #fff;
 `
 
 export const LoadFallback = styled.div`

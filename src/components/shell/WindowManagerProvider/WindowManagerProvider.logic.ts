@@ -11,11 +11,13 @@ import { createInitialSession, reduceSession } from '@/store/session/sessionRedu
 import type {
   AppDefinition,
   NormalGeometry,
+  WindowGeometryState,
   WindowId,
   WindowLaunch,
   WindowRecord,
 } from '@/store/session/sessionTypes'
 import type { WindowManagerApi } from '@/store/session/windowManagerContext'
+import { centerGeometry, readWorkspaceFrame } from '@/utils/workspaceFrame'
 
 export type WindowManagerProviderProps = {
   registry: Map<string, AppDefinition>
@@ -36,7 +38,15 @@ export function useWindowManagerProvider({
   }, [session])
 
   const openApp = useCallback(
-    (appId: string, options?: { title?: string; launch?: WindowLaunch }) => {
+    (
+      appId: string,
+      options?: {
+        title?: string
+        launch?: WindowLaunch
+        maximize?: boolean
+        center?: boolean
+      },
+    ) => {
       const def = registry.get(appId)
       if (!def) {
         console.warn(`Unknown app id: ${appId}`)
@@ -47,25 +57,42 @@ export function useWindowManagerProvider({
       const offset = (Object.keys(prev.windows).length % 10) * 26
       const id = crypto.randomUUID()
       const nextZ = prev.nextZ + 1
-      const geometry: NormalGeometry = {
-        x: 52 + offset,
-        y: 44 + offset,
-        width: def.defaultBounds.width,
-        height: def.defaultBounds.height,
+      const { width, height } = def.defaultBounds
+      const restored: NormalGeometry =
+        options?.center
+          ? (centerGeometry(workspaceRef.current, width, height) ?? {
+              x: 52 + offset,
+              y: 44 + offset,
+              width,
+              height,
+            })
+          : {
+              x: 52 + offset,
+              y: 44 + offset,
+              width,
+              height,
+            }
+
+      let geometry: WindowGeometryState = { mode: 'normal', geometry: restored }
+      if (options?.maximize) {
+        const frame = readWorkspaceFrame(workspaceRef.current)
+        if (frame) {
+          geometry = { mode: 'maximized', restored, frame }
+        }
       }
 
       const window: WindowRecord = {
         id,
         appId,
         title: options?.title ?? def.defaultTitle,
-        geometry: { mode: 'normal', geometry },
+        geometry,
         zIndex: nextZ,
         launch: options?.launch,
       }
 
       dispatch({ type: 'OPEN_WINDOW', window })
     },
-    [registry],
+    [registry, workspaceRef],
   )
 
   const closeWindow = useCallback((windowId: WindowId) => {

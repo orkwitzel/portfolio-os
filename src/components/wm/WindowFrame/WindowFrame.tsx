@@ -6,7 +6,9 @@ import {
   ControlBtn,
   Controls,
   LoadFallback,
-  ResizeCorner,
+  ResizeEast,
+  ResizeGrip,
+  ResizeSouth,
   TitleBar,
   TitleIcon,
   TitleText,
@@ -76,7 +78,11 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
       </Client>
 
       {!vm.maximized ? (
-        <ResizeCorner onPointerDown={vm.onResizePointerDown} aria-hidden />
+        <>
+          <ResizeEast onPointerDown={vm.onResizePointerDown('e')} aria-hidden />
+          <ResizeSouth onPointerDown={vm.onResizePointerDown('s')} aria-hidden />
+          <ResizeGrip onPointerDown={vm.onResizePointerDown('se')} aria-hidden />
+        </>
       ) : null}
     </Window>
   )

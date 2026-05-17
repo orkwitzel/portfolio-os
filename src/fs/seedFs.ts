@@ -4,7 +4,7 @@ import notes from '../content/seed/docs/notes.txt?raw'
 import type { FsNode } from './types'
 import { basename, join, parentPath } from '@/utils/paths'
 
-export const SEED_VERSION = 1
+export const SEED_VERSION = 2
 
 function dir(path: string, now: number): FsNode {
   return {
@@ -51,6 +51,9 @@ export function buildSeedNodes(): FsNode[] {
   nodes.push(file('/docs/notes.txt', notes, now))
 
   nodes.push(
+    jsonFile('/apps/portfolio.app', { appId: 'portfolio', title: 'Or Kwitzel' }, now),
+  )
+  nodes.push(
     jsonFile('/apps/about.app', { appId: 'about', title: 'About portfolio-os' }, now),
   )
   nodes.push(
@@ -84,6 +87,13 @@ export function buildSeedNodes(): FsNode[] {
     ),
   )
 
+  nodes.push(
+    jsonFile(
+      join('/desktop', 'portfolio.desktop'),
+      { name: 'Or Kwitzel', path: '/apps/portfolio.app' },
+      now,
+    ),
+  )
   nodes.push(
     jsonFile(
       join('/desktop', 'my-computer.desktop'),

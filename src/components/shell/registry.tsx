@@ -11,6 +11,12 @@ export function createAppRegistry(defs: AppDefinition[]): Map<string, AppDefinit
 
 export const appDefinitions: AppDefinition[] = [
   {
+    id: 'portfolio',
+    defaultTitle: 'Or Kwitzel',
+    defaultBounds: { width: 1080, height: 800 },
+    Root: lazy(() => import('@/apps/portfolio/PortfolioRoot')),
+  },
+  {
     id: 'computer',
     defaultTitle: 'My Computer',
     defaultBounds: { width: 600, height: 440 },

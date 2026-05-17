@@ -1,4 +1,21 @@
 /** Nerd Font PUA glyphs (Gohu 11 Nerd Font Propo). See https://www.nerdfonts.com/cheat-sheet */
 export const nerd = {
   windowsClassic: '\u{F0A21}',
+  github: '\u{F09B}',
+  mail: '\u{F0E0}',
+  phone: '\u{F095}',
+  linkedin: '\u{F08C}',
+  document: '\u{F1C1}',
+  pdf: '\u{F22D}',
+  user: '\u{F007}',
+  briefcase: '\u{F0B1}',
+  folder: '\u{F07B}',
+  code: '\u{F121}',
+  globe: '\u{F0AC}',
+  star: '\u{F005}',
+  trophy: '\u{F091}',
+  terminal: '\u{F120}',
+  link: '\u{F08E}',
+  ship: '\u{E7AE}',
+  rocket: '\u{F135}',
 } as const
