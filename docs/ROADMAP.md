@@ -19,7 +19,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | Phase | Focus | Status | Notes |
 |-------|--------|--------|--------|
 | **0** | Foundation (desktop shell MVP) | **Done** | Window manager, taskbar, lazy apps, stubs. |
-| **1** | Shell fidelity | **Todo** | Start menu, icons, tray clock, keyboard. |
+| **1** | Shell fidelity | **In progress** | Start menu done; icons + keyboard remain. Tray clock done. |
 | **2** | Apps & content | **Todo** | Social links, real demos, hub app. |
 | **3** | Technical hardening | **Todo** | Clamp, persistence, tests, CI. |
 | **4** | Mobile & accessibility | **Todo** | Responsive shell, a11y pass. |
@@ -51,10 +51,10 @@ Living document: update **Status** and **Notes** when you start or finish work s
 
 | Step | Task | Status | Notes |
 |------|------|--------|--------|
-| P1.1-1 | Add menu open/close state (React state or tiny shell store scoped to `Taskbar`). | Todo | |
-| P1.1-2 | Render menu panel with Win95-style borders; position above taskbar Start button. | Todo | |
-| P1.1-3 | Populate program list from `appDefinitions` (or derived config); call `openApp(id)` on click. | Todo | |
-| P1.1-4 | Dismiss: pointer outside, Escape; optionally click Start toggles. | Todo | |
+| P1.1-1 | Add menu open/close state (React state or tiny shell store scoped to `Taskbar`). | Done | 2026-05-17 — `menuOpen` in `Taskbar`. |
+| P1.1-2 | Render menu panel with Win95-style borders; position above taskbar Start button. | Done | `StartMenu.tsx` + module CSS. |
+| P1.1-3 | Populate program list from `appDefinitions` (or derived config); call `openApp(id)` on click. | Done | `wm.registry` list. |
+| P1.1-4 | Dismiss: pointer outside, Escape; optionally click Start toggles. | Done | Capture-phase pointer + Escape + Start toggle. |
 | P1.1-5 | (Optional) Divider + external links section (see Phase 2.1 if reused). | Todo | |
 
 ### 1.2 Desktop icon polish

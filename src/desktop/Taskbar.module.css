@@ -36,6 +36,13 @@
   line-height: 1;
 }
 
+.startBtnPressed {
+  border-top: 2px solid #404040;
+  border-left: 2px solid #404040;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}
+
 .tasks {
   flex: 1;
   display: flex;
