@@ -185,13 +185,18 @@ export async function openFs(): Promise<FsApi> {
       const from = normalizePath(oldPath)
       const to = normalizePath(newPath)
       if (from === '/') throw new Error('Cannot rename root')
-      if (await db.get('nodes', to)) {
-        throw new Error(`Path already exists: ${to}`)
-      }
-      const node = await db.get('nodes', from)
-      if (!node) throw new Error(`Not found: ${from}`)
+      if (from === to) return
 
       const all = await db.getAll('nodes')
+      const nodeByPath = new Map(all.map((n) => [n.path, n]))
+
+      if (nodeByPath.has(to)) {
+        throw new Error(`Path already exists: ${to}`)
+      }
+      if (!nodeByPath.has(from)) {
+        throw new Error(`Not found: ${from}`)
+      }
+
       const affected = collectDescendantPaths(all, from).sort((a, b) => a.length - b.length)
       const tx = db.transaction('nodes', 'readwrite')
       const now = Date.now()
@@ -199,14 +204,14 @@ export async function openFs(): Promise<FsApi> {
       for (const oldP of affected) {
         const suffix = oldP === from ? '' : oldP.slice(from.length)
         const newP = to + suffix
-        const existing = await db.get('nodes', oldP)
+        const existing = nodeByPath.get(oldP)
         if (!existing) continue
-        const parent = parentPath(newP)
+        const parentDir = dirname(newP)
         const updated: FsNode = {
           ...existing,
           path: newP,
           name: basename(newP),
-          parentPath: parent,
+          parentPath: newP === '/' ? null : parentDir,
           updatedAt: now,
         }
         await tx.store.delete(oldP)

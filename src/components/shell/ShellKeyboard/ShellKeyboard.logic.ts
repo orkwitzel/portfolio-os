@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useContextMenuOptional } from '@/components/shell/ContextMenu'
+import { useShellModalOptional } from '@/components/shell/ShellModal'
 import { getNextFocusWindowId, isEditableTarget } from '@/utils/shellKeyboard'
 import { useWindowManager } from '@/hooks/useWindowManager'
 import type { WindowManagerApi } from '@/store/session/windowManagerContext'
@@ -24,6 +25,7 @@ type ShortcutContext = {
   event: KeyboardEvent
   startMenuOpen: boolean
   contextMenuOpen: boolean
+  shellModalOpen: boolean
   wm: WindowManagerApi
   desktopCtx: DesktopKeyboardContext | undefined
 }
@@ -37,6 +39,7 @@ function shellShortcutsEnabled(ctx: ShortcutContext): boolean {
   return (
     !ctx.startMenuOpen &&
     !ctx.contextMenuOpen &&
+    !ctx.shellModalOpen &&
     !isEditableTarget(document.activeElement)
   )
 }
@@ -47,9 +50,10 @@ function desktopFocused(ctx: ShortcutContext): boolean {
 
 const shortcuts: Shortcut[] = [
   {
-    match: ({ event, startMenuOpen, contextMenuOpen }) =>
+    match: ({ event, startMenuOpen, contextMenuOpen, shellModalOpen }) =>
       !startMenuOpen &&
       !contextMenuOpen &&
+      !shellModalOpen &&
       event.key === 'Escape' &&
       !isEditableTarget(document.activeElement),
     run: ({ event, wm, desktopCtx }) => {
@@ -150,6 +154,7 @@ const shortcuts: Shortcut[] = [
 export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardProps) {
   const wm = useWindowManager()
   const contextMenu = useContextMenuOptional()
+  const shellModal = useShellModalOptional()
   const desktopCtxRef = useRef(desktopCtx)
 
   useLayoutEffect(() => {
@@ -162,6 +167,7 @@ export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardPro
         event,
         startMenuOpen,
         contextMenuOpen: contextMenu?.isOpen() ?? false,
+        shellModalOpen: shellModal?.isOpen() ?? false,
         wm,
         desktopCtx: desktopCtxRef.current,
       }
@@ -175,5 +181,5 @@ export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardPro
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [startMenuOpen, wm, contextMenu])
+  }, [startMenuOpen, wm, contextMenu, shellModal])
 }

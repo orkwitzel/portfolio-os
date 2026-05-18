@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type RefObject } from 'react'
 import { useContextMenuApi } from '@/components/shell/ContextMenu'
+import {
+  createFolderWithRename,
+  createTextDocumentWithRename,
+} from '@/fs/createAndRename'
 import { useShellModal } from '@/components/shell/ShellModal'
 import { useFsStore } from '@/store/fsStore'
 import { useShellClipboard } from '@/store/shellClipboard'
@@ -325,8 +329,15 @@ export function useDesktop({
       onRename: handleStartRename,
       onPaste: handlePaste,
       onRefresh: () => void reloadDesktop(),
-      onNewTextDocument: () => void fsStore.createTextDocumentOnDesktop().then(() => reloadDesktop()),
-      onNewFolder: () => void fsStore.createFolderIn('/docs').then(() => reloadDesktop()),
+      onNewTextDocument: () => {
+        if (!fs) return
+        void createTextDocumentWithRename(fs, fsStore, shellModal, '/desktop').then(() =>
+          reloadDesktop(),
+        )
+      },
+      onNewFolder: () => {
+        void createFolderWithRename(fsStore, shellModal, '/desktop').then(() => reloadDesktop())
+      },
       onNewShortcut: async () => {
         if (!fs) return
         const target = await nextUntitledPath(fs)

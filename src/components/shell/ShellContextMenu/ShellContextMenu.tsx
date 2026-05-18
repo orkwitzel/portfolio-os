@@ -1,23 +1,36 @@
 import { useEffect } from 'react'
 import { useContextMenuApi } from '@/components/shell/ContextMenu'
 import { useShellModal } from '@/components/shell/ShellModal'
+import {
+  createFolderWithRename,
+  createTextDocumentWithRename,
+} from '@/fs/createAndRename'
+import { renameItemAtPath } from '@/fs/renameItem'
+import { nextUntitledPath } from '@/fs/fsOperations'
 import { useFsStore } from '@/store/fsStore'
 import { useShellClipboard } from '@/store/shellClipboard'
 import { useWindowManager } from '@/hooks/useWindowManager'
 import {
+  newItemParentDir,
+  newTextDocumentParentDir,
+  revealInFocusedComputer,
+} from '@/apps/computer/computerFsActions'
+import { getComputerNavigator } from '@/apps/computer/computerNavigation'
+import {
+  buildFsExplorerPaneMenu,
   buildFsTreeMenu,
   buildTaskbarMenu,
   buildWindowTitleMenu,
 } from '@/utils/contextMenuBuilders'
 import {
+  getComputerExplorerWindowId,
+  getFsFolderPaneDir,
   isFsTreeNode,
   isInsideShell,
   isTaskbarArea,
   isWindowTitleBar,
   shouldAllowNativeContextMenu,
 } from '@/utils/shellContextMenu'
-import { getComputerNavigator } from '@/apps/computer/computerNavigation'
-import { nextUntitledPath } from '@/fs/fsOperations'
 import { readWorkspaceFrame } from '@/utils/workspaceFrame'
 
 export function ShellContextMenu() {
@@ -78,6 +91,27 @@ export function ShellContextMenu() {
         if (!node) return
         const hasClipboard = clipboard.hasContent()
         const paths = [fsPath]
+        const parentDir = newItemParentDir(node)
+        const textParentDir = newTextDocumentParentDir(node)
+
+        const onNewFolder = () => {
+          void (async () => {
+            const final = await createFolderWithRename(fsStore, shellModal, parentDir)
+            revealInFocusedComputer(wm, parentDir, final)
+          })()
+        }
+
+        const onNewTextDocument = () => {
+          void (async () => {
+            const final = await createTextDocumentWithRename(
+              fs,
+              fsStore,
+              shellModal,
+              textParentDir,
+            )
+            revealInFocusedComputer(wm, textParentDir, final)
+          })()
+        }
 
         openMenu(
           e.clientX,
@@ -100,7 +134,9 @@ export function ShellContextMenu() {
             onCopy: () => clipboard.copy(paths),
             onDelete: async () => {
               if (node.kind === 'directory') {
-                const children = nodes.filter((n) => n.parentPath === fsPath || n.path.startsWith(fsPath + '/'))
+                const children = nodes.filter(
+                  (n) => n.parentPath === fsPath || n.path.startsWith(fsPath + '/'),
+                )
                 if (children.length > 1) {
                   const ok = await shellModal.confirm({
                     title: 'Confirm Delete',
@@ -111,37 +147,68 @@ export function ShellContextMenu() {
               }
               await fsStore.deletePath(fsPath)
             },
-            onRename: async () => {
-              const next = await shellModal.prompt({
-                title: 'Rename',
-                message: 'Rename to:',
-                defaultValue: node.name,
-              })
-              if (!next || next === node.name) return
-              const parent = node.parentPath ?? '/'
-              const dest = parent === '/' ? `/${next}` : `${parent}/${next}`
-              void fsStore.renamePath(fsPath, dest)
+            onRename: () => {
+              void (async () => {
+                const parentDir =
+                  node.kind === 'directory' ? fsPath : node.parentPath ?? '/'
+                const final = await renameItemAtPath(fsStore, shellModal, fsPath)
+                revealInFocusedComputer(wm, parentDir, final)
+              })()
             },
             onPaste: () => {
               const dest = node.kind === 'directory' ? fsPath : node.parentPath ?? '/'
               void clipboard.pasteToDirectory(dest, fs, fsStore)
             },
-            onNewTextDocument: async () => {
-              const parent =
-                node.kind === 'directory'
-                  ? fsPath
-                  : node.parentPath === '/desktop'
-                    ? '/desktop'
-                    : '/docs'
-              const filePath = await nextUntitledPath(fs, parent)
-              await fs.writeFile(filePath, '')
-              await fsStore.refreshNodes()
-              fsStore.bumpDesktopRevision()
+            onNewTextDocument,
+            onNewFolder,
+            onNewShortcut: async () => {
+              const target = await nextUntitledPath(fs, '/docs')
+              await fs.writeFile(target, '')
+              await fsStore.createShortcutOnDesktop(target)
             },
-            onNewFolder: () => {
-              const parent = node.kind === 'directory' ? fsPath : node.parentPath ?? '/docs'
-              void fsStore.createFolderIn(parent)
-            },
+          }),
+        )
+        return
+      }
+
+      const computerWindowId = getComputerExplorerWindowId(e.target)
+      const paneDir = getFsFolderPaneDir(e.target)
+      if ((paneDir || computerWindowId) && fs) {
+        e.preventDefault()
+        const hasClipboard = clipboard.hasContent()
+        const parentDir =
+          getComputerNavigator(computerWindowId)?.getCreateParentDir() ??
+          paneDir ??
+          '/'
+
+        const onNewFolder = () => {
+          void (async () => {
+            const final = await createFolderWithRename(fsStore, shellModal, parentDir)
+            revealInFocusedComputer(wm, parentDir, final)
+          })()
+        }
+
+        const onNewTextDocument = () => {
+          void (async () => {
+            const final = await createTextDocumentWithRename(
+              fs,
+              fsStore,
+              shellModal,
+              parentDir,
+            )
+            revealInFocusedComputer(wm, parentDir, final)
+          })()
+        }
+
+        openMenu(
+          e.clientX,
+          e.clientY,
+          buildFsExplorerPaneMenu({
+            hasClipboard,
+            onPaste: () => void clipboard.pasteToDirectory(parentDir, fs, fsStore),
+            onRefresh: () => void fsStore.refreshNodes(),
+            onNewTextDocument,
+            onNewFolder,
             onNewShortcut: async () => {
               const target = await nextUntitledPath(fs, '/docs')
               await fs.writeFile(target, '')

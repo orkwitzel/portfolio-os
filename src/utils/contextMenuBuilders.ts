@@ -2,6 +2,40 @@ import type { ContextMenuEntryDef } from '@/components/shell/ContextMenu'
 import type { FsNode } from '@/fs/types'
 import type { WindowGeometryState } from '@/store/session/sessionTypes'
 
+export type FsNewMenuHandlers = {
+  onNewTextDocument: () => void
+  onNewFolder: () => void
+  onNewShortcut: () => void
+}
+
+export function buildFsNewSubmenu(handlers: FsNewMenuHandlers): ContextMenuEntryDef {
+  return {
+    type: 'submenu',
+    id: 'new',
+    label: 'New',
+    items: [
+      {
+        type: 'item',
+        id: 'new-text',
+        label: 'Text Document',
+        onSelect: handlers.onNewTextDocument,
+      },
+      {
+        type: 'item',
+        id: 'new-folder',
+        label: 'Folder',
+        onSelect: handlers.onNewFolder,
+      },
+      {
+        type: 'item',
+        id: 'new-shortcut',
+        label: 'Shortcut',
+        onSelect: handlers.onNewShortcut,
+      },
+    ],
+  }
+}
+
 export type DesktopMenuContext = {
   selectedPaths: string[]
   hasClipboard: boolean
@@ -20,31 +54,7 @@ export type DesktopMenuContext = {
 
 export function buildDesktopBackgroundMenu(ctx: DesktopMenuContext): ContextMenuEntryDef[] {
   return [
-    {
-      type: 'submenu',
-      id: 'new',
-      label: 'New',
-      items: [
-        {
-          type: 'item',
-          id: 'new-text',
-          label: 'Text Document',
-          onSelect: ctx.onNewTextDocument,
-        },
-        {
-          type: 'item',
-          id: 'new-folder',
-          label: 'Folder',
-          onSelect: ctx.onNewFolder,
-        },
-        {
-          type: 'item',
-          id: 'new-shortcut',
-          label: 'Shortcut',
-          onSelect: ctx.onNewShortcut,
-        },
-      ],
-    },
+    buildFsNewSubmenu(ctx),
     { type: 'separator' },
     {
       type: 'item',
@@ -157,47 +167,48 @@ export function buildFsTreeMenu(ctx: FsTreeMenuContext): ContextMenuEntryDef[] {
       label: 'Rename',
       onSelect: ctx.onRename,
     },
+    { type: 'separator' },
+    buildFsNewSubmenu(ctx),
   ]
 
   if (isDir) {
-    items.push(
-      { type: 'separator' },
-      {
-        type: 'submenu',
-        id: 'new',
-        label: 'New',
-        items: [
-          {
-            type: 'item',
-            id: 'new-text',
-            label: 'Text Document',
-            onSelect: ctx.onNewTextDocument,
-          },
-          {
-            type: 'item',
-            id: 'new-folder',
-            label: 'Folder',
-            onSelect: ctx.onNewFolder,
-          },
-          {
-            type: 'item',
-            id: 'new-shortcut',
-            label: 'Shortcut',
-            onSelect: ctx.onNewShortcut,
-          },
-        ],
-      },
-      {
-        type: 'item',
-        id: 'paste',
-        label: 'Paste',
-        disabled: !ctx.hasClipboard,
-        onSelect: ctx.onPaste,
-      },
-    )
+    items.push({
+      type: 'item',
+      id: 'paste',
+      label: 'Paste',
+      disabled: !ctx.hasClipboard,
+      onSelect: ctx.onPaste,
+    })
   }
 
   return items
+}
+
+export type FsExplorerPaneMenuContext = FsNewMenuHandlers & {
+  hasClipboard: boolean
+  onPaste: () => void
+  onRefresh: () => void
+}
+
+export function buildFsExplorerPaneMenu(ctx: FsExplorerPaneMenuContext): ContextMenuEntryDef[] {
+  return [
+    buildFsNewSubmenu(ctx),
+    { type: 'separator' },
+    {
+      type: 'item',
+      id: 'paste',
+      label: 'Paste',
+      disabled: !ctx.hasClipboard,
+      onSelect: ctx.onPaste,
+    },
+    { type: 'separator' },
+    {
+      type: 'item',
+      id: 'refresh',
+      label: 'Refresh',
+      onSelect: ctx.onRefresh,
+    },
+  ]
 }
 
 export type WindowMenuContext = {

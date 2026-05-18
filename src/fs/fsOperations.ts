@@ -1,5 +1,5 @@
 import type { FsApi } from './fsDb'
-import { basename, extension, join, normalizePath } from '@/utils/paths'
+import { basename, dirname, extension, join, normalizePath } from '@/utils/paths'
 import { parseDesktopFile } from './desktop'
 import type { DesktopFile } from './types'
 
@@ -73,12 +73,33 @@ export async function renameDesktopFile(
   fs: FsApi,
   desktopPath: string,
   label: string,
-): Promise<void> {
+): Promise<string> {
   const from = normalizePath(desktopPath)
+  const parent = dirname(from)
   const currentName = basename(from)
-  const nextName = await uniqueNameInDir(fs, '/desktop', resolveDesktopFileName(currentName, label))
-  const to = join('/desktop', nextName)
+  const nextName = await uniqueNameInDir(
+    fs,
+    parent,
+    resolveDesktopFileName(currentName, label),
+  )
+  const to = join(parent, nextName)
   if (to !== from) await fs.renameNode(from, to)
+  return to
+}
+
+export async function renameDesktopDirectory(
+  fs: FsApi,
+  desktopPath: string,
+  label: string,
+): Promise<string> {
+  const from = normalizePath(desktopPath)
+  const parent = dirname(from)
+  const trimmed = label.trim().replace(/[/\\]/g, '')
+  if (!trimmed || trimmed === basename(from)) return from
+  const nextName = await uniqueNameInDir(fs, parent, trimmed)
+  const to = join(parent, nextName)
+  if (to !== from) await fs.renameNode(from, to)
+  return to
 }
 
 export async function createTextDocument(fs: FsApi): Promise<string> {

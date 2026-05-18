@@ -1,9 +1,12 @@
+import { useRef } from 'react'
+import { useContextMenuApi } from '@/components/shell/ContextMenu'
 import {
   AddressBar,
   ExplorerToolbar,
   NavBtnGroup,
   ToolbarBtn,
 } from '@/apps/computer/computer.style'
+import { buildFsNewSubmenu } from '@/utils/contextMenuBuilders'
 
 export type FsExplorerToolbarProps = {
   currentDir: string
@@ -14,6 +17,9 @@ export type FsExplorerToolbarProps = {
   onForward: () => void
   onUp: () => void
   onHome: () => void
+  onNewFolder: () => void
+  onNewTextDocument: () => void
+  onNewShortcut: () => void
 }
 
 export default function FsExplorerToolbar({
@@ -25,7 +31,22 @@ export default function FsExplorerToolbar({
   onForward,
   onUp,
   onHome,
+  onNewFolder,
+  onNewTextDocument,
+  onNewShortcut,
 }: FsExplorerToolbarProps) {
+  const { openMenu } = useContextMenuApi()
+  const newBtnRef = useRef<HTMLButtonElement>(null)
+
+  const openNewMenu = () => {
+    const el = newBtnRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    openMenu(rect.left, rect.bottom, [
+      buildFsNewSubmenu({ onNewFolder, onNewTextDocument, onNewShortcut }),
+    ])
+  }
+
   return (
     <ExplorerToolbar>
       <NavBtnGroup>
@@ -48,6 +69,15 @@ export default function FsExplorerToolbar({
         </ToolbarBtn>
       </NavBtnGroup>
       <AddressBar title={currentDir}>{currentDir}</AddressBar>
+      <ToolbarBtn
+        ref={newBtnRef}
+        type="button"
+        onClick={openNewMenu}
+        aria-label="New"
+        aria-haspopup="menu"
+      >
+        New ▾
+      </ToolbarBtn>
     </ExplorerToolbar>
   )
 }

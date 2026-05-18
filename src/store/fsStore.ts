@@ -9,6 +9,7 @@ import {
   createTextDocument,
   isProtectedPath,
   moveNode,
+  renameDesktopDirectory,
   renameDesktopFile,
   renameDesktopLabel,
 } from '@/fs/fsOperations'
@@ -50,7 +51,7 @@ type FsStoreActions = {
   duplicatePath: (srcPath: string, destDir: string) => Promise<string>
   movePath: (srcPath: string, destDir: string) => Promise<string>
   renameDesktopShortcutLabel: (desktopPath: string, label: string) => Promise<void>
-  renameDesktopItem: (desktopPath: string, label: string) => Promise<void>
+  renameDesktopItem: (desktopPath: string, label: string) => Promise<string>
   createTextDocumentOnDesktop: () => Promise<string>
   createFolderIn: (parentDir: string) => Promise<string>
   createShortcutOnDesktop: (targetPath: string, label?: string) => Promise<string>
@@ -173,12 +174,18 @@ export const useFsStore = create<FsStore>((set, get) => ({
 
   renameDesktopItem: async (desktopPath, label) => {
     const fs = requireFs(get().fs)
+    const normalized = normalizePath(desktopPath)
+    const node = await fs.getNode(normalized)
+    let finalPath = normalized
     if (isDesktopShortcutPath(desktopPath)) {
       await renameDesktopLabel(fs, desktopPath, label)
+    } else if (node?.kind === 'directory') {
+      finalPath = await renameDesktopDirectory(fs, desktopPath, label)
     } else {
-      await renameDesktopFile(fs, desktopPath, label)
+      finalPath = await renameDesktopFile(fs, desktopPath, label)
     }
     await afterFsMutation(get)
+    return finalPath
   },
 
   createTextDocumentOnDesktop: async () => {

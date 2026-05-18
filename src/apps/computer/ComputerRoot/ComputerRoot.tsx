@@ -24,7 +24,7 @@ export default function ComputerRoot(props: AppProps) {
   }
 
   return (
-    <ExplorerColumn>
+    <ExplorerColumn data-computer-explorer>
       <FsExplorerToolbar
         currentDir={vm.currentDir}
         canGoBack={vm.canGoBack}
@@ -34,6 +34,9 @@ export default function ComputerRoot(props: AppProps) {
         onForward={vm.goForward}
         onUp={vm.goUp}
         onHome={vm.goHome}
+        onNewFolder={vm.onNewFolder}
+        onNewTextDocument={vm.onNewTextDocument}
+        onNewShortcut={vm.onNewShortcut}
       />
       <AppBody>
         <TreePane>
@@ -48,6 +51,7 @@ export default function ComputerRoot(props: AppProps) {
         </TreePane>
         <MainColumn>
           <FsFolderView
+            currentDir={vm.currentDir}
             children={vm.folderChildren}
             selectedPath={vm.selectedPath}
             onSelect={onFolderSelect}

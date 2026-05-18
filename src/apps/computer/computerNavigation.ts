@@ -1,6 +1,7 @@
 export type ComputerNavigator = {
-  navigate: (path: string) => void
+  navigate: (dir: string, selected?: string | null) => void
   openItem: (path: string) => void
+  getCreateParentDir: () => string
 }
 
 const navigators = new Map<string, ComputerNavigator>()

@@ -36,6 +36,7 @@ function FolderItemView({
 }
 
 export type FsFolderViewProps = {
+  currentDir: string
   children: FsNode[]
   selectedPath: string | null
   onSelect: (path: string) => void
@@ -43,13 +44,14 @@ export type FsFolderViewProps = {
 }
 
 export default function FsFolderView({
+  currentDir,
   children,
   selectedPath,
   onSelect,
   onOpen,
 }: FsFolderViewProps) {
   return (
-    <FolderView>
+    <FolderView data-fs-folder-pane data-current-dir={currentDir}>
       <FolderGrid>
         {children.map((node) => (
           <FolderItemView

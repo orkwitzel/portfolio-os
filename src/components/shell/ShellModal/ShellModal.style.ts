@@ -10,7 +10,7 @@ export const Overlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.15);
 `
 
 export const Dialog = styled.div`

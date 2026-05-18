@@ -2,6 +2,7 @@ import type { AppDefinition } from '@/store/session/sessionTypes'
 import { placeholderIcon, type IconSource } from '@/components/shell/ShellIcon'
 import type { AppFile, DesktopEntry, DesktopFile, FsNode, WwwFile } from '@/fs/types'
 import { appIcons } from '@/utils/appIcons'
+import { nerd } from '@/utils/nerdIcons'
 import { extension, normalizePath } from '@/utils/paths'
 import type { FsApi } from './fsDb'
 
@@ -62,8 +63,20 @@ export async function listDesktopEntries(fs: FsApi): Promise<DesktopEntry[]> {
   }
 
   for (const node of children) {
-    if (node.kind !== 'file' || isDesktopShortcutFile(node)) continue
     if (node.name.startsWith('.')) continue
+
+    if (node.kind === 'directory') {
+      entries.push({
+        desktopPath: node.path,
+        name: node.name,
+        targetPath: node.path,
+        gridX: typeof node.gridX === 'number' ? node.gridX : -1,
+        gridY: typeof node.gridY === 'number' ? node.gridY : -1,
+      })
+      continue
+    }
+
+    if (isDesktopShortcutFile(node)) continue
     if (shortcutTargets.has(normalizePath(node.path))) continue
     entries.push({
       desktopPath: node.path,
@@ -136,9 +149,14 @@ export async function resolveDesktopIcon(
 ): Promise<IconSource> {
   if (entry.explicitIcon) return entry.explicitIcon
 
-  const ext = extension(entry.targetPath)
   const target = await fs.getNode(entry.targetPath)
   if (!target) return placeholderIcon
+
+  if (target.kind === 'directory') {
+    return { kind: 'nerd', glyph: nerd.folder }
+  }
+
+  const ext = extension(entry.targetPath)
 
   if (ext === '.txt') return appIcons.notepad
 

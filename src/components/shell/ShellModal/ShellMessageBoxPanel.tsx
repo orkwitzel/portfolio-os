@@ -50,11 +50,17 @@ export function ShellConfirmPanel({
   return (
     <Overlay
       role="presentation"
+      data-shell-modal
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) finish(false)
       }}
     >
-      <Dialog role="alertdialog" aria-labelledby="shell-confirm-title" aria-describedby="shell-confirm-msg">
+      <Dialog
+        role="alertdialog"
+        aria-labelledby="shell-confirm-title"
+        aria-describedby="shell-confirm-msg"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <TitleBar>
           <TitleText id="shell-confirm-title">{request.title}</TitleText>
           <TitleClose type="button" aria-label="Close" onClick={() => finish(false)}>
@@ -103,11 +109,16 @@ export function ShellPromptPanel({
   return (
     <Overlay
       role="presentation"
+      data-shell-modal
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) finish(null)
       }}
     >
-      <Dialog role="dialog" aria-labelledby="shell-prompt-title">
+      <Dialog
+        role="dialog"
+        aria-labelledby="shell-prompt-title"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <TitleBar>
           <TitleText id="shell-prompt-title">{request.title}</TitleText>
           <TitleClose type="button" aria-label="Close" onClick={() => finish(null)}>
@@ -121,8 +132,15 @@ export function ShellPromptPanel({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') finish(value)
-              if (e.key === 'Escape') finish(null)
+              e.stopPropagation()
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                finish(value)
+              }
+              if (e.key === 'Escape') {
+                e.preventDefault()
+                finish(null)
+              }
             }}
           />
         </Body>

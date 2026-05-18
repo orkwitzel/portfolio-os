@@ -10,8 +10,13 @@ export type OpenPathContext = {
 
 export async function openPath(path: string, ctx: OpenPathContext): Promise<void> {
   const node = await ctx.fs.getNode(path)
-  if (!node || node.kind !== 'file') {
+  if (!node) {
     console.warn(`Cannot open: ${path}`)
+    return
+  }
+
+  if (node.kind === 'directory') {
+    ctx.wm.openApp('computer', { launch: { path } })
     return
   }
 

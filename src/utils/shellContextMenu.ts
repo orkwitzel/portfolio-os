@@ -36,3 +36,19 @@ export function isFsTreeNode(target: EventTarget | null): string | null {
   const btn = target.closest<HTMLButtonElement>('button[data-fs-path]')
   return btn?.dataset.fsPath ?? null
 }
+
+export function getFsFolderPaneDir(target: EventTarget | null): string | null {
+  if (!(target instanceof HTMLElement)) return null
+  const pane = target.closest('[data-fs-folder-pane]')
+  if (!pane) return null
+  if (target.closest('button[data-fs-path]')) return null
+  return pane.getAttribute('data-current-dir') ?? '/'
+}
+
+export function getComputerExplorerWindowId(target: EventTarget | null): string | null {
+  if (!(target instanceof HTMLElement)) return null
+  if (!target.closest('[data-computer-explorer]')) return null
+  if (target.closest('[data-window-titlebar]')) return null
+  const frame = target.closest<HTMLElement>('[data-window-id]')
+  return frame?.dataset.windowId ?? null
+}

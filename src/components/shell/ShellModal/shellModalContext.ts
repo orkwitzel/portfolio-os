@@ -10,6 +10,7 @@ export type ShellModalApi = {
   prompt: (options: ShellPromptOptions) => Promise<string | null>
   showProperties: (options: ShellPropertiesOptions) => void
   close: () => void
+  isOpen: () => boolean
 }
 
 export const ShellModalContext = createContext<ShellModalApi | null>(null)

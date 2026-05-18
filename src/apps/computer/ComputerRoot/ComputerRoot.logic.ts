@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import { useShellModal } from '@/components/shell/ShellModal'
 import type { AppProps } from '@/store/session/sessionTypes'
 import type { FsNode } from '@/fs/types'
+import {
+  createFolderWithRename,
+  createTextDocumentWithRename,
+} from '@/fs/createAndRename'
+import { nextUntitledPath } from '@/fs/fsOperations'
 import { useFsStore } from '@/store/fsStore'
 import { dirname, extension, normalizePath, parentPath } from '@/utils/paths'
+import { resolveCreateParentDir } from '@/apps/computer/computerFsActions'
 import {
   registerComputerNavigator,
   unregisterComputerNavigator,
@@ -93,8 +100,11 @@ function explorerReducer(state: ExplorerState, action: ExplorerAction): Explorer
 
 export function useComputerRoot({ windowId, launch }: AppProps) {
   const nodes = useFsStore((s) => s.nodes)
+  const fs = useFsStore((s) => s.fs)
+  const fsStore = useFsStore()
   const openPath = useFsStore((s) => s.openPath)
   const ready = useFsStore((s) => s.ready)
+  const shellModal = useShellModal()
 
   const [explorer, dispatch] = useReducer(explorerReducer, undefined, () => {
     const entry = resolveLaunch(launch, [])
@@ -107,6 +117,7 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
   })
 
   const hydrated = useRef(false)
+  const explorerRef = useRef({ currentDir: '/', selectedPath: null as string | null, nodes })
   useEffect(() => {
     if (!ready || hydrated.current) return
     hydrated.current = true
@@ -114,6 +125,18 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
   }, [ready, launch, nodes])
 
   const { currentDir, selectedPath, history, historyIndex } = explorer
+
+  explorerRef.current = { currentDir, selectedPath, nodes }
+
+  const getCreateParentDir = useCallback(
+    () =>
+      resolveCreateParentDir(
+        explorerRef.current.currentDir,
+        explorerRef.current.selectedPath,
+        explorerRef.current.nodes,
+      ),
+    [],
+  )
 
   const canGoBack = historyIndex > 0
   const canGoForward = historyIndex < history.length - 1
@@ -182,10 +205,47 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
     [openItem],
   )
 
+  const revealCreated = useCallback(
+    (finalPath: string) => {
+      goTo(dirname(finalPath), finalPath)
+    },
+    [goTo],
+  )
+
+  const onNewFolder = useCallback(() => {
+    const parentDir = getCreateParentDir()
+    void (async () => {
+      const final = await createFolderWithRename(fsStore, shellModal, parentDir)
+      revealCreated(final)
+    })()
+  }, [fsStore, shellModal, getCreateParentDir, revealCreated])
+
+  const onNewTextDocument = useCallback(() => {
+    if (!fs) return
+    const parentDir = getCreateParentDir()
+    void (async () => {
+      const final = await createTextDocumentWithRename(fs, fsStore, shellModal, parentDir)
+      revealCreated(final)
+    })()
+  }, [fs, fsStore, shellModal, getCreateParentDir, revealCreated])
+
+  const onNewShortcut = useCallback(() => {
+    if (!fs) return
+    void (async () => {
+      const target = await nextUntitledPath(fs, '/docs')
+      await fs.writeFile(target, '')
+      await fsStore.createShortcutOnDesktop(target)
+    })()
+  }, [fs, fsStore])
+
   useEffect(() => {
-    registerComputerNavigator(windowId, { navigate: goTo, openItem })
+    registerComputerNavigator(windowId, {
+      navigate: goTo,
+      openItem,
+      getCreateParentDir,
+    })
     return () => unregisterComputerNavigator(windowId)
-  }, [windowId, goTo, openItem])
+  }, [windowId, goTo, openItem, getCreateParentDir])
 
   return {
     nodes,
@@ -206,5 +266,8 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
     onOpenItem,
     selectFile,
     openItem,
+    onNewFolder,
+    onNewTextDocument,
+    onNewShortcut,
   }
 }

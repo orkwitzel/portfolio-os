@@ -68,7 +68,9 @@ export function ShellModalProvider({ children }: { children: ReactNode }) {
     setRequest({ kind: 'properties', props: options })
   }, [])
 
-  const api: ShellModalApi = { confirm, prompt, showProperties, close }
+  const isOpen = useCallback(() => request !== null, [request])
+
+  const api: ShellModalApi = { confirm, prompt, showProperties, close, isOpen }
 
   return (
     <ShellModalContext.Provider value={api}>

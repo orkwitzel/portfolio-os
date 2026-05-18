@@ -12,7 +12,8 @@ export type FsTreeProps = {
 }
 
 export function childrenOf(nodes: FsNode[], parentPath: string): FsNode[] {
-  return sortNodesForTree(nodes.filter((n) => n.parentPath === parentPath))
+  const parent = normalizePath(parentPath)
+  return sortNodesForTree(nodes.filter((n) => n.parentPath === parent))
 }
 
 export function useFsTree({ nodes }: FsTreeProps) {
