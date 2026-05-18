@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { AppFile, WwwFile } from '@/fs/types'
+import { useOs } from '@/hooks/useOs'
 import { useFsStore } from '@/store/fsStore'
 import { basename, extension } from '@/utils/paths'
-import { useWindowManager } from '@/hooks/useWindowManager'
 
 export type FsPreviewPaneProps = {
   selectedPath: string | null
@@ -29,10 +29,8 @@ export function parseApp(content: string): AppFile | null {
 }
 
 export function useFsPreviewPane({ selectedPath }: FsPreviewPaneProps) {
+  const os = useOs()
   const ready = useFsStore((s) => s.ready)
-  const readFile = useFsStore((s) => s.readFile)
-  const openPath = useFsStore((s) => s.openPath)
-  const wm = useWindowManager()
   const [content, setContent] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -44,7 +42,8 @@ export function useFsPreviewPane({ selectedPath }: FsPreviewPaneProps) {
     }
 
     let cancelled = false
-    readFile(selectedPath)
+    os.fs
+      .read(selectedPath)
       .then((text) => {
         if (!cancelled) {
           setContent(text)
@@ -61,17 +60,24 @@ export function useFsPreviewPane({ selectedPath }: FsPreviewPaneProps) {
     return () => {
       cancelled = true
     }
-  }, [ready, readFile, selectedPath])
+  }, [ready, os, selectedPath])
 
   const ext = selectedPath ? extension(selectedPath) : ''
 
   const openInNotepad = () => {
     if (!selectedPath) return
-    wm.openApp('notepad', {
+    os.win.openApp('notepad', {
       title: basename(selectedPath),
       launch: { path: selectedPath },
     })
   }
 
-  return { selectedPath, content, error, ext, openPath, openInNotepad }
+  return {
+    selectedPath,
+    content,
+    error,
+    ext,
+    openPath: (path: string) => os.fs.open(path),
+    openInNotepad,
+  }
 }

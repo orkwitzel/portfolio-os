@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import type { AppProps } from '@/store/session/sessionTypes'
 import { faviconUrl } from '@/components/shell/ShellIcon/favicon'
-import { useWindowManager } from '@/hooks/useWindowManager'
+import { useOs } from '@/hooks/useOs'
 import { nerd } from '@/utils/nerdIcons'
 import { openExternalLink } from '@/utils/openExternalLink'
 import portraitUrl from '@/content/portfolio/portrait.png?url'
@@ -212,15 +212,15 @@ export const portfolioProfile: PortfolioProfile = {
 
 export function usePortfolioRoot(props: AppProps) {
   void props.windowId
-  const wm = useWindowManager()
+  const os = useOs()
 
   const openLink = useCallback((url: string) => {
     openExternalLink(url)
   }, [])
 
   const openResume = useCallback(() => {
-    wm.openApp('resume')
-  }, [wm])
+    os.win.openApp('resume')
+  }, [os])
 
   const toolbarItems = useMemo((): ToolbarItem[] => {
     return [

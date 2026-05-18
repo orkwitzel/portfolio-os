@@ -22,7 +22,9 @@ export type ShellLaunchItem = {
   gridY: number
 }
 
-export function buildProgramItems(wm: WindowManagerApi): ShellLaunchItem[] {
+export function buildProgramItems(
+  wm: Pick<WindowManagerApi, 'registry' | 'openApp'>,
+): ShellLaunchItem[] {
   return Array.from(wm.registry.values()).map((def) => ({
     kind: 'app',
     id: def.id,

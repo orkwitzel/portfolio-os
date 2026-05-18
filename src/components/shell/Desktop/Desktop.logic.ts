@@ -1,19 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type RefObject } from 'react'
 import { useContextMenuApi } from '@/components/shell/ContextMenu'
-import {
-  createFolderWithRename,
-  createTextDocumentWithRename,
-} from '@/fs/createAndRename'
-import { useShellModal } from '@/components/shell/ShellModal'
+import { nextUntitledPath } from '@/fs/fsOperations'
+import { useOs } from '@/hooks/useOs'
 import { useFsStore } from '@/store/fsStore'
-import { useShellClipboard } from '@/store/shellClipboard'
 import type { ShellLaunchItem } from '@/utils/shellCatalog'
 import { buildDesktopItems } from '@/utils/shellCatalog'
 import {
   buildDesktopBackgroundMenu,
   buildDesktopIconMenu,
 } from '@/utils/contextMenuBuilders'
-import { nextUntitledPath } from '@/fs/fsOperations'
 import {
   snapPosition,
   clampToWorkspace,
@@ -211,17 +206,11 @@ export function useDesktop({
   onRegisterDesktopActions,
   onSelectionChange,
 }: DesktopProps) {
+  const os = useOs()
   const ready = useFsStore((s) => s.ready)
   const desktopRevision = useFsStore((s) => s.desktopRevision)
   const fs = useFsStore((s) => s.fs)
-  const fsStore = useFsStore()
-  const listDesktopEntries = useFsStore((s) => s.listDesktopEntries)
-  const openPath = useFsStore((s) => s.openPath)
-  const resolveDesktopIcon = useFsStore((s) => s.resolveDesktopIcon)
-  const saveDesktopPositions = useFsStore((s) => s.saveDesktopPositions)
   const { openMenu } = useContextMenuApi()
-  const shellModal = useShellModal()
-  const shellClipboard = useShellClipboard()
   const [renamingId, setRenamingId] = useState<string | null>(null)
 
   const [state, dispatch] = useReducer(desktopReducer, {
@@ -244,13 +233,17 @@ export function useDesktop({
 
   const reloadDesktop = useCallback(async () => {
     if (!ready) return
-    const entries = await listDesktopEntries()
-    const built = await buildDesktopItems(entries, openPath, resolveDesktopIcon)
+    const entries = await os.fs.listDesktopEntries()
+    const built = await buildDesktopItems(
+      entries,
+      (path) => os.fs.open(path),
+      (entry) => os.fs.resolveDesktopIcon(entry),
+    )
     dispatch({
       type: 'SET_ITEMS',
       items: built.filter((i): i is DesktopShortcut => i.kind === 'desktop'),
     })
-  }, [ready, listDesktopEntries, openPath, resolveDesktopIcon])
+  }, [ready, os])
 
   useEffect(() => {
     void reloadDesktop()
@@ -270,18 +263,17 @@ export function useDesktop({
 
   const handleCopy = useCallback(() => {
     const paths = selectedPaths()
-    if (paths.length > 0) shellClipboard.copy(paths)
-  }, [selectedPaths, shellClipboard])
+    if (paths.length > 0) os.clipboard.copy(paths)
+  }, [selectedPaths, os])
 
   const handleCut = useCallback(() => {
     const paths = selectedPaths()
-    if (paths.length > 0) shellClipboard.cut(paths)
-  }, [selectedPaths, shellClipboard])
+    if (paths.length > 0) os.clipboard.cut(paths)
+  }, [selectedPaths, os])
 
   const handlePaste = useCallback(() => {
-    if (!fs) return
-    void shellClipboard.pasteToDesktop(fs, fsStore).then(() => reloadDesktop())
-  }, [fs, fsStore, shellClipboard, reloadDesktop])
+    void os.clipboard.pasteToDesktop().then(() => reloadDesktop())
+  }, [os, reloadDesktop])
 
   const handleDelete = useCallback(async () => {
     const paths = selectedPaths()
@@ -290,13 +282,13 @@ export function useDesktop({
       paths.length === 1
         ? 'Are you sure you want to delete this item?'
         : `Are you sure you want to delete these ${paths.length} items?`
-    if (!(await shellModal.confirm({ title: 'Confirm Delete', message }))) return
+    if (!(await os.ui.confirm({ title: 'Confirm Delete', message }))) return
     for (const p of paths) {
-      await fsStore.deletePath(p)
+      await os.fs.delete(p)
     }
     dispatch({ type: 'CLEAR_SELECTION' })
     await reloadDesktop()
-  }, [selectedPaths, fsStore, reloadDesktop, shellModal])
+  }, [selectedPaths, os, reloadDesktop])
 
   const handleStartRename = useCallback(() => {
     const s = stateRef.current
@@ -310,10 +302,10 @@ export function useDesktop({
       setRenamingId(null)
       const trimmed = label.trim()
       if (!trimmed) return
-      await fsStore.renameDesktopItem(id, trimmed)
+      await os.fs.renameDesktopItem(id, trimmed)
       await reloadDesktop()
     },
-    [fsStore, reloadDesktop],
+    [os, reloadDesktop],
   )
 
   const cancelRename = useCallback(() => setRenamingId(null), [])
@@ -321,7 +313,7 @@ export function useDesktop({
   const buildMenuCtx = useCallback(
     () => ({
       selectedPaths: selectedPaths(),
-      hasClipboard: shellClipboard.hasContent(),
+      hasClipboard: os.clipboard.hasContent(),
       onOpen: handleOpenPrimary,
       onCut: handleCut,
       onCopy: handleCopy,
@@ -330,19 +322,16 @@ export function useDesktop({
       onPaste: handlePaste,
       onRefresh: () => void reloadDesktop(),
       onNewTextDocument: () => {
-        if (!fs) return
-        void createTextDocumentWithRename(fs, fsStore, shellModal, '/desktop').then(() =>
-          reloadDesktop(),
-        )
+        void os.fs.create.textDocument('/desktop').then(() => reloadDesktop())
       },
       onNewFolder: () => {
-        void createFolderWithRename(fsStore, shellModal, '/desktop').then(() => reloadDesktop())
+        void os.fs.create.folderWithRename('/desktop').then(() => reloadDesktop())
       },
       onNewShortcut: async () => {
         if (!fs) return
         const target = await nextUntitledPath(fs)
         await fs.writeFile(target, '')
-        await fsStore.createShortcutOnDesktop(target)
+        await os.fs.create.shortcutOnDesktop(target)
         await reloadDesktop()
       },
       onProperties: () => {
@@ -351,7 +340,7 @@ export function useDesktop({
         const item = stateRef.current.items.find((i) => i.id === paths[0])
         if (!item) return
         const isShortcut = item.desktopPath !== item.targetPath
-        shellModal.showProperties({
+        os.ui.showProperties({
           title: `${item.label} Properties`,
           name: item.label,
           icon: item.icon,
@@ -365,7 +354,7 @@ export function useDesktop({
     }),
     [
       selectedPaths,
-      shellClipboard,
+      os,
       handleOpenPrimary,
       handleCut,
       handleCopy,
@@ -373,9 +362,7 @@ export function useDesktop({
       handleStartRename,
       handlePaste,
       reloadDesktop,
-      fsStore,
       fs,
-      shellModal,
     ],
   )
 
@@ -500,7 +487,7 @@ export function useDesktop({
         }))
 
         dispatch({ type: 'APPLY_DROP', updates })
-        await saveDesktopPositions(persistUpdates)
+        await os.fs.saveDesktopPositions(persistUpdates)
       }
 
       pointerMoveHandlerRef.current = onMove
@@ -510,7 +497,7 @@ export function useDesktop({
 
       e.preventDefault()
     },
-    [workspaceRef, detachListeners, saveDesktopPositions],
+    [workspaceRef, detachListeners, os],
   )
 
   const handleIconDoubleClick = useCallback(

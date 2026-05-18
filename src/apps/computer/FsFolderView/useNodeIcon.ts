@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react'
 import { placeholderIcon, type IconSource } from '@/components/shell/ShellIcon'
 import type { FsNode } from '@/fs/types'
 import { resolveNodeIcon } from '@/fs/nodeIcons'
+import { useOs } from '@/hooks/useOs'
 import { useFsStore } from '@/store/fsStore'
-import { useWindowManager } from '@/hooks/useWindowManager'
 
 export function useNodeIcon(node: FsNode): IconSource {
+  const os = useOs()
   const fs = useFsStore((s) => s.fs)
   const ready = useFsStore((s) => s.ready)
-  const wm = useWindowManager()
-  const registry = wm.registry
+  const registry = os.win.registry
   const [icon, setIcon] = useState<IconSource>(placeholderIcon)
 
   useEffect(() => {

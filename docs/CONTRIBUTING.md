@@ -36,7 +36,10 @@ src/
       windowManagerContext.tsx
 
   hooks/                       # Shared React hooks
+    useOs.ts                   # Unified OS API (fs, win, ui, clipboard, explorer)
     useWindowManager.ts        # Re-export from store/session
+
+  os/                          # OS facade over stores/contexts (createOsApi, useOs)
 
   utils/                       # Pure helpers (no React, no UI)
     paths.ts
@@ -129,7 +132,7 @@ export function Desktop(props: DesktopProps) {
 - Export **`Props`** types used by the view (`DesktopProps`).
 - Export types the view needs for rendering (`DesktopShortcut`, `DragState`) when they are component-specific.
 - Keep **reducers and action unions** here when they are private to the component; keep **pure geometry/selection math** in `utils/`.
-- Side effects: `useFsStore`, `useWindowManager`, `fetch`, listeners, `document.addEventListener`.
+- Side effects: `useOs`, `useFsStore` (state selectors), `fetch`, listeners, `document.addEventListener`.
 - Return a **plain object** of state + stable callbacks (`useCallback`); do not return JSX.
 
 ```ts
@@ -177,7 +180,8 @@ export const TitleBar = styled.div<{ $active: boolean }>`
 | Pure functions (no React) | `utils/` | `snapPosition`, `selectFromMarquee`, `basename` |
 | Global Zustand store | `store/` | `fsStore.ts` |
 | Session (windows, focus, z-order) | `store/session/` + context | `sessionReducer`, `useWindowManager` |
-| Shared hook re-exports | `hooks/` | `useWindowManager.ts` |
+| OS API facade | `os/` | `useOs`, `createOsApi` |
+| Shared hook re-exports | `hooks/` | `useOs.ts`, `useWindowManager.ts` |
 | FS DB, seed, routing | `fs/` | `fsDb.ts`, `extensionRouter.ts` |
 | App-only pure algorithms | `apps/<app>/*.logic.ts` | `minesweeper.logic.ts` |
 | Shared non-app UI | `components/shared/` | `MarkdownView` |
@@ -226,7 +230,16 @@ export const TitleBar = styled.div<{ $active: boolean }>`
 4. Add launcher stub at `/apps/<slug>.app` in `seedFs.ts`.
 5. Optionally pin to wallpaper via `/desktop/<name>.desktop`.
 
-Use `useWindowManager()` when the app must talk to the shell (open sibling windows). Use `useFsStore()` for file I/O. Prefer local state in `.logic.ts` for app internals.
+Use `useOs()` for OS actions (filesystem, windows, dialogs, clipboard, explorer integration). Subscribe to reactive state with `useFsStore((s) => …)` or `useWindowManager()` when you need `nodes`, `ready`, or `session` without pulling the full API. Prefer local state in `.logic.ts` for app internals.
+
+```ts
+const os = useOs()
+const nodes = useFsStore((s) => s.nodes)
+
+await os.fs.read(path)
+os.win.openApp('notepad', { launch: { path } })
+await os.ui.confirm({ title: 'Delete', message: '…' })
+```
 
 ### Virtual filesystem (IndexedDB)
 

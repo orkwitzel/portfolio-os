@@ -1,12 +1,14 @@
 import type { ShellModalApi } from '@/components/shell/ShellModal/shellModalContext'
+import { nextUntitledPath, resolveDesktopFileName } from '@/fs/fsOperations'
+import type { FsNode } from '@/fs/types'
 import type { FsStore } from '@/store/fsStore'
 import { isDesktopPath } from '@/store/fsStore'
-import type { FsNode } from '@/fs/types'
-import { resolveDesktopFileName } from './fsOperations'
+import type { FsApi } from '@/fs/fsDb'
 import { basename, dirname, join, normalizePath } from '@/utils/paths'
+import type { OsFsRenameOptions } from './types'
 
-/** Wait for context menus / pointer events to settle before opening a modal. */
-export function deferShellModal(): Promise<void> {
+/** Wait for context menus / pointer handlers to finish before opening a modal. */
+function deferShellModal(): Promise<void> {
   return new Promise((resolve) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => resolve())
@@ -18,7 +20,11 @@ function sanitizeFilename(name: string): string {
   return name.replace(/[/\\]/g, '').trim()
 }
 
-export function buildRenameDestPath(
+/**
+ * Compute the destination path for a rename, preserving extensions on desktop files.
+ * @returns `null` if the name is unchanged or invalid.
+ */
+function buildRenameDestPath(
   node: FsNode | undefined,
   currentPath: string,
   userInput: string,
@@ -38,11 +44,14 @@ export function buildRenameDestPath(
   return parent === '/' ? `/${destName}` : join(parent, destName)
 }
 
-export async function renameItemAtPath(
+/**
+ * @internal Implementation of {@link OsFsApi.rename.interactive}.
+ */
+async function renameItemAtPath(
   fsStore: FsStore,
   shellModal: ShellModalApi,
   currentPath: string,
-  options?: { userInput?: string; deferPrompt?: boolean },
+  options?: OsFsRenameOptions,
 ): Promise<string> {
   const path = normalizePath(currentPath)
   const fs = fsStore.fs
@@ -90,3 +99,34 @@ export async function renameItemAtPath(
     return path
   }
 }
+
+/**
+ * @internal Implementation of {@link OsFsApi.create.folderWithRename}.
+ */
+export async function createFolderWithRename(
+  fsStore: FsStore,
+  shellModal: ShellModalApi,
+  parentDir: string,
+): Promise<string> {
+  const created = await fsStore.createFolderIn(parentDir)
+  return renameItemAtPath(fsStore, shellModal, created)
+}
+
+/**
+ * @internal Implementation of {@link OsFsApi.create.textDocument}.
+ */
+export async function createTextDocumentWithRename(
+  fs: FsApi,
+  fsStore: FsStore,
+  shellModal: ShellModalApi,
+  parentDir: string,
+): Promise<string> {
+  const filePath = await nextUntitledPath(fs, parentDir)
+  await fs.writeFile(filePath, '')
+  await fsStore.refreshNodes()
+  fsStore.bumpDesktopRevision()
+  await deferShellModal()
+  return renameItemAtPath(fsStore, shellModal, filePath, { deferPrompt: false })
+}
+
+export { renameItemAtPath }

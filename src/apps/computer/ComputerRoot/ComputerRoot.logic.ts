@@ -1,15 +1,10 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { useShellModal } from '@/components/shell/ShellModal'
 import type { AppProps } from '@/store/session/sessionTypes'
 import type { FsNode } from '@/fs/types'
-import {
-  createFolderWithRename,
-  createTextDocumentWithRename,
-} from '@/fs/createAndRename'
 import { nextUntitledPath } from '@/fs/fsOperations'
+import { useOs } from '@/hooks/useOs'
 import { useFsStore } from '@/store/fsStore'
 import { dirname, extension, normalizePath, parentPath } from '@/utils/paths'
-import { resolveCreateParentDir } from '@/apps/computer/computerFsActions'
 import {
   registerComputerNavigator,
   unregisterComputerNavigator,
@@ -99,12 +94,10 @@ function explorerReducer(state: ExplorerState, action: ExplorerAction): Explorer
 }
 
 export function useComputerRoot({ windowId, launch }: AppProps) {
+  const os = useOs()
   const nodes = useFsStore((s) => s.nodes)
   const fs = useFsStore((s) => s.fs)
-  const fsStore = useFsStore()
-  const openPath = useFsStore((s) => s.openPath)
   const ready = useFsStore((s) => s.ready)
-  const shellModal = useShellModal()
 
   const [explorer, dispatch] = useReducer(explorerReducer, undefined, () => {
     const entry = resolveLaunch(launch, [])
@@ -130,12 +123,12 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
 
   const getCreateParentDir = useCallback(
     () =>
-      resolveCreateParentDir(
+      os.explorer.resolveCreateParentDir(
         explorerRef.current.currentDir,
         explorerRef.current.selectedPath,
         explorerRef.current.nodes,
       ),
-    [],
+    [os],
   )
 
   const canGoBack = historyIndex > 0
@@ -172,9 +165,9 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
         goTo(path)
         return
       }
-      void openPath(path)
+      void os.fs.open(path)
     },
-    [nodes, goTo, openPath],
+    [nodes, goTo, os],
   )
 
   const onSelectFolder = useCallback(
@@ -215,28 +208,27 @@ export function useComputerRoot({ windowId, launch }: AppProps) {
   const onNewFolder = useCallback(() => {
     const parentDir = getCreateParentDir()
     void (async () => {
-      const final = await createFolderWithRename(fsStore, shellModal, parentDir)
+      const final = await os.fs.create.folderWithRename(parentDir)
       revealCreated(final)
     })()
-  }, [fsStore, shellModal, getCreateParentDir, revealCreated])
+  }, [os, getCreateParentDir, revealCreated])
 
   const onNewTextDocument = useCallback(() => {
-    if (!fs) return
     const parentDir = getCreateParentDir()
     void (async () => {
-      const final = await createTextDocumentWithRename(fs, fsStore, shellModal, parentDir)
+      const final = await os.fs.create.textDocument(parentDir)
       revealCreated(final)
     })()
-  }, [fs, fsStore, shellModal, getCreateParentDir, revealCreated])
+  }, [os, getCreateParentDir, revealCreated])
 
   const onNewShortcut = useCallback(() => {
     if (!fs) return
     void (async () => {
       const target = await nextUntitledPath(fs, '/docs')
       await fs.writeFile(target, '')
-      await fsStore.createShortcutOnDesktop(target)
+      await os.fs.create.shortcutOnDesktop(target)
     })()
-  }, [fs, fsStore])
+  }, [fs, os])
 
   useEffect(() => {
     registerComputerNavigator(windowId, {
