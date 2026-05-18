@@ -16,6 +16,7 @@ import {
   isWindowTitleBar,
   shouldAllowNativeContextMenu,
 } from '@/utils/shellContextMenu'
+import { getComputerNavigator } from '@/apps/computer/computerNavigation'
 import { nextUntitledPath } from '@/fs/fsOperations'
 import { readWorkspaceFrame } from '@/utils/workspaceFrame'
 
@@ -85,7 +86,15 @@ export function ShellContextMenu() {
             node,
             hasClipboard,
             onOpen: () => {
-              if (node.kind === 'file') void fsStore.openPath(fsPath)
+              if (node.kind === 'file') {
+                void fsStore.openPath(fsPath)
+                return
+              }
+              const focusedId = wm.session.focusedWindowId
+              const win = focusedId ? wm.session.windows[focusedId] : null
+              if (win?.appId === 'computer') {
+                getComputerNavigator(focusedId)?.navigate(fsPath)
+              }
             },
             onCut: () => clipboard.cut(paths),
             onCopy: () => clipboard.copy(paths),

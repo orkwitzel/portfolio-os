@@ -130,7 +130,6 @@ export function buildFsTreeMenu(ctx: FsTreeMenuContext): ContextMenuEntryDef[] {
       type: 'item',
       id: 'open',
       label: 'Open',
-      disabled: isDir,
       onSelect: ctx.onOpen,
     },
     { type: 'separator' },

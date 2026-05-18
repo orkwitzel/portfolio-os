@@ -1,24 +1,24 @@
 import type { ReactNode } from 'react'
+import { useFsStore } from '@/store/fsStore'
 import { MarkdownView } from '@/components/shared/MarkdownView'
 import { openExternalLink } from '@/utils/openExternalLink'
 import type { AppFile, WwwFile } from '@/fs/types'
 import {
   DetailActions,
-  DetailBody,
   DetailMessage,
-  DetailPane,
   DetailPre,
-  LocationBar,
+  PreviewBody,
+  PreviewPane,
   ToolbarBtn,
 } from '@/apps/computer/computer.style'
 import {
   parseApp,
   parseWww,
-  useFsDetailPane,
-  type FsDetailPaneProps,
-} from './FsDetailPane.logic'
+  useFsPreviewPane,
+  type FsPreviewPaneProps,
+} from './FsPreviewPane.logic'
 
-function DetailActionBar({ onOpen, label = 'Open' }: { onOpen: () => void; label?: string }) {
+function PreviewActionBar({ onOpen, label = 'Open' }: { onOpen: () => void; label?: string }) {
   return (
     <DetailActions>
       <ToolbarBtn type="button" onClick={onOpen}>
@@ -28,7 +28,7 @@ function DetailActionBar({ onOpen, label = 'Open' }: { onOpen: () => void; label
   )
 }
 
-function WwwDetail({ www }: { www: WwwFile }) {
+function WwwPreview({ www }: { www: WwwFile }) {
   return (
     <>
       <DetailPre>
@@ -36,31 +36,35 @@ function WwwDetail({ www }: { www: WwwFile }) {
         {'\n'}
         {www.url}
       </DetailPre>
-      <DetailActionBar onOpen={() => openExternalLink(www.url)} label="Open in new tab" />
+      <PreviewActionBar onOpen={() => openExternalLink(www.url)} label="Open in new tab" />
     </>
   )
 }
 
-function AppDetail({ app, onOpen }: { app: AppFile; onOpen: () => void }) {
+function AppPreview({ app, onOpen }: { app: AppFile; onOpen: () => void }) {
   return (
     <>
       <DetailPre>
         App: {app.appId}
         {app.title ? `\nTitle: ${app.title}` : ''}
       </DetailPre>
-      <DetailActionBar onOpen={onOpen} />
+      <PreviewActionBar onOpen={onOpen} />
     </>
   )
 }
 
-export default function FsDetailPane(props: FsDetailPaneProps) {
-  const vm = useFsDetailPane(props)
+export default function FsPreviewPane(props: FsPreviewPaneProps) {
+  const vm = useFsPreviewPane(props)
+  const nodes = useFsStore((s) => s.nodes)
+  const node = vm.selectedPath ? nodes.find((n) => n.path === vm.selectedPath) : null
 
-  let body: ReactNode = <DetailMessage>Select a file in the tree.</DetailMessage>
+  if (!vm.selectedPath || !node || node.kind !== 'file') return null
+
+  let body: ReactNode = null
 
   if (vm.error) {
     body = <DetailMessage>{vm.error}</DetailMessage>
-  } else if (vm.selectedPath && vm.content !== null) {
+  } else if (vm.content !== null) {
     switch (vm.ext) {
       case '.md':
         body = <MarkdownView source={vm.content} />
@@ -68,7 +72,7 @@ export default function FsDetailPane(props: FsDetailPaneProps) {
       case '.www': {
         const www = parseWww(vm.content)
         body = www ? (
-          <WwwDetail www={www} />
+          <WwwPreview www={www} />
         ) : (
           <DetailMessage>Invalid .www JSON.</DetailMessage>
         )
@@ -77,7 +81,7 @@ export default function FsDetailPane(props: FsDetailPaneProps) {
       case '.app': {
         const app = parseApp(vm.content)
         body = app ? (
-          <AppDetail app={app} onOpen={() => void vm.openPath(vm.selectedPath!)} />
+          <AppPreview app={app} onOpen={() => void vm.openPath(vm.selectedPath!)} />
         ) : (
           <DetailMessage>Invalid .app JSON.</DetailMessage>
         )
@@ -89,8 +93,8 @@ export default function FsDetailPane(props: FsDetailPaneProps) {
       case '.txt':
         body = (
           <>
-            <DetailMessage>Plain text file — opens in Notepad.</DetailMessage>
-            <DetailActionBar onOpen={vm.openInNotepad} label="Open in Notepad" />
+            <DetailMessage>Plain text file — double-click or Open to edit in Notepad.</DetailMessage>
+            <PreviewActionBar onOpen={vm.openInNotepad} label="Open in Notepad" />
           </>
         )
         break
@@ -99,10 +103,11 @@ export default function FsDetailPane(props: FsDetailPaneProps) {
     }
   }
 
+  if (!body) return null
+
   return (
-    <DetailPane>
-      <LocationBar>{vm.selectedPath ?? '/'}</LocationBar>
-      <DetailBody>{body}</DetailBody>
-    </DetailPane>
+    <PreviewPane>
+      <PreviewBody>{body}</PreviewBody>
+    </PreviewPane>
   )
 }

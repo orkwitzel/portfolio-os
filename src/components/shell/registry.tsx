@@ -21,7 +21,7 @@ export const appDefinitions: AppDefinition[] = [
   {
     id: 'computer',
     defaultTitle: 'My Computer',
-    defaultBounds: { width: 600, height: 440 },
+    defaultBounds: { width: 720, height: 480 },
     icon: appIcons.computer,
     Root: lazy(() => import('@/apps/computer/ComputerRoot')),
   },

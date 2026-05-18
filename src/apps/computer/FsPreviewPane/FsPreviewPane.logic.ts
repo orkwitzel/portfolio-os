@@ -4,7 +4,7 @@ import { useFsStore } from '@/store/fsStore'
 import { basename, extension } from '@/utils/paths'
 import { useWindowManager } from '@/hooks/useWindowManager'
 
-export type FsDetailPaneProps = {
+export type FsPreviewPaneProps = {
   selectedPath: string | null
 }
 
@@ -28,7 +28,7 @@ export function parseApp(content: string): AppFile | null {
   }
 }
 
-export function useFsDetailPane({ selectedPath }: FsDetailPaneProps) {
+export function useFsPreviewPane({ selectedPath }: FsPreviewPaneProps) {
   const ready = useFsStore((s) => s.ready)
   const readFile = useFsStore((s) => s.readFile)
   const openPath = useFsStore((s) => s.openPath)
@@ -37,7 +37,11 @@ export function useFsDetailPane({ selectedPath }: FsDetailPaneProps) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!selectedPath || !ready) return
+    if (!selectedPath || !ready) {
+      setContent(null)
+      setError(null)
+      return
+    }
 
     let cancelled = false
     readFile(selectedPath)
