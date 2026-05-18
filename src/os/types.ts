@@ -6,7 +6,14 @@ import type {
 import type { IconSource } from '@/components/shell/ShellIcon'
 import type { DesktopEntry, FsNode } from '@/fs/types'
 import type { FsStore } from '@/store/fsStore'
+import type { useSettingsStore } from '@/store/settingsStore'
 import type { ShellClipboardStore } from '@/store/shellClipboard'
+import type {
+  ColorSchemeId,
+  CursorMode,
+  FontSizeId,
+  SettingsV1,
+} from '@/theme/tokens'
 import type {
   NormalGeometry,
   WindowId,
@@ -27,6 +34,8 @@ export type OsDeps = {
   modal: ShellModalApi
   /** Shell clipboard store (copy/cut/paste). */
   clipboard: ShellClipboardStore
+  /** User appearance / display preferences store (internal). */
+  settingsStore: typeof useSettingsStore
 }
 
 /**
@@ -362,6 +371,39 @@ export type OsExplorerApi = {
 }
 
 /**
+ * Appearance and display preference syscalls.
+ * Mutations persist to `localStorage` and apply CSS variables on `:root`.
+ */
+export type OsSettingsApi = {
+  /** Current settings snapshot. */
+  get: () => SettingsV1
+
+  /**
+   * Subscribe to any settings change (for {@link useOsSettings} / {@link AppearanceSync}).
+   * @returns Unsubscribe function.
+   */
+  subscribe: (listener: () => void) => () => void
+
+  /** Apply a color scheme preset to the whole shell and apps. */
+  setColorScheme: (id: ColorSchemeId) => void
+
+  /** Switch between WinXP asset cursors and system default cursors. */
+  setCursorMode: (mode: CursorMode) => void
+
+  /** Set solid-color desktop wallpaper. */
+  setWallpaperColor: (hex: string) => void
+
+  /** Set UI font size tier. */
+  setFontSize: (size: FontSizeId) => void
+
+  /** Presets for the Settings color-scheme radio list. */
+  listColorSchemes: () => ReadonlyArray<{ id: ColorSchemeId; label: string }>
+
+  /** Font size options for the Settings Display panel. */
+  listFontSizes: () => ReadonlyArray<{ id: FontSizeId; label: string; px: number }>
+}
+
+/**
  * Unified portfolio OS API. Obtain via {@link useOs} in React components.
  *
  * @example
@@ -382,6 +424,8 @@ export type OsApi = {
   clipboard: OsClipboardApi
   /** My Computer navigation helpers. */
   explorer: OsExplorerApi
+  /** User appearance / display preferences. */
+  settings: OsSettingsApi
 }
 
 /** Launch payload passed to {@link OsWinApi.openApp} (`launch.path`, etc.). */

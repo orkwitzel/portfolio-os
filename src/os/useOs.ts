@@ -2,12 +2,13 @@ import { useMemo } from 'react'
 import { useShellModal } from '@/components/shell/ShellModal'
 import { useWindowManager } from '@/hooks/useWindowManager'
 import { useFsStore } from '@/store/fsStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { useShellClipboard } from '@/store/shellClipboard'
 import { createOsApi } from './createOsApi'
 import type { OsApi } from './types'
 
 /**
- * React hook returning the portfolio OS syscall API (`fs`, `win`, `ui`, `clipboard`, `explorer`).
+ * React hook returning the portfolio OS syscall API (`fs`, `win`, `ui`, `clipboard`, `explorer`, `settings`).
  *
  * Must run inside `WindowManagerProvider`, `ShellModalProvider`, and after `FsBootstrap`
  * has bound the shell. The returned object is memoized per render when dependencies are stable.
@@ -22,9 +23,8 @@ export function useOs(): OsApi {
   const modal = useShellModal()
   const fsStore = useFsStore()
   const clipboard = useShellClipboard()
-
   return useMemo(
-    () => createOsApi({ wm, modal, fsStore, clipboard }),
+    () => createOsApi({ wm, modal, fsStore, clipboard, settingsStore: useSettingsStore }),
     [wm, modal, fsStore, clipboard],
   )
 }

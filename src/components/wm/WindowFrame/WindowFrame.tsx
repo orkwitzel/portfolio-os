@@ -49,28 +49,25 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
         <Controls>
           <ControlBtn
             type="button"
+            $glyph="minimize"
             aria-label="Minimize"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={vm.requestMinimize}
-          >
-            _
-          </ControlBtn>
+          />
           <ControlBtn
             type="button"
+            $glyph={vm.maximized ? 'restore' : 'maximize'}
             aria-label={vm.maximized ? 'Restore' : 'Maximize'}
             onPointerDown={(e) => e.stopPropagation()}
             onClick={vm.toggleMaximize}
-          >
-            {vm.maximized ? '❐' : '□'}
-          </ControlBtn>
+          />
           <ControlBtn
             type="button"
+            $glyph="close"
             aria-label="Close"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={vm.requestClose}
-          >
-            ×
-          </ControlBtn>
+          />
         </Controls>
       </TitleBar>
 

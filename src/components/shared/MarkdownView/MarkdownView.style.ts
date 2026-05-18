@@ -7,7 +7,8 @@ export const Root = styled.div`
   overflow: auto;
   padding: 10px 12px;
   font: var(--font-size-ui) / 1.45 var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
+  background: var(--content-bg-alt);
 
   h1,
   h2,
@@ -50,21 +51,21 @@ export const Root = styled.div`
 
   code {
     font: inherit;
-    background: #e0e0e0;
+    background: var(--shell-surface);
     padding: 0 2px;
   }
 
   a {
-    color: #000080;
+    color: var(--link-color);
 
     &:hover {
-      color: #0000ff;
+      color: var(--accent-to);
     }
   }
 
   hr {
     border: none;
-    border-top: 1px solid #808080;
+    border-top: 1px solid var(--shell-border-mid);
     margin: 0.75em 0;
   }
 
@@ -76,13 +77,13 @@ export const Root = styled.div`
 
   th,
   td {
-    border: 1px solid #808080;
+    border: 1px solid var(--shell-border-mid);
     padding: 4px 6px;
     text-align: left;
   }
 
   th {
-    background: #c0c0c0;
+    background: var(--shell-surface);
     font-weight: 700;
   }
 `

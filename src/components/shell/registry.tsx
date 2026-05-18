@@ -60,4 +60,10 @@ export const appDefinitions: AppDefinition[] = [
     defaultBounds: { width: 490, height: 580 },
     icon: appIcons.tetris,
   }),
+  defineApp(() => import('@/apps/settings/SettingsRoot'), {
+    id: 'settings',
+    defaultTitle: 'Settings',
+    defaultBounds: { width: 480, height: 420 },
+    icon: appIcons.settings,
+  }),
 ]

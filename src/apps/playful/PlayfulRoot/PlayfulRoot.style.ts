@@ -1,9 +1,19 @@
 import styled, { css } from 'styled-components'
-import { cursors } from '@/styles/cursors'
+import { cursorPointer } from '@/styles/cursors'
 
 const numberColor = (n: number) => {
-  const colors = ['', '#0000ff', '#008000', '#ff0000', '#000080', '#800000', '#008080', '#000', '#808080']
-  return colors[n] ?? '#000'
+  const colors = [
+    '',
+    '#0000ff',
+    '#008000',
+    '#ff0000',
+    'var(--link-color)',
+    '#800000',
+    '#008080',
+    'var(--text-primary)',
+    'var(--text-secondary)',
+  ]
+  return colors[n] ?? 'var(--text-primary)'
 }
 
 export const AppBody = styled.div`
@@ -16,7 +26,8 @@ export const AppBody = styled.div`
   padding: 6px;
   min-height: 0;
   font: var(--font-size-ui) var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
+  background: var(--content-bg);
   user-select: none;
 `
 
@@ -27,15 +38,15 @@ export const Header = styled.header`
   width: 100%;
   max-width: 100%;
   padding: 4px 6px;
-  border: 2px inset #c0c0c0;
-  background: #c0c0c0;
+  border: 2px inset var(--inset-border);
+  background: var(--shell-surface);
 `
 
 export const Counter = styled.span`
   box-sizing: border-box;
   min-width: 36px;
   padding: 2px 4px;
-  border: 2px inset #c0c0c0;
+  border: 2px inset var(--inset-border);
   background: #000;
   color: #f00;
   font-weight: 700;
@@ -48,10 +59,10 @@ export const FaceBtn = styled.button`
   width: 28px;
   height: 28px;
   padding: 0;
-  border: 2px outset #c0c0c0;
-  background: #c0c0c0;
+  border: 2px outset var(--shell-surface);
+  background: var(--shell-surface);
   font: 14px/1 var(--font-ui);
-  cursor: ${cursors.default};
+  ${cursorPointer}
 
   &:active {
     border-style: inset;
@@ -69,8 +80,9 @@ export const Board = styled.div`
   grid-template-columns: repeat(9, 22px);
   gap: 0;
   border: 3px solid;
-  border-color: #808080 #fff #fff #808080;
-  background: #c0c0c0;
+  border-color: var(--shell-border-mid) var(--shell-border-light) var(--shell-border-light)
+    var(--shell-border-mid);
+  background: var(--shell-surface);
 `
 
 export const Cell = styled.button<{
@@ -87,19 +99,19 @@ export const Cell = styled.button<{
   margin: 0;
   font: bold 12px/22px var(--font-ui);
   text-align: center;
-  cursor: ${cursors.default};
+  ${cursorPointer}
 
   ${(p) =>
     p.$revealed
       ? css`
-          border: 1px solid #808080;
-          background: ${p.$mineHit ? '#f00' : '#c0c0c0'};
-          color: ${p.$mine ? '#000' : p.$adjacent > 0 ? numberColor(p.$adjacent) : '#000'};
+          border: 1px solid var(--shell-border-mid);
+          background: ${p.$mineHit ? '#f00' : 'var(--shell-surface)'};
+          color: ${p.$mine ? 'var(--text-primary)' : p.$adjacent > 0 ? numberColor(p.$adjacent) : 'var(--text-primary)'};
         `
       : css`
-          border: 2px outset #c0c0c0;
-          background: #c0c0c0;
-          color: ${p.$flagged ? '#f00' : '#000'};
+          border: 2px outset var(--shell-surface);
+          background: var(--shell-surface);
+          color: ${p.$flagged ? '#f00' : 'var(--text-primary)'};
           font-weight: ${p.$flagged ? 700 : 'bold'};
 
           &:active:not(:disabled) {

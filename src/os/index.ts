@@ -16,8 +16,15 @@ export type {
   OsClipboardApi,
   OsExplorerApi,
   OsFsRenameOptions,
+  OsSettingsApi,
   WindowLaunch,
 } from './types'
+export type {
+  SettingsV1,
+  ColorSchemeId,
+  CursorMode,
+  FontSizeId,
+} from '@/theme/tokens'
 export {
   newItemParentDir,
   newTextDocumentParentDir,

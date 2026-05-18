@@ -1,4 +1,5 @@
 import styled, { css, keyframes } from 'styled-components'
+import { cursorPointer } from '@/styles/cursors'
 import { TASKBAR_ANIM_EASE, TASKBAR_ANIM_MS } from '@/utils/taskbarAnimation'
 
 const taskEnter = keyframes`
@@ -43,8 +44,8 @@ const taskExit = keyframes`
 export const Bar = styled.div`
   height: 32px;
   flex-shrink: 0;
-  background: #c0c0c0;
-  border-top: 2px solid #dfdfdf;
+  background: var(--taskbar-bg);
+  border-top: 2px solid var(--taskbar-border-top);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -56,16 +57,17 @@ export const StartBtn = styled.button<{ $pressed: boolean }>`
   margin: 0;
   height: 22px;
   padding: 0 8px 0 6px;
-  border-top: 2px solid ${(p) => (p.$pressed ? '#404040' : '#fff')};
-  border-left: 2px solid ${(p) => (p.$pressed ? '#404040' : '#fff')};
-  border-right: 2px solid ${(p) => (p.$pressed ? '#fff' : '#404040')};
-  border-bottom: 2px solid ${(p) => (p.$pressed ? '#fff' : '#404040')};
-  background: #c0c0c0;
+  border-top: 2px solid ${(p) => (p.$pressed ? 'var(--shell-border-dark)' : 'var(--shell-border-light)')};
+  border-left: 2px solid ${(p) => (p.$pressed ? 'var(--shell-border-dark)' : 'var(--shell-border-light)')};
+  border-right: 2px solid ${(p) => (p.$pressed ? 'var(--shell-border-light)' : 'var(--shell-border-dark)')};
+  border-bottom: 2px solid ${(p) => (p.$pressed ? 'var(--shell-border-light)' : 'var(--shell-border-dark)')};
+  background: var(--shell-surface);
   font: var(--font-size-ui) var(--font-ui);
-  cursor: var(--cursor-default);
+  ${cursorPointer}
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  color: var(--text-primary);
 `
 
 export const StartIcon = styled.span`
@@ -98,15 +100,15 @@ export const TaskBtn = styled.button<{
   max-width: 200px;
   padding: 0 8px 0 6px;
   box-sizing: border-box;
-  border-top: 2px solid ${(p) => (p.$active ? '#404040' : '#fff')};
-  border-left: 2px solid ${(p) => (p.$active ? '#404040' : '#fff')};
-  border-right: 2px solid ${(p) => (p.$active ? '#fff' : '#404040')};
-  border-bottom: 2px solid ${(p) => (p.$active ? '#fff' : '#404040')};
-  background: #c0c0c0;
+  border-top: 2px solid ${(p) => (p.$active ? 'var(--shell-border-dark)' : 'var(--shell-border-light)')};
+  border-left: 2px solid ${(p) => (p.$active ? 'var(--shell-border-dark)' : 'var(--shell-border-light)')};
+  border-right: 2px solid ${(p) => (p.$active ? 'var(--shell-border-light)' : 'var(--shell-border-dark)')};
+  border-bottom: 2px solid ${(p) => (p.$active ? 'var(--shell-border-light)' : 'var(--shell-border-dark)')};
+  background: var(--shell-surface);
   font: var(--font-size-ui) var(--font-ui);
   text-align: left;
-  cursor: var(--cursor-pointer);
-  color: ${(p) => (p.$minimized ? '#404040' : '#000')};
+  ${cursorPointer}
+  color: ${(p) => (p.$minimized ? 'var(--text-secondary)' : 'var(--text-primary)')};
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -143,10 +145,10 @@ export const TaskBtn = styled.button<{
       &:active {
         transform: translateY(0);
         filter: none;
-        border-top: 2px solid #404040;
-        border-left: 2px solid #404040;
-        border-right: 2px solid #fff;
-        border-bottom: 2px solid #fff;
+        border-top: 2px solid var(--shell-border-dark);
+        border-left: 2px solid var(--shell-border-dark);
+        border-right: 2px solid var(--shell-border-light);
+        border-bottom: 2px solid var(--shell-border-light);
       }
     `}
 
@@ -173,7 +175,7 @@ export const Tray = styled.div`
   height: 22px;
   padding: 0 4px;
   box-sizing: border-box;
-  border: 2px inset #c0c0c0;
+  border: 2px inset var(--inset-border);
   flex-shrink: 0;
   display: flex;
   align-items: center;

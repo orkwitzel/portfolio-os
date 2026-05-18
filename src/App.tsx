@@ -11,6 +11,7 @@ import { Taskbar } from '@/components/shell/Taskbar'
 import { WindowManagerProvider } from '@/components/shell/WindowManagerProvider'
 import { useWindowManager } from '@/hooks/useWindowManager'
 import { appDefinitions, createAppRegistry } from '@/components/shell/registry'
+import { AppearanceSync } from '@/components/shell/AppearanceSync'
 import { FsProvider } from '@/fs/FsProvider'
 import type { DesktopSelectionState } from '@/utils/desktopSelection'
 import { Shell } from './App.style'
@@ -63,6 +64,7 @@ function ShellInner({
 
   return (
     <FsProvider registry={registry}>
+      <AppearanceSync />
       <ShellKeyboard startMenuOpen={startMenuOpen} desktopCtx={desktopCtx} />
       <Shell data-shell-root>
         <Desktop

@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { cursors } from '@/styles/cursors'
+import { cursorPointer } from '@/styles/cursors'
 
 export const MODAL_Z = 27000
 
@@ -17,11 +17,11 @@ export const Dialog = styled.div`
   box-sizing: border-box;
   min-width: 280px;
   max-width: min(420px, calc(100vw - 24px));
-  background: #c0c0c0;
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #404040;
-  border-bottom: 2px solid #404040;
+  background: var(--shell-surface);
+  border-top: 2px solid var(--shell-border-light);
+  border-left: 2px solid var(--shell-border-light);
+  border-right: 2px solid var(--shell-border-dark);
+  border-bottom: 2px solid var(--shell-border-dark);
   box-shadow:
     1px 1px 0 #000,
     0 8px 24px rgba(0, 0, 0, 0.25);
@@ -33,8 +33,12 @@ export const TitleBar = styled.div`
   gap: 4px;
   height: 24px;
   padding: 2px 3px;
-  background: linear-gradient(90deg, #000080, #1084d0);
-  color: #fff;
+  background: linear-gradient(
+    90deg,
+    var(--titlebar-active-from),
+    var(--titlebar-active-to)
+  );
+  color: var(--titlebar-active-text);
   user-select: none;
 `
 
@@ -51,20 +55,20 @@ export const TitleClose = styled.button`
   height: 16px;
   padding: 0;
   box-sizing: border-box;
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #404040;
-  border-bottom: 2px solid #404040;
-  background: #c0c0c0;
+  border-top: 2px solid var(--shell-border-light);
+  border-left: 2px solid var(--shell-border-light);
+  border-right: 2px solid var(--shell-border-dark);
+  border-bottom: 2px solid var(--shell-border-dark);
+  background: var(--shell-surface);
   font: 12px / 1 var(--font-ui);
-  color: #000;
-  cursor: ${cursors.pointer};
+  color: var(--text-primary);
+  ${cursorPointer}
 
   &:active {
-    border-top: 2px solid #404040;
-    border-left: 2px solid #404040;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
+    border-top: 2px solid var(--shell-border-dark);
+    border-left: 2px solid var(--shell-border-dark);
+    border-right: 2px solid var(--shell-border-light);
+    border-bottom: 2px solid var(--shell-border-light);
   }
 `
 
@@ -86,14 +90,14 @@ export const MessageIcon = styled.div`
   align-items: center;
   justify-content: center;
   font: bold 22px / 1 var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
 `
 
 export const MessageText = styled.p`
   margin: 0;
   flex: 1;
   font: var(--font-size-ui) / 1.35 var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
 `
 
 export const PromptField = styled.input`
@@ -102,10 +106,10 @@ export const PromptField = styled.input`
   margin-top: 8px;
   box-sizing: border-box;
   padding: 3px 4px;
-  border: 2px inset #c0c0c0;
-  background: #fff;
+  border: 2px inset var(--inset-border);
+  background: var(--content-bg-alt);
   font: var(--font-size-ui) var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
 `
 
 export const ButtonRow = styled.div`
@@ -119,21 +123,22 @@ export const DialogBtn = styled.button<{ $default?: boolean }>`
   min-width: 75px;
   padding: 4px 12px;
   box-sizing: border-box;
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #404040;
-  border-bottom: 2px solid #404040;
-  background: #c0c0c0;
+  border-top: 2px solid var(--shell-border-light);
+  border-left: 2px solid var(--shell-border-light);
+  border-right: 2px solid var(--shell-border-dark);
+  border-bottom: 2px solid var(--shell-border-dark);
+  background: var(--shell-surface);
   font: var(--font-size-ui) var(--font-ui);
-  cursor: ${cursors.pointer};
-  outline: ${(p) => (p.$default ? '1px dotted #000' : 'none')};
+  color: var(--text-primary);
+  ${cursorPointer}
+  outline: ${(p) => (p.$default ? '1px dotted var(--text-primary)' : 'none')};
   outline-offset: -4px;
 
   &:active {
-    border-top: 2px solid #404040;
-    border-left: 2px solid #404040;
-    border-right: 2px solid #fff;
-    border-bottom: 2px solid #fff;
+    border-top: 2px solid var(--shell-border-dark);
+    border-left: 2px solid var(--shell-border-dark);
+    border-right: 2px solid var(--shell-border-light);
+    border-bottom: 2px solid var(--shell-border-light);
   }
 `
 
@@ -145,12 +150,14 @@ export const TabRow = styled.div`
 
 export const Tab = styled.button<{ $active?: boolean }>`
   padding: 4px 10px;
-  border: 2px solid #808080;
-  border-bottom: ${(p) => (p.$active ? '2px solid #c0c0c0' : '2px solid #808080')};
+  border: 2px solid var(--shell-border-mid);
+  border-bottom: ${(p) =>
+    p.$active ? '2px solid var(--shell-surface)' : '2px solid var(--shell-border-mid)'};
   margin-bottom: ${(p) => (p.$active ? '-2px' : '0')};
-  background: ${(p) => (p.$active ? '#c0c0c0' : '#b5b5b5')};
+  background: ${(p) => (p.$active ? 'var(--shell-surface)' : 'var(--titlebar-inactive-to)')};
   font: var(--font-size-ui) var(--font-ui);
-  cursor: ${cursors.default};
+  color: var(--text-primary);
+  ${cursorPointer}
   position: relative;
   z-index: ${(p) => (p.$active ? 1 : 0)};
 `
@@ -158,8 +165,8 @@ export const Tab = styled.button<{ $active?: boolean }>`
 export const TabPanel = styled.div`
   margin: 0 8px;
   padding: 12px;
-  border: 2px inset #c0c0c0;
-  background: #c0c0c0;
+  border: 2px inset var(--inset-border);
+  background: var(--content-bg);
 `
 
 export const PropertiesHeader = styled.div`
@@ -180,10 +187,10 @@ export const PropertiesName = styled.input`
   min-width: 0;
   box-sizing: border-box;
   padding: 3px 4px;
-  border: 2px inset #c0c0c0;
-  background: #fff;
+  border: 2px inset var(--inset-border);
+  background: var(--content-bg-alt);
   font: var(--font-size-ui) var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
 `
 
 export const FieldGrid = styled.dl`
@@ -196,11 +203,11 @@ export const FieldGrid = styled.dl`
 
 export const FieldLabel = styled.dt`
   margin: 0;
-  color: #000;
+  color: var(--text-primary);
 `
 
 export const FieldValue = styled.dd`
   margin: 0;
-  color: #000;
+  color: var(--text-primary);
   word-break: break-word;
 `

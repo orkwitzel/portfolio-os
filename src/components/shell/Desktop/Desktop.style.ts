@@ -1,11 +1,15 @@
 import styled from 'styled-components'
-import { cursors } from '@/styles/cursors'
+import { cursorPointer } from '@/styles/cursors'
 
 export const Workspace = styled.div`
   position: relative;
   flex: 1;
   min-height: 0;
-  background: #018281;
+  background-color: var(--desktop-bg);
+  background-image: var(--desktop-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   user-select: none;
 `
 
@@ -19,13 +23,13 @@ export const Shortcut = styled.button<{ $selected: boolean; $dragging: boolean }
   width: 92px;
   border: none;
   padding: 4px 6px;
-  background: ${(p) => (p.$selected ? 'rgba(0, 0, 128, 0.55)' : 'transparent')};
-  cursor: ${cursors.pointer};
+  background: ${(p) => (p.$selected ? 'var(--selection-bg)' : 'transparent')};
+  ${cursorPointer}
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: #fff;
+  color: var(--selection-text);
   text-shadow:
     1px 0 #000,
     -1px 0 #000,
@@ -35,11 +39,11 @@ export const Shortcut = styled.button<{ $selected: boolean; $dragging: boolean }
   -webkit-user-drag: none;
   opacity: ${(p) => (p.$dragging ? 0.3 : 1)};
   outline: ${(p) =>
-    p.$selected ? '1px dotted #fff' : 'none'};
+    p.$selected ? '1px dotted var(--selection-text)' : 'none'};
   outline-offset: ${(p) => (p.$selected ? '1px' : '0')};
 
   &:focus-visible {
-    outline: 2px dotted #fff;
+    outline: 2px dotted var(--selection-text);
     outline-offset: 2px;
   }
 `
@@ -52,7 +56,7 @@ export const ShortcutGhost = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: #fff;
+  color: var(--selection-text);
   text-shadow:
     1px 0 #000,
     -1px 0 #000,
@@ -73,18 +77,18 @@ export const RenameInput = styled.input`
   width: 100%;
   max-width: 88px;
   padding: 1px 2px;
-  border: 1px solid #000;
+  border: 1px solid var(--shell-border-dark);
   font: var(--font-size-ui) var(--font-ui);
   text-align: center;
-  color: #000;
-  background: #fff;
+  color: var(--text-primary);
+  background: var(--content-bg-alt);
   box-sizing: border-box;
 `
 
 export const MarqueeRect = styled.div`
   position: absolute;
-  border: 1px dotted #fff;
-  background: rgba(0, 0, 128, 0.25);
+  border: 1px dotted var(--selection-text);
+  background: var(--selection-bg);
   pointer-events: none;
   z-index: 30;
 `

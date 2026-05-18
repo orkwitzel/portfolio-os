@@ -18,4 +18,5 @@ export const nerd = {
   link: '\u{F08E}',
   ship: '\u{E7AE}',
   rocket: '\u{F135}',
+  gear: '\u{F013}',
 } as const

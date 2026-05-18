@@ -1,41 +1,86 @@
 /* Windows XP cursors — use direct url(), not var(), in cursor properties. */
 
-html,
-body,
-#root {
+html:not([data-cursor-mode='system']),
+html:not([data-cursor-mode='system']) body,
+html:not([data-cursor-mode='system']) #root {
   cursor: url('../content/cursors/winxp/arrow.png') 1 1, default;
 }
 
+html[data-cursor-mode='system'],
+html[data-cursor-mode='system'] body,
+html[data-cursor-mode='system'] #root {
+  cursor: default;
+}
+
 /* Interactive controls */
-a,
-button,
-summary,
-label[for],
-select,
-input[type='button'],
-input[type='submit'],
-input[type='reset'],
-input[type='checkbox'],
-input[type='radio'],
-[role='button'],
-[role='link'],
-[role='menuitem'],
-[role='tab'] {
+html:not([data-cursor-mode='system']) a,
+html:not([data-cursor-mode='system']) button,
+html:not([data-cursor-mode='system']) summary,
+html:not([data-cursor-mode='system']) label[for],
+html:not([data-cursor-mode='system']) select,
+html:not([data-cursor-mode='system']) input[type='button'],
+html:not([data-cursor-mode='system']) input[type='submit'],
+html:not([data-cursor-mode='system']) input[type='reset'],
+html:not([data-cursor-mode='system']) input[type='checkbox'],
+html:not([data-cursor-mode='system']) input[type='radio'],
+html:not([data-cursor-mode='system']) [role='button'],
+html:not([data-cursor-mode='system']) [role='link'],
+html:not([data-cursor-mode='system']) [role='menuitem'],
+html:not([data-cursor-mode='system']) [role='tab'] {
   cursor: url('../content/cursors/winxp/pointer.png') 9 1, pointer;
 }
 
-input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
-textarea,
-[contenteditable='true'] {
+html[data-cursor-mode='system'] a,
+html[data-cursor-mode='system'] button,
+html[data-cursor-mode='system'] summary,
+html[data-cursor-mode='system'] label[for],
+html[data-cursor-mode='system'] select,
+html[data-cursor-mode='system'] input[type='button'],
+html[data-cursor-mode='system'] input[type='submit'],
+html[data-cursor-mode='system'] input[type='reset'],
+html[data-cursor-mode='system'] input[type='checkbox'],
+html[data-cursor-mode='system'] input[type='radio'],
+html[data-cursor-mode='system'] [role='button'],
+html[data-cursor-mode='system'] [role='link'],
+html[data-cursor-mode='system'] [role='menuitem'],
+html[data-cursor-mode='system'] [role='tab'] {
+  cursor: pointer;
+}
+
+html:not([data-cursor-mode='system'])
+  input:not([type='button']):not([type='submit']):not([type='reset']):not(
+    [type='checkbox']
+  ):not([type='radio']):not([type='range']):not([type='file']),
+html:not([data-cursor-mode='system']) textarea,
+html:not([data-cursor-mode='system']) [contenteditable='true'] {
   cursor: url('../content/cursors/winxp/text.png') 5 11, text;
 }
 
-[disabled],
-[aria-disabled='true'] {
+html[data-cursor-mode='system']
+  input:not([type='button']):not([type='submit']):not([type='reset']):not(
+    [type='checkbox']
+  ):not([type='radio']):not([type='range']):not([type='file']),
+html[data-cursor-mode='system'] textarea,
+html[data-cursor-mode='system'] [contenteditable='true'] {
+  cursor: text;
+}
+
+html:not([data-cursor-mode='system']) [disabled],
+html:not([data-cursor-mode='system']) [aria-disabled='true'] {
   cursor: url('../content/cursors/winxp/not-allowed.png') 12 11, not-allowed;
+}
+
+html[data-cursor-mode='system'] [disabled],
+html[data-cursor-mode='system'] [aria-disabled='true'] {
+  cursor: not-allowed;
 }
 
 body.app-loading,
 body.app-loading * {
   cursor: url('../content/cursors/winxp/wait.png') 8 11, wait !important;
+}
+
+html[data-cursor-mode='system'] body.app-loading,
+html[data-cursor-mode='system'] body.app-loading * {
+  cursor: wait !important;
 }

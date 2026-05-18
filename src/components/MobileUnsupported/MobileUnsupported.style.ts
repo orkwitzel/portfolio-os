@@ -15,24 +15,28 @@ export const Panel = styled.div`
   max-width: 320px;
   padding: 16px;
   box-sizing: border-box;
-  background: #c0c0c0;
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #404040;
-  border-bottom: 2px solid #404040;
+  background: var(--shell-surface);
+  border-top: 2px solid var(--shell-border-light);
+  border-left: 2px solid var(--shell-border-light);
+  border-right: 2px solid var(--shell-border-dark);
+  border-bottom: 2px solid var(--shell-border-dark);
   box-shadow: 1px 1px 0 #000;
 `
 
 export const TitleBar = styled.div`
   margin: -16px -16px 12px;
   padding: 4px 6px;
-  background: linear-gradient(90deg, #000080, #1084d0);
-  color: #fff;
+  background: linear-gradient(
+    90deg,
+    var(--titlebar-active-from),
+    var(--titlebar-active-to)
+  );
+  color: var(--titlebar-active-text);
   font: bold 12px / 1 var(--font-ui);
 `
 
 export const Message = styled.p`
   margin: 0;
   font: var(--font-size-ui) / 1.45 var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
 `

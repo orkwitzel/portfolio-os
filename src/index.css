@@ -7,6 +7,45 @@
 :root {
   --font-ui: 'GohuFont Nerd Font', monospace;
   --font-size-ui: 11px;
+
+  /* Theme tokens — defaults match "classic" preset; overridden by applyAppearance */
+  --shell-surface: #c0c0c0;
+  --shell-border-light: #ffffff;
+  --shell-border-dark: #404040;
+  --shell-border-mid: #808080;
+  --titlebar-active-from: #000080;
+  --titlebar-active-to: #1084d0;
+  --titlebar-inactive-from: #808080;
+  --titlebar-inactive-to: #b5b5b5;
+  --titlebar-active-text: #ffffff;
+  --titlebar-inactive-text: #c0c0c0;
+  --taskbar-bg: #c0c0c0;
+  --taskbar-border-top: #dfdfdf;
+  --desktop-bg: #018281;
+  --desktop-bg-image: none;
+  --text-primary: #000000;
+  --text-secondary: #404040;
+  --text-inverse: #ffffff;
+  --content-bg: #c0c0c0;
+  --content-bg-alt: #ffffff;
+  --selection-bg: rgba(0, 0, 128, 0.55);
+  --selection-text: #ffffff;
+  --link-color: #000080;
+  --accent-from: #000080;
+  --accent-to: #1084d0;
+  --accent-surface: #f0f4ff;
+  --window-shadow: 1px 1px 0 #000, 0 10px 28px rgba(0, 0, 0, 0.2);
+  --inset-border: #c0c0c0;
+  --menu-highlight: #000080;
+  --menu-highlight-text: #ffffff;
+  --app-gradient-from: #b8d4e8;
+  --app-gradient-mid: #c0c0c0;
+  --app-gradient-to: #d8c8e8;
+  --banner-from: #000080;
+  --banner-mid: #1084d0;
+  --banner-to: #008080;
+  --hero-bg: linear-gradient(135deg, #fff8e8 0%, #f0f8ff 50%, #f5f0ff 100%);
+  --panel-border: #c0c0c0;
 }
 
 html,

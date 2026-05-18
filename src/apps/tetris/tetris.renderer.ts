@@ -11,6 +11,7 @@ import {
   type PieceKind,
   type TetrisState,
 } from '@/apps/tetris/tetris.logic'
+import { getCssVar } from '@/theme/getThemeColors'
 
 export const CELL = 22
 export const PREVIEW_CELL = 18
@@ -53,10 +54,10 @@ function drawPlayfieldBorder(
 ) {
   ctx.fillStyle = '#000'
   ctx.fillRect(x, y, w, h)
-  ctx.strokeStyle = '#808080'
+  ctx.strokeStyle = getCssVar('--shell-border-mid', '#808080')
   ctx.lineWidth = BEVEL
   ctx.strokeRect(x + BEVEL / 2, y + BEVEL / 2, w - BEVEL, h - BEVEL)
-  ctx.strokeStyle = '#fff'
+  ctx.strokeStyle = getCssVar('--shell-border-light', '#ffffff')
   ctx.beginPath()
   ctx.moveTo(x, y + h)
   ctx.lineTo(x, y)

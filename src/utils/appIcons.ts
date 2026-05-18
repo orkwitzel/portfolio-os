@@ -14,6 +14,7 @@ export const appIcons = {
   resume: { kind: 'nerd', glyph: nerd.pdf },
   playful: { kind: 'nerd', glyph: nerd.terminal },
   tetris: { kind: 'nerd', glyph: nerd.trophy },
+  settings: { kind: 'nerd', glyph: nerd.gear },
 } as const satisfies Record<string, IconSource>
 
 export const wwwIcons = {

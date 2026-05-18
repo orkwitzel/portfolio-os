@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { cursorPointer } from '@/styles/cursors'
 import { CANVAS_H, CANVAS_W, LAYOUT_W, SIDE_RAIL_W } from '@/apps/tetris/tetris.renderer'
 
 export const AppBody = styled.div`
@@ -11,7 +12,8 @@ export const AppBody = styled.div`
   padding: 10px;
   min-height: 0;
   font: 13px var(--font-ui);
-  color: #000;
+  color: var(--text-primary);
+  background: var(--content-bg);
   user-select: none;
   outline: none;
 `
@@ -24,8 +26,8 @@ export const Header = styled.header`
   max-width: ${LAYOUT_W}px;
   gap: 6px;
   padding: 6px 8px;
-  border: 2px inset #c0c0c0;
-  background: #c0c0c0;
+  border: 2px inset var(--inset-border);
+  background: var(--shell-surface);
 `
 
 export const Counter = styled.span`
@@ -33,7 +35,7 @@ export const Counter = styled.span`
   flex: 1;
   min-width: 0;
   padding: 4px 6px;
-  border: 2px inset #c0c0c0;
+  border: 2px inset var(--inset-border);
   background: #000;
   color: #f00;
   font-weight: 700;
@@ -79,8 +81,8 @@ export const SideRail = styled.aside`
 export const ControlsPanel = styled.div`
   flex: 1;
   padding: 8px;
-  border: 2px inset #c0c0c0;
-  background: #c0c0c0;
+  border: 2px inset var(--inset-border);
+  background: var(--shell-surface);
 `
 
 export const ControlsTitle = styled.div`
@@ -93,7 +95,7 @@ export const ControlsTitle = styled.div`
 export const Controls = styled.div`
   font-size: 12px;
   line-height: 1.5;
-  color: #000;
+  color: var(--text-primary);
 
   kbd {
     font-family: var(--font-ui);
@@ -105,10 +107,11 @@ export const RestartBtn = styled.button`
   box-sizing: border-box;
   width: 100%;
   padding: 6px 8px;
-  border: 2px outset #c0c0c0;
-  background: #c0c0c0;
+  border: 2px outset var(--shell-surface);
+  background: var(--shell-surface);
   font: 13px var(--font-ui);
-  cursor: default;
+  color: var(--text-primary);
+  ${cursorPointer}
   flex-shrink: 0;
 
   &:active {

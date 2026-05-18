@@ -1,6 +1,7 @@
 import { createClipboardApi } from './clipboard'
 import { createExplorerApi } from './explorer'
 import { createFsApi } from './fs'
+import { createSettingsApi } from './settings'
 import type { OsApi, OsDeps } from './types'
 import { createUiApi } from './ui'
 import { createWinApi } from './win'
@@ -19,5 +20,6 @@ export function createOsApi(deps: OsDeps): OsApi {
     ui: createUiApi(deps),
     clipboard: createClipboardApi(deps),
     explorer: createExplorerApi(deps),
+    settings: createSettingsApi(deps),
   }
 }

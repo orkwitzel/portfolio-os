@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { cursors } from '@/styles/cursors'
+import { cursorPointer } from '@/styles/cursors'
 
 export const ExplorerColumn = styled.div`
   box-sizing: border-box;
@@ -32,15 +32,15 @@ export const TreePane = styled.div`
   min-width: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #404040;
-  background: #c0c0c0;
+  border-right: 1px solid var(--shell-border-dark);
+  background: var(--shell-surface);
 `
 
 export const PlacesList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 4px;
-  border-bottom: 1px solid #808080;
+  border-bottom: 1px solid var(--shell-border-mid);
   flex: 0 0 auto;
 `
 
@@ -54,15 +54,15 @@ export const PlacesButton = styled.button<{ $active?: boolean }>`
   width: 100%;
   padding: 2px 6px;
   border: none;
-  background: ${(p) => (p.$active ? '#000080' : 'transparent')};
+  background: ${(p) => (p.$active ? 'var(--menu-highlight)' : 'transparent')};
   font-family: var(--font-ui, 'MS Sans Serif', sans-serif);
   font-size: 11px;
   text-align: left;
-  cursor: ${cursors.pointer};
-  color: ${(p) => (p.$active ? '#fff' : 'inherit')};
+  ${cursorPointer}
+  color: ${(p) => (p.$active ? 'var(--menu-highlight-text)' : 'inherit')};
 
   &:hover {
-    background: ${(p) => (p.$active ? '#000080' : 'rgba(0, 0, 128, 0.15)')};
+    background: ${(p) => (p.$active ? 'var(--menu-highlight)' : 'rgba(0, 0, 128, 0.12)')};
   }
 `
 
@@ -79,8 +79,8 @@ export const ExplorerToolbar = styled.div`
   align-items: center;
   gap: 4px;
   padding: 2px 4px;
-  border-bottom: 1px solid #808080;
-  background: #c0c0c0;
+  border-bottom: 1px solid var(--shell-border-mid);
+  background: var(--shell-surface);
 `
 
 export const NavBtnGroup = styled.div`
@@ -95,8 +95,8 @@ export const AddressBar = styled.div`
   padding: 2px 6px;
   font-family: var(--font-mono, monospace);
   font-size: var(--font-size-ui, 12px);
-  border: 1px inset #808080;
-  background: #fff;
+  border: 1px inset var(--shell-border-mid);
+  background: var(--shell-border-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -106,7 +106,7 @@ export const FolderView = styled.div`
   flex: 1;
   min-height: 0;
   overflow: auto;
-  background: #fff;
+  background: var(--shell-border-light);
   padding: 8px;
 `
 
@@ -122,18 +122,18 @@ export const FolderItem = styled.button<{ $selected?: boolean }>`
   border: none;
   padding: 4px 6px;
   background: ${(p) => (p.$selected ? 'rgba(0, 0, 128, 0.2)' : 'transparent')};
-  cursor: ${cursors.pointer};
+  ${cursorPointer}
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: #000;
+  color: var(--text-primary);
   font: var(--font-size-ui) var(--font-ui);
-  outline: ${(p) => (p.$selected ? '1px dotted #000080' : 'none')};
+  outline: ${(p) => (p.$selected ? '1px dotted var(--menu-highlight)' : 'none')};
   outline-offset: 1px;
 
   &:focus-visible {
-    outline: 2px dotted #000080;
+    outline: 2px dotted var(--menu-highlight);
     outline-offset: 2px;
   }
 `
@@ -151,8 +151,8 @@ export const PreviewPane = styled.div`
   min-height: 0;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #808080;
-  background: #c0c0c0;
+  border-top: 1px solid var(--shell-border-mid);
+  background: var(--shell-surface);
 `
 
 export const PreviewBody = styled.div`
@@ -160,7 +160,7 @@ export const PreviewBody = styled.div`
   min-height: 0;
   overflow: auto;
   padding: 6px 8px;
-  background: #fff;
+  background: var(--shell-border-light);
 `
 
 export const TreeList = styled.ul`
@@ -178,11 +178,11 @@ export const TreeRow = styled.div<{ $selected?: boolean }>`
   display: flex;
   align-items: center;
   width: 100%;
-  background: ${(p) => (p.$selected ? '#000080' : 'transparent')};
-  color: ${(p) => (p.$selected ? '#fff' : 'inherit')};
+  background: ${(p) => (p.$selected ? 'var(--menu-highlight)' : 'transparent')};
+  color: ${(p) => (p.$selected ? 'var(--shell-border-light)' : 'inherit')};
 
   &:hover {
-    background: ${(p) => (p.$selected ? '#000080' : 'rgba(0, 0, 128, 0.15)')};
+    background: ${(p) => (p.$selected ? 'var(--menu-highlight)' : 'rgba(0, 0, 128, 0.12)')};
   }
 `
 
@@ -193,7 +193,7 @@ export const TreeToggle = styled.button`
   background: transparent;
   font-size: 10px;
   line-height: 1;
-  cursor: ${cursors.pointer};
+  ${cursorPointer}
   color: inherit;
 `
 
@@ -206,7 +206,7 @@ export const TreeLabel = styled.button`
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   text-align: left;
-  cursor: ${cursors.pointer};
+  ${cursorPointer}
   color: inherit;
 `
 
@@ -219,10 +219,10 @@ export const DetailActions = styled.div`
 export const ToolbarBtn = styled.button`
   padding: 2px 10px;
   border: 2px outset #dfdfdf;
-  background: #c0c0c0;
+  background: var(--shell-surface);
   font-family: var(--font-ui, 'MS Sans Serif', sans-serif);
   font-size: var(--font-size-ui, 12px);
-  cursor: ${cursors.pointer};
+  ${cursorPointer}
 
   &:disabled {
     opacity: 0.5;
