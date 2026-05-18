@@ -41,10 +41,13 @@ export type AppProps = {
   launch?: WindowLaunch
 }
 
+export type AppModule = { default: ComponentType<AppProps> }
+
 export type AppDefinition = {
   id: string
   defaultTitle: string
   defaultBounds: { width: number; height: number }
+  loader: () => Promise<AppModule>
   Root: LazyExoticComponent<ComponentType<AppProps>>
   icon?: IconSource
 }

@@ -76,7 +76,7 @@ export function WindowFrame({ window: win }: { window: WindowRecord }) {
 
       <Client>
         {Root ? (
-          <Suspense fallback={<LoadFallback>Loading…</LoadFallback>}>
+          <Suspense fallback={null}>
             <Root windowId={win.id} launch={win.launch} />
           </Suspense>
         ) : (

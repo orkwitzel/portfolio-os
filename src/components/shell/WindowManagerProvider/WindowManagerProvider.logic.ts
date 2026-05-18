@@ -1,9 +1,11 @@
 import {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
+  useState,
   type ReactNode,
   type RefObject,
 } from 'react'
@@ -32,10 +34,27 @@ export function useWindowManagerProvider({
 }: WindowManagerProviderProps) {
   const [session, dispatch] = useReducer(reduceSession, undefined, createInitialSession)
   const sessionRef = useRef(session)
+  const loadingCountRef = useRef(0)
+  const [loadingCount, setLoadingCount] = useState(0)
 
   useLayoutEffect(() => {
     sessionRef.current = session
   }, [session])
+
+  useEffect(() => {
+    document.body.classList.toggle('app-loading', loadingCount > 0)
+    return () => document.body.classList.remove('app-loading')
+  }, [loadingCount])
+
+  const beginAppLoad = useCallback(() => {
+    loadingCountRef.current += 1
+    setLoadingCount(loadingCountRef.current)
+  }, [])
+
+  const endAppLoad = useCallback(() => {
+    loadingCountRef.current = Math.max(0, loadingCountRef.current - 1)
+    setLoadingCount(loadingCountRef.current)
+  }, [])
 
   const openApp = useCallback(
     (
@@ -53,46 +72,58 @@ export function useWindowManagerProvider({
         return
       }
 
-      const prev = sessionRef.current
-      const offset = (Object.keys(prev.windows).length % 10) * 26
-      const id = crypto.randomUUID()
-      const nextZ = prev.nextZ + 1
-      const { width, height } = def.defaultBounds
-      const restored: NormalGeometry =
-        options?.center
-          ? (centerGeometry(workspaceRef.current, width, height) ?? {
-              x: 52 + offset,
-              y: 44 + offset,
-              width,
-              height,
-            })
-          : {
-              x: 52 + offset,
-              y: 44 + offset,
-              width,
-              height,
+      beginAppLoad()
+
+      void (async () => {
+        try {
+          await def.loader()
+
+          const prev = sessionRef.current
+          const offset = (Object.keys(prev.windows).length % 10) * 26
+          const id = crypto.randomUUID()
+          const nextZ = prev.nextZ + 1
+          const { width, height } = def.defaultBounds
+          const restored: NormalGeometry =
+            options?.center
+              ? (centerGeometry(workspaceRef.current, width, height) ?? {
+                  x: 52 + offset,
+                  y: 44 + offset,
+                  width,
+                  height,
+                })
+              : {
+                  x: 52 + offset,
+                  y: 44 + offset,
+                  width,
+                  height,
+                }
+
+          let geometry: WindowGeometryState = { mode: 'normal', geometry: restored }
+          if (options?.maximize) {
+            const frame = readWorkspaceFrame(workspaceRef.current)
+            if (frame) {
+              geometry = { mode: 'maximized', restored, frame }
             }
+          }
 
-      let geometry: WindowGeometryState = { mode: 'normal', geometry: restored }
-      if (options?.maximize) {
-        const frame = readWorkspaceFrame(workspaceRef.current)
-        if (frame) {
-          geometry = { mode: 'maximized', restored, frame }
+          const window: WindowRecord = {
+            id,
+            appId,
+            title: options?.title ?? def.defaultTitle,
+            geometry,
+            zIndex: nextZ,
+            launch: options?.launch,
+          }
+
+          dispatch({ type: 'OPEN_WINDOW', window })
+        } catch (err) {
+          console.error(`Failed to load app "${appId}"`, err)
+        } finally {
+          endAppLoad()
         }
-      }
-
-      const window: WindowRecord = {
-        id,
-        appId,
-        title: options?.title ?? def.defaultTitle,
-        geometry,
-        zIndex: nextZ,
-        launch: options?.launch,
-      }
-
-      dispatch({ type: 'OPEN_WINDOW', window })
+      })()
     },
-    [registry, workspaceRef],
+    [registry, workspaceRef, beginAppLoad, endAppLoad],
   )
 
   const closeWindow = useCallback((windowId: WindowId) => {

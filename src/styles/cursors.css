@@ -1,9 +1,9 @@
-/* Windows 98–style cursors — use direct url(), not var(), in cursor properties. */
+/* Windows XP cursors — use direct url(), not var(), in cursor properties. */
 
 html,
 body,
 #root {
-  cursor: url('../content/cursors/win98/arrow.png') 0 0, default;
+  cursor: url('../content/cursors/winxp/arrow.png') 1 1, default;
 }
 
 /* Interactive controls */
@@ -21,16 +21,21 @@ input[type='radio'],
 [role='link'],
 [role='menuitem'],
 [role='tab'] {
-  cursor: url('../content/cursors/win98/pointer.png') 3 0, pointer;
+  cursor: url('../content/cursors/winxp/pointer.png') 9 1, pointer;
 }
 
 input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
 textarea,
 [contenteditable='true'] {
-  cursor: url('../content/cursors/win98/text.png') 4 9, text;
+  cursor: url('../content/cursors/winxp/text.png') 5 11, text;
 }
 
 [disabled],
 [aria-disabled='true'] {
-  cursor: url('../content/cursors/win98/not-allowed.png') 16 16, not-allowed;
+  cursor: url('../content/cursors/winxp/not-allowed.png') 12 11, not-allowed;
+}
+
+body.app-loading,
+body.app-loading * {
+  cursor: url('../content/cursors/winxp/wait.png') 8 11, wait !important;
 }
