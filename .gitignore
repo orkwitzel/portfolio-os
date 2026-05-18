@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Personal assets (not tracked)
+public/resume.pdf
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

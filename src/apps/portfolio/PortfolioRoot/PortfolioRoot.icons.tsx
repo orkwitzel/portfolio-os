@@ -15,7 +15,6 @@ import {
 
 const toolbarFallbacks: Record<string, string> = {
   email: nerd.mail,
-  phone: nerd.phone,
   linkedin: nerd.linkedin,
   github: nerd.github,
   resume: nerd.pdf,

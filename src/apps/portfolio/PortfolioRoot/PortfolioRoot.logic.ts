@@ -59,7 +59,6 @@ export type PortfolioProfile = {
   award: string
   summary: string
   email: string
-  phone: string
   linkedIn: string
   github: string
   stats: { label: string; value: string; icon: string }[]
@@ -85,7 +84,6 @@ export const portfolioProfile: PortfolioProfile = {
   summary:
     'Full-Stack Developer with 7+ years of experience, including 3+ years delivering mission-critical military software. I specialize in scalable backend systems, modern web apps, and shipping under pressure.',
   email: 'orkwitzel@gmail.com',
-  phone: '',
   linkedIn: 'https://www.linkedin.com/in/or-kwitzel-83294b2b4/',
   github: 'https://github.com/orkwitzel',
   stats: [
@@ -231,12 +229,6 @@ export function usePortfolioRoot(props: AppProps) {
         label: 'Email',
         icon: { kind: 'favicon', url: faviconUrl('https://gmail.com') },
         action: () => openLink(`mailto:${portfolioProfile.email}`),
-      },
-      {
-        id: 'phone',
-        label: 'Phone',
-        icon: { kind: 'nerd', glyph: nerd.phone },
-        action: () => openLink(`tel:${portfolioProfile.phone}`),
       },
       {
         id: 'linkedin',
