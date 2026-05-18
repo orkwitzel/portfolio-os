@@ -53,4 +53,11 @@ export const appDefinitions: AppDefinition[] = [
     icon: appIcons.playful,
     Root: lazy(() => import('@/apps/playful/PlayfulRoot')),
   },
+  {
+    id: 'tetris',
+    defaultTitle: 'Tetris',
+    defaultBounds: { width: 490, height: 580 },
+    icon: appIcons.tetris,
+    Root: lazy(() => import('@/apps/tetris/TetrisRoot')),
+  },
 ]

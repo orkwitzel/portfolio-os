@@ -5,7 +5,7 @@ import type { FsNode } from './types'
 import { appIcons, wwwIcons } from '@/utils/appIcons'
 import { basename, join, parentPath } from '@/utils/paths'
 
-export const SEED_VERSION = 4
+export const SEED_VERSION = 5
 
 function dir(path: string, now: number): FsNode {
   return {
@@ -62,6 +62,9 @@ export function buildSeedNodes(): FsNode[] {
   )
   nodes.push(
     jsonFile('/apps/playful.app', { appId: 'playful', title: 'Minesweeper' }, now),
+  )
+  nodes.push(
+    jsonFile('/apps/tetris.app', { appId: 'tetris', title: 'Tetris' }, now),
   )
   nodes.push(
     jsonFile('/apps/computer.app', { appId: 'computer', title: 'My Computer' }, now),
