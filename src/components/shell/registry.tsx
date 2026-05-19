@@ -33,7 +33,7 @@ export const appDefinitions: AppDefinition[] = [
   defineApp(() => import('@/apps/notepad/NotepadRoot'), {
     id: 'notepad',
     defaultTitle: 'Notepad',
-    defaultBounds: { width: 400, height: 300 },
+    defaultBounds: { width: 480, height: 360 },
     icon: appIcons.notepad,
   }),
   defineApp(() => import('@/apps/about/AboutRoot'), {

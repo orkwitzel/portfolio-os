@@ -56,7 +56,12 @@ export function ShellContextMenu() {
               const frame = readWorkspaceFrame(os.win.workspaceRef.current)
               if (frame) os.win.maximize(windowId, frame)
             },
-            onClose: () => os.win.close(windowId),
+            onClose: () => {
+              void (async () => {
+                const allowed = await os.win.requestClose(windowId)
+                if (allowed) os.win.close(windowId)
+              })()
+            },
           }),
         )
         return

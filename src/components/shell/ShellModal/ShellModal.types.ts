@@ -15,6 +15,16 @@ export type ShellPromptOptions = {
   cancelLabel?: string
 }
 
+export type ShellSaveChangesOptions = {
+  title?: string
+  message: string
+  saveLabel?: string
+  discardLabel?: string
+  cancelLabel?: string
+}
+
+export type ShellSaveChangesResult = 'save' | 'discard' | 'cancel'
+
 export type ShellPropertiesOptions = {
   title: string
   name: string
@@ -29,6 +39,15 @@ export type ShellPropertiesOptions = {
 type Resolver<T> = (value: T) => void
 
 export type ShellModalRequest =
+  | {
+      kind: 'saveChanges'
+      title: string
+      message: string
+      saveLabel: string
+      discardLabel: string
+      cancelLabel: string
+      resolve: Resolver<ShellSaveChangesResult>
+    }
   | {
       kind: 'confirm'
       title: string

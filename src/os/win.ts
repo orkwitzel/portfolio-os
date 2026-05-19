@@ -7,6 +7,8 @@ export function createWinApi(deps: OsDeps): OsWinApi {
   return {
     openApp: (...args) => wm.openApp(...args),
     close: (windowId) => wm.closeWindow(windowId),
+    requestClose: (windowId) => wm.requestCloseWindow(windowId),
+    setTitle: (windowId, title) => wm.setWindowTitle(windowId, title),
     focus: (windowId) => wm.focusWindow(windowId),
     minimize: (windowId) => wm.minimizeWindow(windowId),
     restore: (windowId) => wm.restoreWindow(windowId),

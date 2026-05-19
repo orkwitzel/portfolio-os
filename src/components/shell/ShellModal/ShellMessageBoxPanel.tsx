@@ -26,6 +26,7 @@ import {
 } from './ShellModal.style'
 
 type ConfirmRequest = Extract<ShellModalRequest, { kind: 'confirm' }>
+type SaveChangesRequest = Extract<ShellModalRequest, { kind: 'saveChanges' }>
 type PromptRequest = Extract<ShellModalRequest, { kind: 'prompt' }>
 type PropertiesRequest = Extract<ShellModalRequest, { kind: 'properties' }>
 
@@ -78,6 +79,66 @@ export function ShellConfirmPanel({
             {request.confirmLabel}
           </DialogBtn>
           <DialogBtn type="button" onClick={() => finish(false)}>
+            {request.cancelLabel}
+          </DialogBtn>
+        </ButtonRow>
+      </Dialog>
+    </Overlay>
+  )
+}
+
+export function ShellSaveChangesPanel({
+  request,
+  onClose,
+}: {
+  request: SaveChangesRequest
+  onClose: () => void
+}) {
+  const saveRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    saveRef.current?.focus()
+  }, [])
+
+  const finish = (value: 'save' | 'discard' | 'cancel') => {
+    request.resolve(value)
+    onClose()
+  }
+
+  return (
+    <Overlay
+      role="presentation"
+      data-shell-modal
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) finish('cancel')
+      }}
+    >
+      <Dialog
+        role="alertdialog"
+        aria-labelledby="shell-save-title"
+        aria-describedby="shell-save-msg"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <TitleBar>
+          <TitleText id="shell-save-title">{request.title}</TitleText>
+          <TitleClose type="button" aria-label="Close" onClick={() => finish('cancel')}>
+            ×
+          </TitleClose>
+        </TitleBar>
+        <Body>
+          <MessageRow>
+            <MessageIcon aria-hidden>?</MessageIcon>
+            <MessageText id="shell-save-msg">{request.message}</MessageText>
+          </MessageRow>
+        </Body>
+        <ButtonRow>
+          <DialogBtn ref={saveRef} type="button" $default onClick={() => finish('save')}>
+            {request.saveLabel}
+          </DialogBtn>
+          <DialogBtn type="button" onClick={() => finish('discard')}>
+            {request.discardLabel}
+          </DialogBtn>
+          <DialogBtn type="button" onClick={() => finish('cancel')}>
             {request.cancelLabel}
           </DialogBtn>
         </ButtonRow>

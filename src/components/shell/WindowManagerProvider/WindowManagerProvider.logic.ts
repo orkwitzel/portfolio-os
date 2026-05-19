@@ -126,8 +126,36 @@ export function useWindowManagerProvider({
     [registry, workspaceRef, beginAppLoad, endAppLoad],
   )
 
+  const closeGuardsRef = useRef(new Map<WindowId, () => Promise<boolean>>())
+
   const closeWindow = useCallback((windowId: WindowId) => {
     dispatch({ type: 'CLOSE_WINDOW', windowId })
+    closeGuardsRef.current.delete(windowId)
+  }, [])
+
+  const registerCloseGuard = useCallback(
+    (windowId: WindowId, handler: () => Promise<boolean>) => {
+      closeGuardsRef.current.set(windowId, handler)
+    },
+    [],
+  )
+
+  const unregisterCloseGuard = useCallback((windowId: WindowId) => {
+    closeGuardsRef.current.delete(windowId)
+  }, [])
+
+  const requestCloseWindow = useCallback(async (windowId: WindowId): Promise<boolean> => {
+    if (!(windowId in sessionRef.current.windows)) return false
+    const guard = closeGuardsRef.current.get(windowId)
+    if (guard) {
+      const allowed = await guard()
+      if (!allowed) return false
+    }
+    return true
+  }, [])
+
+  const setWindowTitle = useCallback((windowId: WindowId, title: string) => {
+    dispatch({ type: 'SET_WINDOW_TITLE', windowId, title })
   }, [])
 
   const focusWindow = useCallback((windowId: WindowId) => {
@@ -178,6 +206,10 @@ export function useWindowManagerProvider({
       resizeWindow,
       maximizeWindow,
       unmaximizeWindow,
+      setWindowTitle,
+      registerCloseGuard,
+      unregisterCloseGuard,
+      requestCloseWindow,
     }),
     [
       session,
@@ -193,6 +225,10 @@ export function useWindowManagerProvider({
       resizeWindow,
       maximizeWindow,
       unmaximizeWindow,
+      setWindowTitle,
+      registerCloseGuard,
+      unregisterCloseGuard,
+      requestCloseWindow,
     ],
   )
 

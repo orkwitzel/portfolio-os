@@ -15,6 +15,7 @@ Shell-level chords for the portfolio-os desktop. Implementation lives in `src/co
 | **Delete** | Delete selected desktop item(s) |
 | **Ctrl+A** | Select all desktop items |
 | **Ctrl+`** | Cycle focus through visible (non-minimized) windows, back → front by z-order |
+| **Alt+F4** | Request close on the focused window (runs app close guards) |
 | **Escape** (Start menu open) | Close the Start menu only (`StartMenu.tsx`) |
 | **Escape** (context menu open) | Close the context menu only (`ContextMenu`) |
 
@@ -24,7 +25,8 @@ Shell-level chords for the portfolio-os desktop. Implementation lives in `src/co
 
 - Runs only when the Start menu and context menu are **closed**. When either menu is open, `ShellKeyboard` ignores Escape so the menu can close first.
 - Does **not** run when focus is in an editable control: `textarea`, `input`, or `contentEditable` (`isEditableTarget`).
-- With a focused window: closes that window. With no focused window but desktop selection: clears selection.
+- With a focused window: runs `requestCloseWindow` (apps may prompt for unsaved changes) then closes. With no focused window but desktop selection: clears selection.
+- Title-bar **Close** and **Alt+F4** use the same close-guard path as Escape.
 
 ### Desktop clipboard chords
 
@@ -49,5 +51,18 @@ Shell-level chords for the portfolio-os desktop. Implementation lives in `src/co
 - Start menu arrow-key roving / typeahead
 - **Shift+Ctrl+`** reverse window cycle
 - Win95-style Alt+Tab overlay UI
+
+## Notepad (when the Notepad textarea is focused)
+
+| Chord | Action |
+|-------|--------|
+| **Ctrl+N** | New document |
+| **Ctrl+O** | Open file |
+| **Ctrl+S** | Save |
+| **Ctrl+Shift+S** | Save As |
+| **Ctrl+F** | Find |
+| **F3** | Find Next |
+| **Ctrl+H** | Replace |
+| **Ctrl+Z / Ctrl+X / Ctrl+C / Ctrl+V / Ctrl+A** | Undo, Cut, Copy, Paste, Select All |
 
 Add new global shortcuts in `ShellKeyboard` and document them here.

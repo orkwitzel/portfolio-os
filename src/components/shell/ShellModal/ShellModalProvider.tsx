@@ -4,12 +4,15 @@ import {
   ShellConfirmPanel,
   ShellPromptPanel,
   ShellPropertiesPanel,
+  ShellSaveChangesPanel,
 } from './ShellMessageBoxPanel'
 import type {
   ShellConfirmOptions,
   ShellModalRequest,
   ShellPromptOptions,
   ShellPropertiesOptions,
+  ShellSaveChangesOptions,
+  ShellSaveChangesResult,
 } from './ShellModal.types'
 
 function ShellModalLayer({
@@ -21,6 +24,9 @@ function ShellModalLayer({
 }) {
   if (request.kind === 'confirm') {
     return <ShellConfirmPanel request={request} onClose={onClose} />
+  }
+  if (request.kind === 'saveChanges') {
+    return <ShellSaveChangesPanel request={request} onClose={onClose} />
   }
   if (request.kind === 'prompt') {
     return <ShellPromptPanel request={request} onClose={onClose} />
@@ -68,9 +74,25 @@ export function ShellModalProvider({ children }: { children: ReactNode }) {
     setRequest({ kind: 'properties', props: options })
   }, [])
 
+  const saveChanges = useCallback(
+    (options: ShellSaveChangesOptions) =>
+      new Promise<ShellSaveChangesResult>((resolve) => {
+        setRequest({
+          kind: 'saveChanges',
+          title: options.title ?? 'Notepad',
+          message: options.message,
+          saveLabel: options.saveLabel ?? 'Save',
+          discardLabel: options.discardLabel ?? "Don't Save",
+          cancelLabel: options.cancelLabel ?? 'Cancel',
+          resolve,
+        })
+      }),
+    [],
+  )
+
   const isOpen = useCallback(() => request !== null, [request])
 
-  const api: ShellModalApi = { confirm, prompt, showProperties, close, isOpen }
+  const api: ShellModalApi = { confirm, prompt, saveChanges, showProperties, close, isOpen }
 
   return (
     <ShellModalContext.Provider value={api}>

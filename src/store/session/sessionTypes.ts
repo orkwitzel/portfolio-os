@@ -67,3 +67,4 @@ export type WMAction =
       frame: NormalGeometry
     }
   | { type: 'UNMAXIMIZE_WINDOW'; windowId: WindowId }
+  | { type: 'SET_WINDOW_TITLE'; windowId: WindowId; title: string }

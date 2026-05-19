@@ -111,6 +111,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | P2.2-1 | List target demos (skills to showcase); one app folder each under `src/apps/`. | Done | Spec: `docs/superpowers/specs/2026-05-17-phase-2-2-demo-apps-design.md` — `about`, `resume`, `playful`. |
 | P2.2-2 | Replace or slim `Notepad` / `About` per content strategy; keep `AppProps` contract. | Done | About (MD), Resume (PDF), Minesweeper; Notepad re-added with IDB save (P2.3). |
 | P2.2-3 | Audit bundle: heavy deps only inside their lazy chunks. | Done | `react-markdown` in About chunk only; `resume.pdf` static; see spec lazy chunk map. |
+| P2.2-4 | Notepad classic menus + document lifecycle (File/Edit/Search/View/Help, close guard, Open/Save As). | Done | Spec: `docs/specs/2026-05-19-notepad-classic-menus/` |
 
 ### 2.3 “My Computer” / readme hub
 

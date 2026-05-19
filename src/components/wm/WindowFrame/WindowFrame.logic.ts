@@ -169,11 +169,13 @@ export function useWindowFrame(win: WindowRecord) {
     if (!runTransition('minimize', from, to)) return
   }, [minimized, runTransition, sessionRect, wm.workspaceRef])
 
-  const requestClose = useCallback(() => {
+  const requestClose = useCallback(async () => {
+    const allowed = await wm.requestCloseWindow(win.id)
+    if (!allowed) return
     const from = sessionRect
     const to = closeTarget(from)
     if (!runTransition('close', from, to)) return
-  }, [runTransition, sessionRect])
+  }, [wm, win.id, runTransition, sessionRect])
 
   const attachPointerListeners = (target: HTMLElement, pointerId: number) => {
     const windowId = win.id

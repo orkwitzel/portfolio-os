@@ -3,11 +3,14 @@ import type {
   ShellConfirmOptions,
   ShellPromptOptions,
   ShellPropertiesOptions,
+  ShellSaveChangesOptions,
+  ShellSaveChangesResult,
 } from './ShellModal.types'
 
 export type ShellModalApi = {
   confirm: (options: ShellConfirmOptions) => Promise<boolean>
   prompt: (options: ShellPromptOptions) => Promise<string | null>
+  saveChanges: (options: ShellSaveChangesOptions) => Promise<ShellSaveChangesResult>
   showProperties: (options: ShellPropertiesOptions) => void
   close: () => void
   isOpen: () => boolean

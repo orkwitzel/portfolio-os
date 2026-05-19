@@ -59,7 +59,10 @@ const shortcuts: Shortcut[] = [
     run: ({ event, wm, desktopCtx }) => {
       const id = wm.session.focusedWindowId
       if (id) {
-        wm.closeWindow(id)
+        void (async () => {
+          const allowed = await wm.requestCloseWindow(id)
+          if (allowed) wm.closeWindow(id)
+        })()
         event.preventDefault()
       } else if (desktopCtx?.hasSelection) {
         desktopCtx.clearSelection()
@@ -132,6 +135,24 @@ const shortcuts: Shortcut[] = [
       Boolean(ctx.desktopCtx?.hasSelection),
     run: ({ event, desktopCtx }) => {
       desktopCtx?.deleteSelection()
+      event.preventDefault()
+    },
+  },
+  {
+    match: ({ event, startMenuOpen, contextMenuOpen, shellModalOpen }) =>
+      !startMenuOpen &&
+      !contextMenuOpen &&
+      !shellModalOpen &&
+      event.altKey &&
+      event.key === 'F4' &&
+      Boolean(event.target instanceof HTMLElement),
+    run: ({ event, wm }) => {
+      const id = wm.session.focusedWindowId
+      if (!id) return
+      void (async () => {
+        const allowed = await wm.requestCloseWindow(id)
+        if (allowed) wm.closeWindow(id)
+      })()
       event.preventDefault()
     },
   },

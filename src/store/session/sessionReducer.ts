@@ -215,6 +215,18 @@ export function reduceSession(state: DesktopSession, action: WMAction): DesktopS
       }
     }
 
+    case 'SET_WINDOW_TITLE': {
+      const w = state.windows[action.windowId]
+      if (!w || w.title === action.title) return state
+      return {
+        ...state,
+        windows: {
+          ...state.windows,
+          [action.windowId]: { ...w, title: action.title },
+        },
+      }
+    }
+
     default:
       return state
   }

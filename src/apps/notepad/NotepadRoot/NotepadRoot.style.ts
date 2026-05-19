@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { cursorPointer } from '@/styles/cursors'
 
 export const AppBody = styled.div`
   box-sizing: border-box;
@@ -10,35 +9,7 @@ export const AppBody = styled.div`
   background: var(--content-bg);
 `
 
-export const Toolbar = styled.div`
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 4px;
-  border-bottom: 1px solid var(--shell-border-mid);
-  background: var(--shell-surface);
-`
-
-export const ToolBtn = styled.button`
-  padding: 2px 12px;
-  border: 2px outset var(--taskbar-border-top);
-  background: var(--shell-surface);
-  font: inherit;
-  color: var(--text-primary);
-  ${cursorPointer}
-
-  &:active {
-    border-style: inset;
-  }
-`
-
-export const PathLabel = styled.span`
-  font: var(--font-size-ui) / 1.35 var(--font-ui);
-  color: var(--text-primary);
-`
-
-export const NotepadField = styled.textarea`
+export const NotepadField = styled.textarea<{ $wordWrap?: boolean }>`
   flex: 1;
   box-sizing: border-box;
   margin: 2px;
@@ -50,4 +21,7 @@ export const NotepadField = styled.textarea`
   background: var(--content-bg-alt);
   color: var(--text-primary);
   min-height: 0;
+  white-space: ${(p) => (p.$wordWrap ? 'pre-wrap' : 'pre')};
+  overflow: ${(p) => (p.$wordWrap ? 'auto' : 'auto')};
+  overflow-x: ${(p) => (p.$wordWrap ? 'hidden' : 'auto')};
 `

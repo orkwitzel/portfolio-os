@@ -32,6 +32,10 @@ export type WindowManagerApi = {
   resizeWindow: (windowId: WindowId, width: number, height: number) => void
   maximizeWindow: (windowId: WindowId, frame: NormalGeometry) => void
   unmaximizeWindow: (windowId: WindowId) => void
+  setWindowTitle: (windowId: WindowId, title: string) => void
+  registerCloseGuard: (windowId: WindowId, handler: () => Promise<boolean>) => void
+  unregisterCloseGuard: (windowId: WindowId) => void
+  requestCloseWindow: (windowId: WindowId) => Promise<boolean>
 }
 
 export const WindowManagerContext = createContext<WindowManagerApi | null>(null)

@@ -7,6 +7,7 @@ export function createUiApi(deps: OsDeps): OsUiApi {
   return {
     confirm: (options) => modal.confirm(options),
     prompt: (options) => modal.prompt(options),
+    saveChanges: (options) => modal.saveChanges(options),
     showProperties: (options) => modal.showProperties(options),
   }
 }

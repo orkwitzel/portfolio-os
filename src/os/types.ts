@@ -2,6 +2,8 @@ import type { ShellModalApi } from '@/components/shell/ShellModal/shellModalCont
 import type {
   ShellConfirmOptions,
   ShellPromptOptions,
+  ShellSaveChangesOptions,
+  ShellSaveChangesResult,
 } from '@/components/shell/ShellModal/ShellModal.types'
 import type { IconSource } from '@/components/shell/ShellIcon'
 import type { DesktopEntry, FsNode } from '@/fs/types'
@@ -222,6 +224,15 @@ export type OsWinApi = {
   /** Close and remove a window from the session. */
   close: (windowId: WindowId) => void
 
+  /**
+   * Ask the app close guard (if any) whether closing is allowed.
+   * @returns `true` if the window may close; `false` if vetoed.
+   */
+  requestClose: (windowId: WindowId) => Promise<boolean>
+
+  /** Update the window title shown in the title bar. */
+  setTitle: (windowId: WindowId, title: string) => void
+
   /** Bring a window to the front and mark it focused. */
   focus: (windowId: WindowId) => void
 
@@ -278,6 +289,11 @@ export type OsUiApi = {
    * @returns Trimmed user input, or `null` if cancelled.
    */
   prompt: (options: ShellPromptOptions) => Promise<string | null>
+
+  /**
+   * Three-way save prompt: Save, Don't Save, or Cancel.
+   */
+  saveChanges: (options: ShellSaveChangesOptions) => Promise<ShellSaveChangesResult>
 
   /**
    * Open the read-only Properties dialog for a desktop item.
