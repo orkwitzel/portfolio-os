@@ -52,6 +52,7 @@ export function Taskbar(props: TaskbarProps) {
           <TaskBtn
             key={task.id}
             type="button"
+            {...(!task.exiting ? { 'data-taskbar-window-id': task.id } : {})}
             $active={task.active}
             $minimized={task.minimized}
             $entering={task.entering}

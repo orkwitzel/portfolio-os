@@ -31,6 +31,12 @@ export function isTaskbarArea(target: EventTarget | null): boolean {
   return Boolean(target.closest('[data-taskbar]'))
 }
 
+export function isTaskbarWindowButton(target: EventTarget | null): string | null {
+  if (!(target instanceof HTMLElement)) return null
+  const btn = target.closest<HTMLButtonElement>('button[data-taskbar-window-id]')
+  return btn?.dataset.taskbarWindowId ?? null
+}
+
 export function isFsTreeNode(target: EventTarget | null): string | null {
   if (!(target instanceof HTMLElement)) return null
   const btn = target.closest<HTMLButtonElement>('button[data-fs-path]')

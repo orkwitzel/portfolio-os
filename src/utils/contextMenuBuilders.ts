@@ -271,14 +271,68 @@ export function buildWindowTitleMenu(ctx: WindowMenuContext): ContextMenuEntryDe
   ]
 }
 
-export function buildTaskbarMenu(): ContextMenuEntryDef[] {
+export type TaskbarMenuContext = {
+  onOpenSettings: () => void
+}
+
+export function buildTaskbarMenu(ctx: TaskbarMenuContext): ContextMenuEntryDef[] {
   return [
+    {
+      type: 'item',
+      id: 'settings',
+      label: 'Settings',
+      onSelect: ctx.onOpenSettings,
+    },
+    { type: 'separator' },
     {
       type: 'item',
       id: 'tile',
       label: 'Tile Windows',
       disabled: true,
       onSelect: () => {},
+    },
+  ]
+}
+
+export type TaskbarWindowMenuContext = {
+  geometry: WindowGeometryState
+  onFocus: () => void
+  onMinimize: () => void
+  onMaximize: () => void
+  onClose: () => void
+}
+
+export function buildTaskbarWindowMenu(ctx: TaskbarWindowMenuContext): ContextMenuEntryDef[] {
+  const maximized = ctx.geometry.mode === 'maximized'
+  const minimized = ctx.geometry.mode === 'minimized'
+  return [
+    {
+      type: 'item',
+      id: 'focus',
+      label: 'Focus',
+      onSelect: ctx.onFocus,
+    },
+    { type: 'separator' },
+    {
+      type: 'item',
+      id: 'minimize',
+      label: 'Minimize',
+      disabled: minimized,
+      onSelect: ctx.onMinimize,
+    },
+    {
+      type: 'item',
+      id: 'maximize',
+      label: 'Maximize',
+      disabled: maximized || minimized,
+      onSelect: ctx.onMaximize,
+    },
+    { type: 'separator' },
+    {
+      type: 'item',
+      id: 'close',
+      label: 'Close',
+      onSelect: ctx.onClose,
     },
   ]
 }

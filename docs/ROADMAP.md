@@ -88,6 +88,16 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | P1.4-3 | Cycle focus/z-order through visible windows (**Ctrl+`** chord). | Done | `getNextFocusWindowId` in `shellKeyboard.ts`; Alt+Tab reserved by OS. |
 | P1.4-4 | Document shortcuts in README or `docs/`. | Done | Canonical: `docs/keyboard-shortcuts.md`; linked from README + `agents.md`. |
 
+### 1.5 Taskbar context menu
+
+**Outcome:** Right-click on the taskbar opens Settings on chrome; right-click on a task button opens per-window actions (Focus, Maximize, Minimize, Close).
+
+| Step | Task | Status | Notes |
+|------|------|--------|--------|
+| P1.5-1 | Hit-test task buttons (`data-taskbar-window-id`, `isTaskbarWindowButton`). | Done | Spec: `docs/specs/2026-05-19-taskbar-context-menu/`. |
+| P1.5-2 | `buildTaskbarMenu` (Settings + disabled Tile Windows) and `buildTaskbarWindowMenu`. | Done | Reuses `os.win` verbs; Close label not Exit. |
+| P1.5-3 | Wire `ShellContextMenu` branches before generic taskbar fallback. | Done | Window menu before `isTaskbarArea`; Settings via `openApp('settings')`. |
+
 ---
 
 ## Phase 2 — Apps & content

@@ -7,6 +7,7 @@ import {
   buildFsExplorerPaneMenu,
   buildFsTreeMenu,
   buildTaskbarMenu,
+  buildTaskbarWindowMenu,
   buildWindowTitleMenu,
 } from '@/utils/contextMenuBuilders'
 import {
@@ -15,6 +16,7 @@ import {
   isFsTreeNode,
   isInsideShell,
   isTaskbarArea,
+  isTaskbarWindowButton,
   isWindowTitleBar,
   shouldAllowNativeContextMenu,
 } from '@/utils/shellContextMenu'
@@ -67,9 +69,46 @@ export function ShellContextMenu() {
         return
       }
 
+      const taskbarWindowId = isTaskbarWindowButton(e.target)
+      if (taskbarWindowId) {
+        e.preventDefault()
+        const win = os.win.session.windows[taskbarWindowId]
+        if (!win) return
+        openMenu(
+          e.clientX,
+          e.clientY,
+          buildTaskbarWindowMenu({
+            geometry: win.geometry,
+            onFocus: () => {
+              if (win.geometry.mode === 'minimized') os.win.restore(taskbarWindowId)
+              else os.win.focus(taskbarWindowId)
+            },
+            onMinimize: () => os.win.minimize(taskbarWindowId),
+            onMaximize: () => {
+              if (win.geometry.mode === 'maximized') return
+              const frame = readWorkspaceFrame(os.win.workspaceRef.current)
+              if (frame) os.win.maximize(taskbarWindowId, frame)
+            },
+            onClose: () => {
+              void (async () => {
+                const allowed = await os.win.requestClose(taskbarWindowId)
+                if (allowed) os.win.close(taskbarWindowId)
+              })()
+            },
+          }),
+        )
+        return
+      }
+
       if (isTaskbarArea(e.target)) {
         e.preventDefault()
-        openMenu(e.clientX, e.clientY, buildTaskbarMenu())
+        openMenu(
+          e.clientX,
+          e.clientY,
+          buildTaskbarMenu({
+            onOpenSettings: () => os.win.openApp('settings'),
+          }),
+        )
         return
       }
 
