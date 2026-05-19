@@ -17,13 +17,14 @@ Shell-level chords for the portfolio-os desktop. Implementation lives in `src/co
 | **Ctrl+`** | Cycle focus through visible (non-minimized) windows, back → front by z-order |
 | **Alt+F4** | Request close on the focused window (runs app close guards) |
 | **Escape** (Start menu open) | Close the Start menu only (`StartMenu.tsx`) |
+| **Escape** (clock widget open) | Close the clock widget only (`ClockWidget.tsx`) |
 | **Escape** (context menu open) | Close the context menu only (`ContextMenu`) |
 
 ## Behavior notes
 
 ### Escape — close window / clear selection
 
-- Runs only when the Start menu and context menu are **closed**. When either menu is open, `ShellKeyboard` ignores Escape so the menu can close first.
+- Runs only when the Start menu, clock widget, and context menu are **closed**. When any of those overlays is open, `ShellKeyboard` ignores Escape so the overlay can close first.
 - Does **not** run when focus is in an editable control: `textarea`, `input`, or `contentEditable` (`isEditableTarget`).
 - With a focused window: runs `requestCloseWindow` (apps may prompt for unsaved changes) then closes. With no focused window but desktop selection: clears selection.
 - Title-bar **Close** and **Alt+F4** use the same close-guard path as Escape.
@@ -41,10 +42,10 @@ Shell-level chords for the portfolio-os desktop. Implementation lives in `src/co
 - Cycles among windows where `geometry.mode !== 'minimized'`.
 - Does not restore minimized windows.
 
-### Start menu / context menu Escape
+### Start menu / clock widget / context menu Escape
 
-- Each menu registers its own Escape handler while open.
-- `ShellKeyboard` skips global shortcuts while a menu is open.
+- Each overlay registers its own Escape handler while open.
+- `ShellKeyboard` skips global shortcuts while the Start menu or clock widget is open.
 
 ## Not implemented (deferred)
 

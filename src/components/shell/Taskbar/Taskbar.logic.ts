@@ -8,6 +8,8 @@ import { TASKBAR_ANIM_MS } from '@/utils/taskbarAnimation'
 export type TaskbarProps = {
   startMenuOpen: boolean
   onStartMenuOpenChange: (open: boolean) => void
+  clockWidgetOpen: boolean
+  onClockWidgetOpenChange: (open: boolean) => void
 }
 
 type ExitingTask = {
@@ -33,7 +35,12 @@ function resolveTaskIcon(registry: Map<string, AppDefinition>, appId: string): I
   return registry.get(appId)?.icon ?? placeholderIcon
 }
 
-export function useTaskbar({ startMenuOpen, onStartMenuOpenChange }: TaskbarProps) {
+export function useTaskbar({
+  startMenuOpen,
+  onStartMenuOpenChange,
+  clockWidgetOpen,
+  onClockWidgetOpenChange,
+}: TaskbarProps) {
   const wm = useWindowManager()
   const session = wm.session
   const startRef = useRef<HTMLButtonElement>(null)
@@ -154,6 +161,8 @@ export function useTaskbar({ startMenuOpen, onStartMenuOpenChange }: TaskbarProp
     startButtonId,
     startMenuOpen,
     onStartMenuOpenChange,
+    clockWidgetOpen,
+    onClockWidgetOpenChange,
     toggleStart: () => onStartMenuOpenChange(!startMenuOpen),
     closeStart: () => onStartMenuOpenChange(false),
   }

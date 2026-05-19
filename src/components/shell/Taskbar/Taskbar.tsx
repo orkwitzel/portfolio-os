@@ -21,6 +21,8 @@ export function Taskbar(props: TaskbarProps) {
     startRef,
     startButtonId,
     startMenuOpen,
+    clockWidgetOpen,
+    onClockWidgetOpenChange,
     toggleStart,
     closeStart,
   } = useTaskbar(props)
@@ -71,7 +73,7 @@ export function Taskbar(props: TaskbarProps) {
         ))}
       </Tasks>
       <Tray>
-        <TrayClock />
+        <TrayClock open={clockWidgetOpen} onOpenChange={onClockWidgetOpenChange} />
       </Tray>
     </Bar>
   )

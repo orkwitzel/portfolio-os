@@ -18,12 +18,14 @@ export type DesktopKeyboardContext = {
 
 export type ShellKeyboardProps = {
   startMenuOpen: boolean
+  clockWidgetOpen: boolean
   desktopCtx?: DesktopKeyboardContext
 }
 
 type ShortcutContext = {
   event: KeyboardEvent
   startMenuOpen: boolean
+  clockWidgetOpen: boolean
   contextMenuOpen: boolean
   shellModalOpen: boolean
   wm: WindowManagerApi
@@ -38,6 +40,7 @@ type Shortcut = {
 function shellShortcutsEnabled(ctx: ShortcutContext): boolean {
   return (
     !ctx.startMenuOpen &&
+    !ctx.clockWidgetOpen &&
     !ctx.contextMenuOpen &&
     !ctx.shellModalOpen &&
     !isEditableTarget(document.activeElement)
@@ -50,8 +53,9 @@ function desktopFocused(ctx: ShortcutContext): boolean {
 
 const shortcuts: Shortcut[] = [
   {
-    match: ({ event, startMenuOpen, contextMenuOpen, shellModalOpen }) =>
+    match: ({ event, startMenuOpen, clockWidgetOpen, contextMenuOpen, shellModalOpen }) =>
       !startMenuOpen &&
+      !clockWidgetOpen &&
       !contextMenuOpen &&
       !shellModalOpen &&
       event.key === 'Escape' &&
@@ -139,8 +143,9 @@ const shortcuts: Shortcut[] = [
     },
   },
   {
-    match: ({ event, startMenuOpen, contextMenuOpen, shellModalOpen }) =>
+    match: ({ event, startMenuOpen, clockWidgetOpen, contextMenuOpen, shellModalOpen }) =>
       !startMenuOpen &&
+      !clockWidgetOpen &&
       !contextMenuOpen &&
       !shellModalOpen &&
       event.altKey &&
@@ -157,8 +162,9 @@ const shortcuts: Shortcut[] = [
     },
   },
   {
-    match: ({ event, startMenuOpen, contextMenuOpen }) =>
+    match: ({ event, startMenuOpen, clockWidgetOpen, contextMenuOpen }) =>
       !startMenuOpen &&
+      !clockWidgetOpen &&
       !contextMenuOpen &&
       event.ctrlKey &&
       !event.shiftKey &&
@@ -172,7 +178,7 @@ const shortcuts: Shortcut[] = [
   },
 ]
 
-export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardProps) {
+export function useShellKeyboard({ startMenuOpen, clockWidgetOpen, desktopCtx }: ShellKeyboardProps) {
   const wm = useWindowManager()
   const contextMenu = useContextMenuOptional()
   const shellModal = useShellModalOptional()
@@ -187,6 +193,7 @@ export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardPro
       const ctx: ShortcutContext = {
         event,
         startMenuOpen,
+        clockWidgetOpen,
         contextMenuOpen: contextMenu?.isOpen() ?? false,
         shellModalOpen: shellModal?.isOpen() ?? false,
         wm,
@@ -202,5 +209,5 @@ export function useShellKeyboard({ startMenuOpen, desktopCtx }: ShellKeyboardPro
 
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [startMenuOpen, wm, contextMenu, shellModal])
+  }, [startMenuOpen, clockWidgetOpen, wm, contextMenu, shellModal])
 }

@@ -76,6 +76,7 @@ Living document: update **Status** and **Notes** when you start or finish work s
 | P1.3-1 | Decide format (`HH:mm`, locale, timezone display yes/no). | Done | Locale 12h `hour` + `minute`, no seconds or timezone label. |
 | P1.3-2 | Implement ticking clock component in tray region (`Taskbar`). | Done | `TrayClock.tsx`; aligns to minute boundary + visibility refresh. |
 | P1.3-3 | Style tray inset to match chrome; avoid layout shift on tick. | Done | Tabular nums, `min-width` tray, flex centering. |
+| P1.3-4 | Clock widget popup (analog + digital time/date/timezone). | Done | Spec: `docs/specs/2026-05-19-clock-widget/`; `ClockWidget` + nested `AnalogClock`. |
 
 ### 1.4 Keyboard shortcuts
 

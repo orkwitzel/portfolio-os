@@ -19,10 +19,14 @@ import { Shell } from './App.style'
 function ShellInner({
   startMenuOpen,
   onStartMenuOpenChange,
+  clockWidgetOpen,
+  onClockWidgetOpenChange,
   workspaceRef,
 }: {
   startMenuOpen: boolean
   onStartMenuOpenChange: (open: boolean) => void
+  clockWidgetOpen: boolean
+  onClockWidgetOpenChange: (open: boolean) => void
   workspaceRef: React.RefObject<HTMLDivElement | null>
 }) {
   const wm = useWindowManager()
@@ -65,7 +69,11 @@ function ShellInner({
   return (
     <FsProvider registry={registry}>
       <AppearanceSync />
-      <ShellKeyboard startMenuOpen={startMenuOpen} desktopCtx={desktopCtx} />
+      <ShellKeyboard
+        startMenuOpen={startMenuOpen}
+        clockWidgetOpen={clockWidgetOpen}
+        desktopCtx={desktopCtx}
+      />
       <Shell data-shell-root>
         <Desktop
           workspaceRef={workspaceRef}
@@ -81,6 +89,8 @@ function ShellInner({
         <Taskbar
           startMenuOpen={startMenuOpen}
           onStartMenuOpenChange={onStartMenuOpenChange}
+          clockWidgetOpen={clockWidgetOpen}
+          onClockWidgetOpenChange={onClockWidgetOpenChange}
         />
       </Shell>
       <ShellContextMenu />
@@ -93,6 +103,17 @@ export default function App() {
   const workspaceRef = useRef<HTMLDivElement>(null)
   const registry = useMemo(() => createAppRegistry(appDefinitions), [])
   const [startMenuOpen, setStartMenuOpen] = useState(false)
+  const [clockWidgetOpen, setClockWidgetOpen] = useState(false)
+
+  const handleStartMenuOpenChange = useCallback((open: boolean) => {
+    setStartMenuOpen(open)
+    if (open) setClockWidgetOpen(false)
+  }, [])
+
+  const handleClockWidgetOpenChange = useCallback((open: boolean) => {
+    setClockWidgetOpen(open)
+    if (open) setStartMenuOpen(false)
+  }, [])
 
   if (isMobile) {
     return <MobileUnsupported />
@@ -104,7 +125,9 @@ export default function App() {
         <WindowManagerProvider registry={registry} workspaceRef={workspaceRef}>
           <ShellInner
             startMenuOpen={startMenuOpen}
-            onStartMenuOpenChange={setStartMenuOpen}
+            onStartMenuOpenChange={handleStartMenuOpenChange}
+            clockWidgetOpen={clockWidgetOpen}
+            onClockWidgetOpenChange={handleClockWidgetOpenChange}
             workspaceRef={workspaceRef}
           />
         </WindowManagerProvider>
