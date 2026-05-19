@@ -1,0 +1,102 @@
+---
+description: Spec-driven planning workflow (requirements -> design -> tasks) for complex changes in portfolio-os.
+alwaysApply: true
+---
+
+# Spec-driven planning workflow
+
+This repository uses a **plan-before-code** workflow for any non-trivial change.
+Follow it whenever the request meets *any* of these triggers:
+
+- Touches more than ~2 files or crosses a module boundary
+  (e.g. `src/components/shell/`, `src/components/wm/`, `src/apps/<name>/`,
+  `src/store/session/`, `src/fs/`).
+- Adds or changes a windowed app, session/reducer semantics, the OS facade
+  (`src/os/`), the virtual filesystem (`src/fs/`), or global state.
+- Introduces a new dependency, build step, or public-ish surface.
+- Has ambiguous or open product/UX decisions.
+
+For tiny, obvious edits (typos, copy tweaks, single-file refactors, doc-only
+changes), skip the workflow and just make the change.
+
+## Rules for the agent
+
+1. **Do not start coding immediately.** Acknowledge the request and switch
+   into planning mode.
+
+2. **Create or update a spec** under `docs/specs/<feature-name>/` (kebab-case,
+   optionally prefixed with a date: `2026-05-19-<feature-name>/`). The spec
+   directory must contain:
+
+   - `requirements.md` — what and why
+   - `design.md` — how
+   - `tasks.md` — ordered checklist of work
+
+   Use the templates in `docs/specs/_template/` as the starting point.
+
+3. **Ask clarifying questions** when requirements are ambiguous, when product
+   decisions could go multiple ways, or when there is no clear owner for an
+   open question. Prefer a small number of focused questions over guessing.
+   Record the resolved answers back into `requirements.md`.
+
+4. **Wait for explicit approval** before moving from spec to implementation.
+   A short user message like "approved", "go ahead", or "implement task N" is
+   enough. Do not proactively start editing source files in `src/` until then.
+
+5. **Implement one task at a time** from `tasks.md`. After completing a task:
+
+   - Tick the checkbox in `tasks.md` and add a one-line note (what shipped,
+     any deviation from the design).
+   - Run the relevant checks for what changed (see below).
+   - Summarize: files changed, checks run, what is left.
+
+6. **Verification.** Before declaring a task done, run the checks documented
+   in the task's *Validation* section. Default repo-wide checks are:
+
+   ```bash
+   npm run lint
+   npm run build
+   ```
+
+   `npm run build` runs `tsc -b` then `vite build`, so it doubles as the
+   typecheck. Run both for any change that touches `src/`. Doc-only changes
+   under `docs/` do not require either.
+
+7. **Keep specs honest.** If implementation reveals that the design is wrong,
+   update `design.md` (and `requirements.md` if scope shifts) *before*
+   continuing — don't let the code and the spec drift.
+
+8. **Cross-reference the roadmap.** When a spec maps to a phase/step in
+   `docs/ROADMAP.md`, link it from `requirements.md` and update the roadmap's
+   Status/Notes in the same change series, as `docs/CONTRIBUTING.md` requires.
+
+## Repo conventions the spec must respect
+
+These are non-negotiable unless the spec explicitly proposes changing them:
+
+- **Folder-per-component**: every React component lives in its own folder
+  with `Component.tsx` (dumb view), `Component.logic.ts` (hooks/handlers),
+  `Component.style.ts` (styled-components), and optional `index.ts`.
+- **Session truth in the reducer**: window open/focus/move/resize/min/max/close
+  transitions go through `src/store/session/sessionReducer.ts`. UI calls
+  verbs on `useWindowManager()` / `useOs()`.
+- **Apps are lazy-registered** in `src/components/shell/registry.tsx`.
+- **Imports use the `@/` alias** for anything under `src/`.
+- **Styling is styled-components** in `*.style.ts`; no new `*.module.css`.
+- **TypeScript everywhere**, no `any` in new code.
+
+When a design conflicts with these, call it out in `design.md` under
+*Risks/tradeoffs* and ask the user before proceeding.
+
+## Spec directory shape
+
+```
+docs/specs/<feature-name>/
+  requirements.md
+  design.md
+  tasks.md
+  notes/                # optional: scratch, transcripts, screenshots
+```
+
+The matching template lives at `docs/specs/_template/`. See
+`docs/specs/README.md` for example prompts and the human-side workflow.
