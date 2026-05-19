@@ -10,5 +10,15 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "routes": [
+    {
+      "pattern": "orkwitzel.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.orkwitzel.com",
+      "custom_domain": true
+    }
   ]
 }
