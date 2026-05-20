@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "portfolio",
+  "name": "desktop-os",
   "compatibility_date": "2026-05-19",
   "observability": {
     "enabled": true
@@ -10,15 +10,5 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
-  ],
-  "routes": [
-    {
-      "pattern": "orkwitzel.com",
-      "custom_domain": true
-    },
-    {
-      "pattern": "www.orkwitzel.com",
-      "custom_domain": true
-    }
   ]
 }

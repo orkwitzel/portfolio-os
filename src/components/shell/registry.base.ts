@@ -50,3 +50,5 @@ export const baseAppDefinitions: AppDefinition[] = [
     icon: appIcons.settings,
   }),
 ]
+
+export const appDefinitions = baseAppDefinitions

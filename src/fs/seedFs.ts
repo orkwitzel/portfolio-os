@@ -3,7 +3,6 @@ import keyboardShortcuts from '../content/seed/docs/keyboard-shortcuts.md?raw'
 import notes from '../content/seed/docs/notes.txt?raw'
 import type { FsNode } from './types'
 import { appIcons } from '@/utils/appIcons'
-import { buildSiteSeedNodes } from '@/site/seed/siteSeed'
 import { basename, join, parentPath } from '@/utils/paths'
 
 export const SEED_VERSION = 7
@@ -89,6 +88,5 @@ export function buildBaseSeedNodes(now: number): FsNode[] {
 }
 
 export function buildSeedNodes(): FsNode[] {
-  const now = Date.now()
-  return [...buildBaseSeedNodes(now), ...buildSiteSeedNodes(now)]
+  return buildBaseSeedNodes(Date.now())
 }

@@ -1,80 +1,24 @@
-# Fork model: desktop-os + portfolio
+# Forking desktop-os
 
-This repository is structured as a **portfolio fork**: personal work lives under `src/site/`. The generic Win95-style shell and demo apps are merge-friendly from a future **desktop-os** upstream.
+This repository is the **upstream** OS. Personal portfolio sites should fork it and add a `src/site/` layer.
 
-## Repositories
+## Reference fork
 
-| Repo | Contents |
-|------|----------|
-| **desktop-os** (upstream) | Everything except `src/site/`. Uses `registry.base.ts` + `buildBaseSeedNodes()` only. |
-| **portfolio** (this fork) | Full tree including `src/site/` (apps, content, seed, deploy). |
+- **Portfolio:** [github.com/orkwitzel/portfolio](https://github.com/orkwitzel/portfolio)
 
-## Layout
+## Add a portfolio layer
 
+1. Fork this repo on GitHub.
+2. Add `src/site/` (apps, content, seed, `registry.site.ts`, `icons.ts`).
+3. Compose `registry.tsx` from `siteAppDefinitions` + `baseAppDefinitions`.
+4. Merge `buildSiteSeedNodes()` in `seedFs.ts`.
+
+See the portfolio repo for a working example.
+
+## Sync from upstream (in your fork)
+
+```bash
+git remote add upstream https://github.com/orkwitzel/desktop-os.git
+git fetch upstream
+git merge upstream/main
 ```
-src/site/                    # Portfolio only — upstream never edits
-  apps/portfolio|about|resume/
-  content/
-  config/assets.ts
-  seed/siteSeed.ts
-  registry.site.ts
-  icons.ts
-
-src/components/shell/
-  registry.base.ts           # Base demo apps (upstream)
-  registry.tsx               # site + base (fork)
-
-src/fs/seedFs.ts             # buildBaseSeedNodes + buildSiteSeedNodes
-```
-
-## Create desktop-os from this repo
-
-1. Clone or duplicate the repo as `desktop-os`.
-2. Delete the entire `src/site/` directory.
-3. Replace `src/components/shell/registry.tsx` with:
-
-   ```ts
-   export {
-     appDefinitions,
-     createAppRegistry,
-     defineApp,
-   } from './registry.base'
-   ```
-
-   And in `registry.base.ts`, export `appDefinitions = baseAppDefinitions` (or alias).
-
-4. In `src/fs/seedFs.ts`, set `buildSeedNodes` to `buildBaseSeedNodes` only (remove `buildSiteSeedNodes` import).
-5. Run `npm run build` and `npm run lint`.
-
-## Portfolio fork workflow
-
-1. Fork **desktop-os** on GitHub (or keep this repo as portfolio and add upstream later).
-2. Ensure `src/site/` exists with personal apps and seed.
-3. Add upstream remote:
-
-   ```bash
-   git remote add upstream git@github.com:YOUR_ORG/desktop-os.git
-   ```
-
-4. Sync OS improvements:
-
-   ```bash
-   git fetch upstream
-   git merge upstream/main
-   npm install
-   npm run build
-   npm run lint
-   ```
-
-## Merge conflict hotspots
-
-- `package.json` / `package-lock.json`
-- `src/components/shell/registry.base.ts`
-- `src/fs/seedFs.ts` (especially `SEED_VERSION`)
-- `src/utils/appIcons.ts`
-
-Avoid editing `src/components/shell/*` (except `registry.tsx`) in the portfolio fork; propose OS fixes upstream first.
-
-## Personal changes
-
-Keep name, links, CV, deploy, and copy changes under `src/site/` or `wrangler.jsonc` only.
