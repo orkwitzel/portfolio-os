@@ -2,6 +2,20 @@
 
 This repo is a **fork** of [desktop-os](https://github.com/orkwitzel/desktop-os). Personal apps and content live under `src/site/`; the rest merges from upstream.
 
+## Do pushes to desktop-os appear here automatically?
+
+**No.** The two repos are separate on GitHub. Pushing to `desktop-os` only updates that repository (and anything deployed from it, if you host it).
+
+Your live portfolio site is built and deployed from **this** repo (`portfolio`). To pick up OS changes:
+
+```bash
+git fetch upstream
+git merge upstream/main
+git push origin main   # then run your deploy (e.g. npm run deploy)
+```
+
+Until you merge (and deploy), `portfolio` keeps whatever code it already had.
+
 ## Remotes
 
 | Remote | URL |
