@@ -16,17 +16,25 @@ src/
       StartMenu/
       ShellIcon/
       WindowManagerProvider/
-      registry.tsx             # App definitions + lazy imports
+      registry.base.ts         # Base demo apps (upstream-safe)
+      registry.tsx             # Composes site + base app definitions
     wm/                        # Window chrome (frame + layer)
       WindowFrame/
       WindowLayer/
     shared/                    # UI shared across apps (not tied to one program)
       MarkdownView/
 
-  apps/                        # Windowed programs (lazy-loaded)
+  apps/                        # Built-in OS demo apps (lazy-loaded)
     <app-name>/
       <Component>/             # One folder per component (see below)
-      minesweeper.logic.ts     # App-local pure logic (when not a component)
+
+  site/                        # Portfolio fork only — personal apps, content, seed
+    apps/                      # portfolio, about, resume
+    content/
+    config/
+    seed/
+    registry.site.ts
+    icons.ts
 
   store/                       # Global client state
     fsStore.ts                 # Zustand (filesystem + shell binding)
@@ -55,8 +63,7 @@ src/
     FsProvider.tsx, FsBootstrap.tsx
     types.ts
 
-  content/                     # Static assets (markdown, seed files)
-    about.md
+  content/                     # OS static assets (seed docs, icons)
     seed/
 ```
 

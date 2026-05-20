@@ -4,7 +4,7 @@ import { faviconUrl } from '@/components/shell/ShellIcon/favicon'
 import { useOs } from '@/hooks/useOs'
 import { nerd } from '@/utils/nerdIcons'
 import { openExternalLink } from '@/utils/openExternalLink'
-import portraitUrl from '@/content/portfolio/portrait.png?url'
+import portraitUrl from '@/site/content/portfolio/portrait.png?url'
 
 export const panelHeaderIcons = {
   teal: nerd.user,

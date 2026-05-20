@@ -18,7 +18,7 @@ This file is for **automated coding agents** (and humans acting like them). Read
 
 2. **Apps stay inside the client area** — Window chrome (`WindowFrame`) renders controls and sizing; app roots (`src/apps/*`) must not manage stacking or escape the window metaphor without an explicit design change.
 
-3. **Registration is explicit** — New runnable surfaces ship via `appDefinitions` in `src/desktop/registry.tsx` using `React.lazy` so bundles stay split.
+3. **Registration is explicit** — Base apps in `src/components/shell/registry.base.ts`; portfolio apps in `src/site/registry.site.ts`. Composed in `registry.tsx` with `React.lazy` so bundles stay split. See `docs/FORK.md`.
 
 4. **Refs during render** — Follow existing patterns: sync refs with `useLayoutEffect` where ESLint requires it; do not silence hooks lint rules without a strong reason.
 
@@ -35,7 +35,8 @@ Run both before claiming a task is done.
 
 | Goal | Where to change |
 |------|------------------|
-| New desktop program | Add `src/apps/<name>/`, export root component typed with `AppProps`, register in `registry.tsx`. |
+| New desktop program (OS demo) | Add `src/apps/<name>/`, register in `registry.base.ts`. |
+| New portfolio-only app | Add `src/site/apps/<name>/`, register in `src/site/registry.site.ts`. |
 | Desktop shortcuts | `Desktop.tsx` + `Desktop.module.css`. |
 | Taskbar behavior | `Taskbar.tsx` + reducer actions if semantics change. |
 | Window chrome / drag-resize | `WindowFrame.tsx` + CSS modules under `src/wm/`. |

@@ -4,6 +4,8 @@ A **retro desktop-style portfolio shell**: a fake Windows 95–inspired workspac
 
 Built with **React 19**, **TypeScript**, and **Vite**.
 
+This repo is structured as a **portfolio fork** of a future **desktop-os** upstream. Personal apps and content live under `src/site/`; see **[docs/FORK.md](./docs/FORK.md)** for splitting repos and syncing with upstream.
+
 ## Quick start
 
 ```bash
@@ -25,15 +27,16 @@ npm run preview # serve dist locally
 |------|---------|
 | [agents.md](./agents.md) | Short guidance for coding agents (architecture boundaries, verification commands). |
 | [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) | Rules for humans and agents: repo layout, code style, commits, review checklist. |
+| [docs/FORK.md](./docs/FORK.md) | desktop-os upstream vs portfolio fork; merge workflow. |
 | [docs/ROADMAP.md](./docs/ROADMAP.md) | Phased implementation plan with tasks, IDs, and status tracking. |
 | [docs/keyboard-shortcuts.md](./docs/keyboard-shortcuts.md) | Shell keyboard chords and edge cases. |
 
 ## Architecture (overview)
 
-- **Session state** — Centralized in `src/desktop/sessionReducer.ts`, driven by actions dispatched from `WindowManagerProvider`.
-- **Public API** — Imperative verbs (`openApp`, `focusWindow`, `moveWindow`, …) exposed via `useWindowManager()` from `windowManagerContext.tsx`.
-- **Apps** — Registered in `src/desktop/registry.tsx` with `React.lazy` for code splitting; implementations live under `src/apps/<name>/`.
-- **Presentation** — `Desktop` + `Taskbar` + `WindowLayer` / `WindowFrame` render the shell and chrome.
+- **Session state** — Centralized in `src/store/session/sessionReducer.ts`, driven by actions from `WindowManagerProvider`.
+- **Public API** — Imperative verbs (`openApp`, `focusWindow`, …) via `useWindowManager()` / `useOs()`.
+- **Apps** — Base demos in `src/apps/`; personal apps in `src/site/apps/`. Registration in `registry.base.ts` + `src/site/registry.site.ts`.
+- **Presentation** — `Desktop` + `Taskbar` + `WindowLayer` / `WindowFrame`.
 
 Details and contribution rules live in **[docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)**.
 

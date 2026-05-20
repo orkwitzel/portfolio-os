@@ -2,10 +2,11 @@ import readme from '../content/seed/README.md?raw'
 import keyboardShortcuts from '../content/seed/docs/keyboard-shortcuts.md?raw'
 import notes from '../content/seed/docs/notes.txt?raw'
 import type { FsNode } from './types'
-import { appIcons, wwwIcons } from '@/utils/appIcons'
+import { appIcons } from '@/utils/appIcons'
+import { buildSiteSeedNodes } from '@/site/seed/siteSeed'
 import { basename, join, parentPath } from '@/utils/paths'
 
-export const SEED_VERSION = 6
+export const SEED_VERSION = 7
 
 function dir(path: string, now: number): FsNode {
   return {
@@ -32,16 +33,11 @@ function jsonFile(path: string, value: unknown, now: number): FsNode {
   return file(path, JSON.stringify(value, null, 2) + '\n', now)
 }
 
-export function buildSeedNodes(): FsNode[] {
-  const now = Date.now()
+/** Generic OS seed — desktop-os upstream owns this. */
+export function buildBaseSeedNodes(now: number): FsNode[] {
   const nodes: FsNode[] = [dir('/', now)]
 
-  const directories = [
-    '/apps',
-    '/docs',
-    '/www',
-    '/desktop',
-  ]
+  const directories = ['/apps', '/docs', '/www', '/desktop']
 
   for (const d of directories) {
     nodes.push(dir(d, now))
@@ -51,15 +47,6 @@ export function buildSeedNodes(): FsNode[] {
   nodes.push(file('/docs/keyboard-shortcuts.md', keyboardShortcuts, now))
   nodes.push(file('/docs/notes.txt', notes, now))
 
-  nodes.push(
-    jsonFile('/apps/portfolio.app', { appId: 'portfolio', title: 'Or Kwitzel' }, now),
-  )
-  nodes.push(
-    jsonFile('/apps/about.app', { appId: 'about', title: 'About portfolio-os' }, now),
-  )
-  nodes.push(
-    jsonFile('/apps/resume.app', { appId: 'resume', title: 'Resume' }, now),
-  )
   nodes.push(
     jsonFile('/apps/playful.app', { appId: 'playful', title: 'Minesweeper' }, now),
   )
@@ -78,31 +65,6 @@ export function buildSeedNodes(): FsNode[] {
 
   nodes.push(
     jsonFile(
-      '/www/github.www',
-      { name: 'GitHub', url: 'https://github.com/orkwitzel' },
-      now,
-    ),
-  )
-  nodes.push(
-    jsonFile(
-      '/www/linkedin.www',
-      {
-        name: 'LinkedIn',
-        url: 'https://www.linkedin.com/in/or-kwitzel-83294b2b4/',
-      },
-      now,
-    ),
-  )
-
-  nodes.push(
-    jsonFile(
-      join('/desktop', 'portfolio.desktop'),
-      { name: 'Or Kwitzel', path: '/apps/portfolio.app', icon: appIcons.portfolio },
-      now,
-    ),
-  )
-  nodes.push(
-    jsonFile(
       join('/desktop', 'my-computer.desktop'),
       { name: 'My Computer', path: '/apps/computer.app', icon: appIcons.computer },
       now,
@@ -117,20 +79,6 @@ export function buildSeedNodes(): FsNode[] {
   )
   nodes.push(
     jsonFile(
-      join('/desktop', 'github.desktop'),
-      { name: 'GitHub', path: '/www/github.www', icon: wwwIcons.github },
-      now,
-    ),
-  )
-  nodes.push(
-    jsonFile(
-      join('/desktop', 'linkedin.desktop'),
-      { name: 'LinkedIn', path: '/www/linkedin.www', icon: wwwIcons.linkedin },
-      now,
-    ),
-  )
-  nodes.push(
-    jsonFile(
       join('/desktop', 'settings.desktop'),
       { name: 'Settings', path: '/apps/settings.app', icon: appIcons.settings },
       now,
@@ -138,4 +86,9 @@ export function buildSeedNodes(): FsNode[] {
   )
 
   return nodes
+}
+
+export function buildSeedNodes(): FsNode[] {
+  const now = Date.now()
+  return [...buildBaseSeedNodes(now), ...buildSiteSeedNodes(now)]
 }
