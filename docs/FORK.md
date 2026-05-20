@@ -24,33 +24,31 @@ git remote add upstream https://github.com/orkwitzel/desktop-os.git
 ```bash
 git fetch upstream
 git merge upstream/main
+```
+
+If `src/site/` was removed by the merge, restore it:
+
+```bash
+git checkout HEAD -- src/site/
+git add src/site/
+```
+
+Then confirm `registry.tsx` composes site + base apps and `seedFs.ts` calls `buildSiteSeedNodes()`.
+
+```bash
 npm install
 npm run build
 npm run lint
 ```
 
-`.gitattributes` keeps `src/site/**` on our side during merges. After merging, confirm:
-
-- `src/components/shell/registry.tsx` still composes `siteAppDefinitions` + `baseAppDefinitions`
-- `src/fs/seedFs.ts` still calls `buildSiteSeedNodes()`
-- `wrangler.jsonc` still has your deploy routes (not upstream’s generic config)
-
 ## Layout
 
 ```
 src/site/          # Portfolio only — do not upstream
-  apps/            # portfolio, about, resume
-  content/
-  config/
-  seed/
-  registry.site.ts
-  icons.ts
-
-src/components/shell/
-  registry.base.ts # From upstream
-  registry.tsx     # site + base
+src/components/shell/registry.base.ts  # From upstream
+src/components/shell/registry.tsx      # site + base
 ```
 
 ## Personal changes
 
-Edit only `src/site/`, `wrangler.jsonc`, `.env`, and deploy config. Propose shell/WM/FS fixes in **desktop-os** first.
+Edit only `src/site/`, `wrangler.jsonc`, `.env`, and deploy config.
