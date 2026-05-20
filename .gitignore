@@ -32,3 +32,4 @@ public/resume.pdf
 !.dev.vars.example
 .env*
 !.env.example
+.env.production.local

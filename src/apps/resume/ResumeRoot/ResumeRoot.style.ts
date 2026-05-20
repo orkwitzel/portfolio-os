@@ -1,8 +1,6 @@
 import styled from 'styled-components'
 import { cursorPointer } from '@/styles/cursors'
 
-export const RESUME_URL = '/resume.pdf'
-
 export const AppBody = styled.div`
   box-sizing: border-box;
   flex: 1;
