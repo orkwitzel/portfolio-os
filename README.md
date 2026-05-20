@@ -1,10 +1,10 @@
-# portfolio-os
+# portfolio
 
-A **retro desktop-style portfolio shell**: a fake Windows 95–inspired workspace where desktop shortcuts launch lazily loaded React “applications” inside draggable, resizable, minimizable windows—multiple instances per app are supported.
+Personal portfolio site built on **[desktop-os](https://github.com/orkwitzel/desktop-os)** — a Win95-style browser desktop with lazy-loaded apps in draggable windows.
 
 Built with **React 19**, **TypeScript**, and **Vite**.
 
-This repo is structured as a **portfolio fork** of a future **desktop-os** upstream. Personal apps and content live under `src/site/`; see **[docs/FORK.md](./docs/FORK.md)** for splitting repos and syncing with upstream.
+Personal apps and content live under `src/site/`. See **[docs/FORK.md](./docs/FORK.md)** for upstream sync (`git merge upstream/main`).
 
 ## Quick start
 
