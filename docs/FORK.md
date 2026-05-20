@@ -6,7 +6,13 @@ This repo is a **fork** of [desktop-os](https://github.com/orkwitzel/desktop-os)
 
 **No.** The two repos are separate on GitHub. Pushing to `desktop-os` only updates that repository (and anything deployed from it, if you host it).
 
-Your live portfolio site is built and deployed from **this** repo (`portfolio`). To pick up OS changes:
+Your live site (**orkwitzel.com**) is built and deployed from **this** repo only:
+
+```bash
+npm run deploy   # wrangler — see wrangler.jsonc
+```
+
+To pick up OS changes from desktop-os:
 
 ```bash
 git fetch upstream

@@ -16,14 +16,17 @@ npm run dev
 ```bash
 npm run build   # production bundle
 npm run lint    # ESLint
-npm run preview # serve dist locally
+npm run preview # build + wrangler dev (local)
+npm run deploy  # build + deploy to Cloudflare (orkwitzel.com)
 ```
+
+**Upstream OS:** [github.com/orkwitzel/desktop-os](https://github.com/orkwitzel/desktop-os) — not deployed from that repo; merge changes here first, then deploy.
 
 ## Documentation
 
 | File | Purpose |
 |------|---------|
-| [agents.md](./agents.md) | Agent guidance |
+| [AGENTS.md](./AGENTS.md) | Agent guidance |
 | [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) | Code conventions |
 | [docs/FORK.md](./docs/FORK.md) | Upstream sync |
 | [docs/ROADMAP.md](./docs/ROADMAP.md) | Implementation plan |

@@ -42,4 +42,4 @@
 
 ## Open questions
 
-- [ ] GitHub org/repo names for `desktop-os` vs `portfolio` (document placeholders until created).
+- [x] GitHub repos: [orkwitzel/desktop-os](https://github.com/orkwitzel/desktop-os), [orkwitzel/portfolio](https://github.com/orkwitzel/portfolio) (renamed from portfolio-os).

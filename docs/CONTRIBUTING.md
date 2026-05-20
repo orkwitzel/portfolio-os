@@ -2,6 +2,10 @@
 
 Rules here apply to **human contributors** and to **coding agents**. Humans own final judgment on product direction; agents follow repo conventions and ask when requirements conflict.
 
+This repo is a **fork** of [desktop-os](https://github.com/orkwitzel/desktop-os). Shared shell code should ideally land upstream first, then merge `upstream/main`. Personal work stays under `src/site/`. See [FORK.md](./FORK.md).
+
+**Deployment** runs from this repo only (`npm run deploy` / `wrangler.jsonc`), not from desktop-os.
+
 ## Project layout
 
 ```
@@ -192,7 +196,9 @@ export const TitleBar = styled.div<{ $active: boolean }>`
 | FS DB, seed, routing | `fs/` | `fsDb.ts`, `extensionRouter.ts` |
 | App-only pure algorithms | `apps/<app>/*.logic.ts` | `minesweeper.logic.ts` |
 | Shared non-app UI | `components/shared/` | `MarkdownView` |
-| App registration + lazy load | `components/shell/registry.tsx` | `appDefinitions` |
+| App registration (OS demos) | `components/shell/registry.base.ts` | `baseAppDefinitions` |
+| App registration (personal) | `src/site/registry.site.ts` | `siteAppDefinitions` |
+| Composed registry | `components/shell/registry.tsx` | `appDefinitions` |
 
 **Rules of thumb**
 
@@ -220,22 +226,24 @@ export const TitleBar = styled.div<{ $active: boolean }>`
 
 1. **TypeScript everywhere** in `src/` — explicit props for exported components; avoid `any`.
 2. **Keep session transitions pure** — `sessionReducer` has no side effects; persistence/analytics stay outside unless redesigned.
-3. **Lazy-load apps** — `React.lazy` in `registry.tsx`; dynamic import paths use `@/apps/<app>/<Component>`.
+3. **Lazy-load apps** — `defineApp` in `registry.base.ts` or `src/site/registry.site.ts`; OS apps under `@/apps/…`, personal apps under `@/site/apps/…`.
 4. **Hooks & ESLint** — Respect `react-hooks` rules; fix ref/access issues by destructuring, not blanket disables.
 5. **Dumb views** — When touching a component, keep new behavior in `.logic.ts`, not in `.tsx`.
 
 ### Adding an application
 
-1. Create `src/apps/<slug>/<Slug>Root/` with `SlugRoot.tsx`, `SlugRoot.logic.ts`, `SlugRoot.style.ts`, `index.ts`.
+**Personal app (this fork only)**
+
+1. Create `src/site/apps/<slug>/<Slug>Root/` (`*.tsx`, `*.logic.ts`, `*.style.ts`, `index.ts`).
 2. `SlugRoot` must accept `AppProps` from `@/store/session/sessionTypes`.
-3. Append to `appDefinitions` in `components/shell/registry.tsx`:
+3. Register in `src/site/registry.site.ts` via `defineApp(() => import('@/site/apps/…'), { … })`.
+4. Add nodes in `src/site/seed/siteSeed.ts` (`.app` stub + optional `.desktop` shortcut).
 
-   ```ts
-   Root: lazy(() => import('@/apps/my-app/MyRoot')),
-   ```
+**OS demo app (share with upstream)**
 
-4. Add launcher stub at `/apps/<slug>.app` in `seedFs.ts`.
-5. Optionally pin to wallpaper via `/desktop/<name>.desktop`.
+1. Implement under `src/apps/<slug>/` and register in `registry.base.ts`.
+2. Add base seed entries in `buildBaseSeedNodes()` inside `src/fs/seedFs.ts`.
+3. Prefer committing the same change to [desktop-os](https://github.com/orkwitzel/desktop-os), then `git merge upstream/main` here.
 
 Use `useOs()` for OS actions (filesystem, windows, dialogs, clipboard, explorer integration). Subscribe to reactive state with `useFsStore((s) => …)` or `useWindowManager()` when you need `nodes`, `ready`, or `session` without pulling the full API. Prefer local state in `.logic.ts` for app internals.
 
