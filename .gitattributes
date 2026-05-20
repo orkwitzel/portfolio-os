@@ -1,0 +1,2 @@
+# Keep portfolio-only tree when merging desktop-os upstream.
+src/site/** merge=ours

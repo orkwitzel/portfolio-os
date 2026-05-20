@@ -6,11 +6,17 @@ This repo is a **fork** of [desktop-os](https://github.com/orkwitzel/desktop-os)
 
 | Remote | URL |
 |--------|-----|
-| `origin` | This portfolio site (deploy target) |
+| `origin` | [orkwitzel/portfolio](https://github.com/orkwitzel/portfolio) |
 | `upstream` | [orkwitzel/desktop-os](https://github.com/orkwitzel/desktop-os) |
 
 ```bash
 git remote -v
+```
+
+If `upstream` is missing:
+
+```bash
+git remote add upstream https://github.com/orkwitzel/desktop-os.git
 ```
 
 ## Sync OS updates from upstream
@@ -23,7 +29,11 @@ npm run build
 npm run lint
 ```
 
-Resolve conflicts in shared files (`registry.base.ts`, `seedFs.ts`, `package.json`) — not in `src/site/` unless upstream bumped seed layout.
+`.gitattributes` keeps `src/site/**` on our side during merges. After merging, confirm:
+
+- `src/components/shell/registry.tsx` still composes `siteAppDefinitions` + `baseAppDefinitions`
+- `src/fs/seedFs.ts` still calls `buildSiteSeedNodes()`
+- `wrangler.jsonc` still has your deploy routes (not upstream’s generic config)
 
 ## Layout
 
