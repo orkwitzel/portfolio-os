@@ -1,6 +1,6 @@
-# About portfolio-os
+# About OrkOS
 
-**portfolio-os** is a retro Windows 95–style desktop shell built as a portfolio site. Shortcuts on the wallpaper open lazily loaded React “apps” inside draggable, resizable, minimizable windows—just like a tiny operating system in the browser.
+**OrkOS** is a retro Windows 95–style desktop shell built as a portfolio site. Shortcuts on the wallpaper open lazily loaded React “apps” inside draggable, resizable, minimizable windows—just like a tiny operating system in the browser.
 
 ## What you can try
 

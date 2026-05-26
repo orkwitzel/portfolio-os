@@ -4,7 +4,7 @@ export function MobileUnsupported() {
   return (
     <Screen role="main">
       <Panel>
-        <TitleBar>Portfolio OS</TitleBar>
+        <TitleBar>OrkOS</TitleBar>
         <Message>
           This app doesn&apos;t work on mobile. Please open it on a desktop or laptop
           browser.

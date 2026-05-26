@@ -4,7 +4,7 @@ This file is for **automated coding agents** (and humans acting like them). Read
 
 ## Project in one sentence
 
-**portfolio** is a personal site built on [desktop-os](https://github.com/orkwitzel/desktop-os): a React + Vite Win95-style desktop where shortcuts open lazily loaded apps in draggable windows.
+**OrkOS** is a personal site built on [desktop-os](https://github.com/orkwitzel/desktop-os): a React + Vite Win95-style desktop where shortcuts open lazily loaded apps in draggable windows.
 
 ## Two repos
 

@@ -1,4 +1,4 @@
-# portfolio
+# OrkOS
 
 Personal portfolio site built on **[desktop-os](https://github.com/orkwitzel/desktop-os)** — a Win95-style browser desktop with lazy-loaded apps in draggable windows.
 

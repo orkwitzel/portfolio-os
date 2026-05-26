@@ -1,5 +1,5 @@
 /**
- * Portfolio OS syscall API — unified facade over filesystem, windows, UI, clipboard, and explorer.
+ * OrkOS syscall API — unified facade over filesystem, windows, UI, clipboard, and explorer.
  *
  * @packageDocumentation
  * @module os

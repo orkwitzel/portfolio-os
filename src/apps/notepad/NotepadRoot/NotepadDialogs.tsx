@@ -166,7 +166,7 @@ export function NotepadAboutDialog({ onClose }: { onClose: () => void }) {
     >
       <FieldRow>
         <p style={{ margin: 0 }}>Notepad</p>
-        <p style={{ margin: 0 }}>portfolio-os virtual text editor</p>
+        <p style={{ margin: 0 }}>OrkOS virtual text editor</p>
       </FieldRow>
     </DialogShell>
   )

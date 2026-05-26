@@ -1,6 +1,6 @@
-# portfolio-os
+# OrkOS
 
-Welcome to **portfolio-os** — a Win95-style desktop shell in the browser.
+Welcome to **OrkOS** — a Win95-style desktop shell in the browser.
 
 ## What to try
 

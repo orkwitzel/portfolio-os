@@ -21,7 +21,7 @@ export function buildSiteSeedNodes(now: number): FsNode[] {
     jsonFile('/apps/portfolio.app', { appId: 'portfolio', title: 'Or Kwitzel' }, now),
   )
   nodes.push(
-    jsonFile('/apps/about.app', { appId: 'about', title: 'About portfolio-os' }, now),
+    jsonFile('/apps/about.app', { appId: 'about', title: 'About OrkOS' }, now),
   )
   nodes.push(
     jsonFile('/apps/resume.app', { appId: 'resume', title: 'Resume' }, now),

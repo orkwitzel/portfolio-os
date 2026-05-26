@@ -12,7 +12,7 @@ export const siteAppDefinitions: AppDefinition[] = [
   }),
   defineApp(() => import('@/site/apps/about/AboutRoot'), {
     id: 'about',
-    defaultTitle: 'About portfolio-os',
+    defaultTitle: 'About OrkOS',
     defaultBounds: { width: 480, height: 360 },
     icon: siteIcons.about,
   }),
